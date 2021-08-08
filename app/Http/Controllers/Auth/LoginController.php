@@ -27,7 +27,6 @@ class LoginController extends Controller
 
             } else {
 
-                // Auth::user()->currentAccessToken()->delete();
                 Auth::logout();
 
                 return response()->json([
