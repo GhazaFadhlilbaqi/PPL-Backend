@@ -37,11 +37,29 @@ class LoginController extends Controller
     {
 
         $request->user()->currentAccessToken()->delete();
-        Auth::logout();
-
         return response()->json([
             'status' => 'success',
             'message' => 'logged out'
         ]);
+    }
+
+    public function verify(Request $request)
+    {
+        // NOTE: Token format must be : Bearer {token}
+        if (Auth::check()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'user' => $request->user(),
+                    'token' => explode(' ', $request->header('Authorization'))[1],
+                    'tokenAbilities' => $request->user()->currentAccessToken()->abilities,
+                ]
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Unauthenticated User',
+            ], 401);
+        }
     }
 }

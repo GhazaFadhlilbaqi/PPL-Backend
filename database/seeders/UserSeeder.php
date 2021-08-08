@@ -19,9 +19,10 @@ class UserSeeder extends Seeder
         User::truncate();
 
         User::factory()->create([
-            'name' => 'Mizuhara Chizuru',
+            'first_name' => 'Mizuhara',
+            'last_name' => 'Chizuru',
             'email' => 'chizuru@gmail.com',
-            'password' => Hash::make(1234),
+            'address' => 'Jln. Pahlawan No. 7 Gambiran, Banyuwangi'
         ]);
 
         User::factory(10)->create();

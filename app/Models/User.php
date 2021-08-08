@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Mtvs\EloquentHashids\HasHashid;
+use Mtvs\EloquentHashids\HashidRouting;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, HasHashid, HashidRouting;
 
     /**
      * The attributes that are mass assignable.
@@ -18,7 +20,12 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'phone',
+        'address',
+        'photo',
+        'email_verified_at',
         'email',
         'password',
     ];
