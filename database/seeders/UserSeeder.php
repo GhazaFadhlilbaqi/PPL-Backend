@@ -18,13 +18,21 @@ class UserSeeder extends Seeder
 
         User::truncate();
 
-        User::factory()->create([
+        $rootUser = User::factory()->create([
             'first_name' => 'Mizuhara',
             'last_name' => 'Chizuru',
             'email' => 'chizuru@gmail.com',
             'address' => 'Jln. Pahlawan No. 7 Gambiran, Banyuwangi'
         ]);
 
-        User::factory(10)->create();
+        $rootUser->each(function($user) {
+            $user->assignRole('root');
+        });
+
+        $users = User::factory(10)->create();
+
+        $users->each(function($user) {
+            $user->assignRole('owner');
+        });
     }
 }
