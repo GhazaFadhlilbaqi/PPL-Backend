@@ -15,13 +15,26 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
 
-            $user = Auth::user();
-            $token = $user->createToken('auth');
+            if (!is_null(Auth::user()->email_verified_at)) {
 
-            return response()->json([
-                'status' => 'success',
-                'data' => compact('user', 'token')
-            ]);
+                $user = Auth::user();
+                $token = $user->createToken('auth');
+
+                return response()->json([
+                    'status' => 'success',
+                    'data' => compact('user', 'token')
+                ]);
+
+            } else {
+
+                // Auth::user()->currentAccessToken()->delete();
+                Auth::logout();
+
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Please verify your email first'
+                ], 401);
+            }
 
         } else {
 
