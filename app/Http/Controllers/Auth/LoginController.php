@@ -18,6 +18,7 @@ class LoginController extends Controller
             if (!is_null(Auth::user()->email_verified_at)) {
 
                 $user = Auth::user();
+                $user->getAllPermissions();
                 $token = $user->createToken('auth');
 
                 return response()->json([

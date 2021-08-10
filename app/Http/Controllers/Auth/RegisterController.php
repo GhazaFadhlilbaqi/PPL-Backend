@@ -23,6 +23,7 @@ class RegisterController extends Controller
             ]);
 
             $user = User::create($request->only(['first_name', 'last_name', 'email', 'password', 'job', 'phone']));
+            $user->assignRole('owner');
 
             // Send verification mail
             if ($user) $this->sendVerificationMail($user);

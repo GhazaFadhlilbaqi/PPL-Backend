@@ -42,7 +42,8 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'verification_token',
-        'email_verified_at'
+        'email_verified_at',
+        'id'
     ];
 
     /**
@@ -55,4 +56,6 @@ class User extends Authenticatable
     ];
 
     protected $guard_name = 'api';
+
+    protected $appends = ['hashid'];
 }
