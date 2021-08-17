@@ -59,6 +59,7 @@ class LoginController extends Controller
     {
         // NOTE: Token format must be : Bearer {token}
         if (Auth::check()) {
+            $request->user()->getAllPermissions();
             return response()->json([
                 'status' => 'success',
                 'data' => [

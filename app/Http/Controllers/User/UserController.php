@@ -8,6 +8,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
@@ -38,15 +39,21 @@ class UserController extends Controller
                     if (File::exists(public_path(self::PHOTO_PROFILE_PATH) . $user->photo)) File::delete(public_path(self::PHOTO_PROFILE_PATH) . $user->photo);
                 }
 
-                $request->merge(['photo', $randomName]);
+                $user->photo = $randomName;
+                $user->save();
+            }
+
+            if ($request->has('password')) {
+                $user->password = Hash::make($request->password);
+                $user->update();
             }
 
             $user->update($request->only([
                 'first_name',
                 'last_name',
                 'phone',
+                'email',
                 'job',
-                'photo'
             ]));
 
             $user->getAllPermissions();

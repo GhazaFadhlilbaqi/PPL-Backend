@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\OldPassword;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserUpdateRequest extends FormRequest
@@ -33,6 +34,20 @@ class UserUpdateRequest extends FormRequest
         if ($this->hasFile('photo-update')) {
             $rules = [
                 'photo-update' => 'mimes:png,jpg,svg,bmp,jpeg|max:2048',
+            ];
+        }
+
+        if ($this->has('email')) {
+            $rules = [
+                'email' => 'required|email|unique:users,email'
+            ];
+        }
+
+        if ($this->has('password')) {
+            $rules = [
+                'old_password' => ['required', new OldPassword],
+                'password' => 'required|min:6',
+                'password_confirmation' => 'required_with:password|same:password'
             ];
         }
 
