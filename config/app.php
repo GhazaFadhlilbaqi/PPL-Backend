@@ -135,7 +135,7 @@ return [
     */
 
     'email_verification' => [
-        'callback_domain' => 'http://localhost:8000',
+        'callback_domain' => 'http://localhost:8080',
     ],
 
     'providers' => [
