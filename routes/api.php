@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,4 +36,10 @@ Route::prefix('auth')->group(function() {
 Route::prefix('user')->middleware('auth:sanctum')->group(function() {
     Route::get('{user}', [UserController::class, 'show']);
     Route::post('{user}', [UserController::class, 'update']);
+});
+
+Route::prefix('payment')->middleware('auth:sanctum')->group(function() {
+    Route::post('fetch-snap-token', [PaymentController::class, 'fetchSnapToken']);
+    // NOTE: For demo purpose only
+    Route::post('demo-add-token', [PaymentController::class, 'addToken']);
 });
