@@ -140,6 +140,11 @@ return [
         'callback_domain' => 'http://localhost:8080',
     ],
 
+    'password_reset_form' => [
+        'callback_domain' => 'http://localhost:8080',
+        'form_route' => '/auth/user/reset-password',
+    ],
+
     'providers' => [
 
         /*
