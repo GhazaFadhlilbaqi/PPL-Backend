@@ -33,7 +33,7 @@ class ForgotPasswordMail extends Mailable
      */
     public function build()
     {
-        return $this->view('view.name', [
+        return $this->view('mails.auth.forgot-password', [
             'user' => $this->user,
             'passwordReset' => $this->passwordReset,
         ]);
