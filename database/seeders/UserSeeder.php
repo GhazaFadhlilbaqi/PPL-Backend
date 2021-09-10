@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     public function run()
     {
 
-        User::truncate();
+        // User::truncate();
 
         $rootUser = User::factory()->create([
             'first_name' => 'Mizuhara',

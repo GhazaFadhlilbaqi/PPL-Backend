@@ -22,6 +22,9 @@ class LoginController extends Controller
                 $user->getAllPermissions();
                 $token = $user->createToken('auth');
 
+                // Populate company data
+                $user->company;
+
                 return response()->json([
                     'status' => 'success',
                     'data' => compact('user', 'token')

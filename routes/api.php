@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Http\Request;
@@ -49,4 +50,12 @@ Route::prefix('payment')->middleware('auth:sanctum')->group(function() {
     Route::post('fetch-snap-token', [PaymentController::class, 'fetchSnapToken']);
     // NOTE: For demo purpose only
     Route::post('demo-add-token', [PaymentController::class, 'addToken']);
+});
+
+Route::prefix('company')->middleware('auth:sanctum')->group(function() {
+    Route::get('', [CompanyController::class, 'index']);
+    Route::post('', [CompanyController::class, 'store'])->middleware('utils.determine-request-data-owner');
+    Route::post('{company}', [CompanyController::class, 'update']);
+    Route::get('{company}/set-active', [CompanyController::class, 'setActiveCompany']);
+    Route::delete('{company}', [CompanyController::class, 'destroy']);
 });

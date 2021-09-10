@@ -57,5 +57,15 @@ class User extends Authenticatable
 
     protected $guard_name = 'api';
 
-    protected $appends = ['hashid'];
+    protected $appends = ['hashid', '_active_company'];
+
+    public function getActiveCompanyAttribute()
+    {
+        return $this->company->where('is_active', TRUE)->first();
+    }
+
+    public function company()
+    {
+        return $this->hasMany(Company::class);
+    }
 }
