@@ -48,14 +48,13 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function() {
 
 Route::prefix('payment')->middleware('auth:sanctum')->group(function() {
     Route::post('fetch-snap-token', [PaymentController::class, 'fetchSnapToken']);
-    // NOTE: For demo purpose only
+    # NOTE: For demo purpose only
     Route::post('demo-add-token', [PaymentController::class, 'addToken']);
 });
 
 Route::prefix('company')->middleware('auth:sanctum')->group(function() {
     Route::get('', [CompanyController::class, 'index']);
-    Route::post('', [CompanyController::class, 'store'])->middleware('utils.determine-request-data-owner');
+    # Because user can only have one company in one account, so store should only works for first time
+    Route::post('', [CompanyController::class, 'store'])->middleware(['utils.determine-request-data-owner', 'company.ensure-user-dont-have-company']);
     Route::post('{company}', [CompanyController::class, 'update']);
-    Route::get('{company}/set-active', [CompanyController::class, 'setActiveCompany']);
-    Route::delete('{company}', [CompanyController::class, 'destroy']);
 });

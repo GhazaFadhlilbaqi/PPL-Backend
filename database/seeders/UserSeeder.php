@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
@@ -21,7 +22,9 @@ class UserSeeder extends Seeder
         $rootUser = User::factory()->create([
             'first_name' => 'Mizuhara',
             'last_name' => 'Chizuru',
+            'password' => Hash::make(1234),
             'email' => 'chizuru@gmail.com',
+            'email_verified_at' => Carbon::now(),
             'address' => 'Jln. Pahlawan No. 7 Gambiran, Banyuwangi'
         ]);
 

@@ -51,21 +51,13 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
+    protected $casts = ['email_verified_at' => 'datetime'];
     protected $guard_name = 'api';
-
-    protected $appends = ['hashid', '_active_company'];
-
-    public function getActiveCompanyAttribute()
-    {
-        return $this->company->where('is_active', TRUE)->first();
-    }
+    protected $appends = ['hashid'];
+    protected $with = ['company'];
 
     public function company()
     {
-        return $this->hasMany(Company::class);
+        return $this->hasOne(Company::class);
     }
 }

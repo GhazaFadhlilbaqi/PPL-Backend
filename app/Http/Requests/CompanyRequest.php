@@ -24,10 +24,11 @@ class CompanyRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'email' => 'required|email',
-            'director_name' => 'required',
-            'phone_number' => 'required',
+            'name' => 'required_without:update_picture',
+            'email' => 'required_without:update_picture|email',
+            'director_name' => 'required_without:update_picture',
+            'phone_number' => 'required_without:update_picture',
+            'update_picture' => 'sometimes|mimes:png,jpg,jpeg,bmp|max:2048'
         ];
     }
 }
