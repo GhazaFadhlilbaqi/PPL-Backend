@@ -17,10 +17,10 @@ class RolePermissionSeeder extends Seeder
     public function run()
     {
 
-        // Create roles
+        # Create roles
         $roles = $this->createRoles();
 
-        // Create permissions
+        # Create permissions
         $this->createPermissions();
 
         $rootPermissions = [
@@ -35,7 +35,7 @@ class RolePermissionSeeder extends Seeder
             'read dashboard'
         ];
 
-        // Assigning Permission
+        # Assigning Permission
         $roles['root']->givePermissionTo($rootPermissions);
         $roles['owner']->givePermissionTo($ownerPermission);
         $roles['consultant']->givePermissionTo($consultanPermissions);
