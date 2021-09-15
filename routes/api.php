@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Company\CompanyController;
+use App\Http\Controllers\Master\UnitController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Http\Request;
@@ -57,4 +58,10 @@ Route::prefix('company')->middleware('auth:sanctum')->group(function() {
     # Because user can only have one company in one account, so store should only works for first time
     Route::post('', [CompanyController::class, 'store'])->middleware(['utils.determine-request-data-owner', 'company.ensure-user-dont-have-company']);
     Route::post('{company}', [CompanyController::class, 'update']);
+});
+
+Route::prefix('master')->middleware('auth:sanctum')->group(function() {
+    Route::prefix('unit')->group(function() {
+        Route::post('', [UnitController::class, 'store']);
+    });
 });
