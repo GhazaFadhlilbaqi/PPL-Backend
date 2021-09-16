@@ -63,5 +63,7 @@ Route::prefix('company')->middleware('auth:sanctum')->group(function() {
 Route::prefix('master')->middleware('auth:sanctum')->group(function() {
     Route::prefix('unit')->group(function() {
         Route::post('', [UnitController::class, 'store']);
+        Route::get('', [UnitController::class, 'getAllData']);
+        Route::get('{unit}/delete', [UnitController::class, 'destroy']);
     });
 });

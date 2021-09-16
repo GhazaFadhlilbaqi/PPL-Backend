@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cc960972becb28d560b4ed4fa67ec2fe",
+    "content-hash": "6176c24dffec1917a2211ee37e8924a4",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2936,6 +2936,70 @@
                 }
             ],
             "time": "2020-08-18T17:17:46+00:00"
+        },
+        {
+            "name": "santigarcor/laravel-vuetable",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/santigarcor/laravel-vuetable.git",
+                "reference": "a974ee7475a10a76e4d124041da52045074bb077"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/santigarcor/laravel-vuetable/zipball/a974ee7475a10a76e4d124041da52045074bb077",
+                "reference": "a974ee7475a10a76e4d124041da52045074bb077",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^5.7|^6.0|^7.0|^8.0",
+                "illuminate/http": "^5.7|^6.0|^7.0|^8.0",
+                "illuminate/support": "^5.7|^6.0|^7.0|^8.0",
+                "php": ">=7.2.5"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.2.0",
+                "orchestra/testbench": "^3.7|^6.0",
+                "phpunit/phpunit": "^9.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Vuetable\\VuetableServiceProvider"
+                    ],
+                    "aliases": {
+                        "Vuetable": "Vuetable\\VuetableFacade"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Vuetable\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Santiago Garcia",
+                    "homepage": "http://santigarcor.me"
+                }
+            ],
+            "description": "Vuetable laravel backend package",
+            "keywords": [
+                "laravel",
+                "table",
+                "vue",
+                "vuetable"
+            ],
+            "support": {
+                "issues": "https://github.com/santigarcor/laravel-vuetable/issues",
+                "source": "https://github.com/santigarcor/laravel-vuetable/tree/1.1.0"
+            },
+            "time": "2021-03-09T13:16:50+00:00"
         },
         {
             "name": "spatie/laravel-permission",
