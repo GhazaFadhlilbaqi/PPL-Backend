@@ -39,4 +39,13 @@ class UnitController extends Controller
             ], 500);
         }
     }
+
+    public function update(UnitRequest $request, Unit $unit)
+    {
+        $unit = $unit->update($request->only(['name']));
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('unit'),
+        ]);
+    }
 }

@@ -65,5 +65,6 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
         Route::post('', [UnitController::class, 'store']);
         Route::get('', [UnitController::class, 'getAllData']);
         Route::get('{unit}/delete', [UnitController::class, 'destroy']);
+        Route::post('{unit}', [UnitController::class, 'update']);
     });
 });
