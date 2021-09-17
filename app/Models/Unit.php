@@ -14,4 +14,9 @@ class Unit extends Model
     protected $fillable = ['name'];
     protected $appends = ['hashid'];
     protected $hidden = ['id'];
+
+    public function itemPrice()
+    {
+        return $this->hasMany(ItemPrice::class);
+    }
 }

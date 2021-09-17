@@ -5,12 +5,17 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UnitRequest;
 use App\Models\Unit;
-use Exception;
 use Illuminate\Http\Request;
-use Vuetable\Vuetable;
+use Exception;
 
 class UnitController extends Controller
 {
+
+    public function index()
+    {
+        return $this->getTableFormattedData(Unit::query())->make();
+    }
+
     public function store(UnitRequest $request)
     {
         $unit = Unit::create($request->only(['name']));
@@ -18,11 +23,6 @@ class UnitController extends Controller
             'status' => 'success',
             'data' => compact('unit')
         ]);
-    }
-
-    public function getAllData()
-    {
-        return Vuetable::of(Unit::query())->make();
     }
 
     public function destroy(Unit $unit)
