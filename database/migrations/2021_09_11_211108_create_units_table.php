@@ -27,6 +27,7 @@ class CreateUnitsTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('item_prices');
         Schema::dropIfExists('units');
     }
 }

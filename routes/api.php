@@ -4,11 +4,11 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Company\CompanyController;
+use App\Http\Controllers\Master\ItemPriceController;
 use App\Http\Controllers\Master\ItemPriceGroupController;
 use App\Http\Controllers\Master\UnitController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\User\UserController;
-use App\Models\ItemPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -76,6 +76,14 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
         Route::post('', [ItemPriceGroupController::class, 'store']);
         Route::get('{itemPriceGroup}/delete', [ItemPriceGroupController::class, 'destroy']);
         Route::post('{itemPriceGroup}', [ItemPriceGroupController::class, 'update']);
+    });
+
+    Route::prefix('item-price')->group(function() {
+        Route::post('', [ItemPriceController::class, 'store']);
+        Route::get('', [ItemPriceController::class, 'index']);
+        Route::post('{itemPriceId}', [ItemPriceController::class, 'update']);
+        Route::get('{itemPrice}/delete', [ItemPriceController::class, 'destroy']);
+        Route::post('{itemPrice}/set-price', [ItemPriceController::class, 'setPrice']);
     });
 
 });

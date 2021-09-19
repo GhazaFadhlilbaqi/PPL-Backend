@@ -18,7 +18,6 @@ class CreateItemPricesTable extends Migration
             $table->unsignedBigInteger('item_price_group_id');
             $table->unsignedBigInteger('unit_id');
             $table->string('name', 128);
-            $table->unsignedInteger('price')->default(0);
             $table->timestamps();
             $table->foreign('item_price_group_id')->references('id')->on('item_price_groups')->onDelete('restrict')->onUpdate('cascade');
             $table->foreign('unit_id')->references('id')->on('units')->onDelete('restrict')->onUpdate('cascade');

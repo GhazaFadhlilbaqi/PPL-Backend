@@ -7,15 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 use Mtvs\EloquentHashids\HasHashid;
 use Mtvs\EloquentHashids\HashidRouting;
 
-class Province extends Model
+class ItemPriceProvince extends Model
 {
     use HasFactory, HasHashid, HashidRouting;
 
-    protected $hidden = ['id', 'created_at', 'updated_at'];
+    protected $table = 'item_price_province';
+    protected $fillable = ['item_price_id', 'province_id', 'price'];
+    protected $hidden = ['id'];
     protected $appends = ['hashid'];
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
 
     public function itemPrice()
     {
-        return $this->belongsToMany(ItemPrice::class);
+        return $this->belongsTo(ItemPrice::class);
     }
 }

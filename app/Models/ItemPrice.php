@@ -9,9 +9,8 @@ class ItemPrice extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['item_price_group_id', 'unit_id', 'name', 'price'];
-    protected $hidden = ['id'];
-    protected $appends = ['hashid'];
+    public $incrementing = false;
+    protected $fillable = ['id', 'item_price_group_id', 'unit_id', 'name'];
 
     public function itemPriceGroup()
     {
@@ -21,5 +20,15 @@ class ItemPrice extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    public function province()
+    {
+        return $this->belongsToMany(Province::class);
+    }
+
+    public function price()
+    {
+        return $this->hasMany(ItemPriceProvince::class);
     }
 }
