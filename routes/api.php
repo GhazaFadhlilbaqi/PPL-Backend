@@ -4,8 +4,11 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Company\CompanyController;
+use App\Http\Controllers\Master\AhsController;
+use App\Http\Controllers\Master\AhsItemController;
 use App\Http\Controllers\Master\ItemPriceController;
 use App\Http\Controllers\Master\ItemPriceGroupController;
+use App\Http\Controllers\Master\ProvinceController;
 use App\Http\Controllers\Master\UnitController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\User\UserController;
@@ -64,6 +67,10 @@ Route::prefix('company')->middleware('auth:sanctum')->group(function() {
 
 Route::prefix('master')->middleware('auth:sanctum')->group(function() {
 
+    Route::prefix('provinces')->middleware('auth:sanctum')->group(function() {
+        Route::get('', [ProvinceController::class, 'index']);
+    });
+
     Route::prefix('unit')->group(function() {
         Route::post('', [UnitController::class, 'store']);
         Route::get('', [UnitController::class, 'index']);
@@ -84,6 +91,16 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
         Route::post('{itemPriceId}', [ItemPriceController::class, 'update']);
         Route::get('{itemPrice}/delete', [ItemPriceController::class, 'destroy']);
         Route::post('{itemPrice}/set-price', [ItemPriceController::class, 'setPrice']);
+    });
+
+    Route::prefix('ahs')->group(function() {
+        Route::get('', [AhsController::class, 'index']);
+        Route::post('', [AhsController::class, 'store']);
+    });
+
+    Route::prefix('ahs-item')->group(function() {
+        Route::get('{ahs?}', [AhsItemController::class, 'index']);
+        Route::post('{ahs}', AhsItemController::class, 'store');
     });
 
 });

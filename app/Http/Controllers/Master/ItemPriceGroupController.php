@@ -10,8 +10,19 @@ use Exception;
 
 class ItemPriceGroupController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+
+        if ($request->has('datatable') && $request->datatable == 'false') {
+
+            $itemPriceGroups = ItemPriceGroup::all();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => compact('itemPriceGroups'),
+            ]);
+        }
+
         return $this->getTableFormattedData(ItemPriceGroup::query())->make();
     }
 

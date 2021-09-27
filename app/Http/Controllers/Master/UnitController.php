@@ -11,8 +11,19 @@ use Exception;
 class UnitController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
+
+        if ($request->has('datatable') && $request->datatable == 'false') {
+
+            $units = Unit::all();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => compact('units'),
+            ]);
+        }
+
         return $this->getTableFormattedData(Unit::query())->make();
     }
 

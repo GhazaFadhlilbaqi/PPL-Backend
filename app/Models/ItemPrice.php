@@ -31,4 +31,9 @@ class ItemPrice extends Model
     {
         return $this->hasMany(ItemPriceProvince::class);
     }
+
+    public function ahsItem()
+    {
+        return $this->morphMany(AhsItem::class, 'ahsItemable');
+    }
 }
