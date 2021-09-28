@@ -100,7 +100,7 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
 
     Route::prefix('ahs-item')->group(function() {
         Route::get('{ahs?}', [AhsItemController::class, 'index']);
-        Route::post('{ahs}', AhsItemController::class, 'store');
+        Route::post('{ahs}', [AhsItemController::class, 'store']);
     });
 
 });

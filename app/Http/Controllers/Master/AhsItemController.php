@@ -12,7 +12,16 @@ class AhsItemController extends Controller
 
     public function index(Request $request)
     {
-        if ($request->has('ahs'))
+
+        if (is_null($request->ahs)) $ahs = AhsItem::with('ahsItemable')->get();
+        else $ahs = AhsItem::with('ahsItemable')->get();
+
+        return dd($ahs);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $request->ahs
+        ]);
     }
 
     public function store(Request $request, Ahs $ahs)
