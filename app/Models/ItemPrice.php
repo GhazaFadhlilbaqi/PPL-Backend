@@ -11,6 +11,7 @@ class ItemPrice extends Model
 
     public $incrementing = false;
     protected $fillable = ['id', 'item_price_group_id', 'unit_id', 'name'];
+    protected $with = ['unit'];
 
     public function itemPriceGroup()
     {

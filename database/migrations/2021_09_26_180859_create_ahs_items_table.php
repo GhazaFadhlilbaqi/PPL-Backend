@@ -16,8 +16,8 @@ class CreateAhsItemsTable extends Migration
         Schema::create('ahs_items', function (Blueprint $table) {
             $table->id();
             $table->string('ahs_id');
-            $table->string('name');
-            $table->unsignedBigInteger('unit_id');
+            $table->string('name')->nullable();
+            $table->unsignedBigInteger('unit_id')->nullable();
             $table->float('coefficient')->default(0.0);
             $table->enum('section', ['labor', 'ingredients', 'tools', 'others']);
             $table->string('ahs_itemable_id');
