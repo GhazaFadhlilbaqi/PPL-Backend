@@ -89,6 +89,7 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
         Route::post('', [ItemPriceController::class, 'store']);
         Route::get('', [ItemPriceController::class, 'index']);
         Route::post('{itemPriceId}', [ItemPriceController::class, 'update']);
+        Route::post('{itemPrice}/batch-update', [ItemPriceController::class, 'batchUpdatePrice']);
         Route::get('{itemPrice}/delete', [ItemPriceController::class, 'destroy']);
         Route::post('{itemPrice}/set-price', [ItemPriceController::class, 'setPrice']);
     });

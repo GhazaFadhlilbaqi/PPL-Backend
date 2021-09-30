@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ItemPriceBatchUpdateRequest;
 use App\Http\Requests\ItemPriceRequest;
 use App\Models\ItemPrice;
 use App\Models\ItemPriceGroup;
 use App\Models\ItemPriceProvince;
+use App\Models\Province;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Vinkla\Hashids\Facades\Hashids;
 
@@ -114,6 +117,25 @@ class ItemPriceController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => compact('itemPrice'),
+        ]);
+    }
+
+    public function batchUpdatePrice(ItemPrice $itemPrice, ItemPriceBatchUpdateRequest $request)
+    {
+        $provincesWithItemPrice = Province::all()->map(function($province) use ($itemPrice, $request) {
+            return [
+                'province_id' => $province->id,
+                'item_price_id' => $itemPrice->id,
+                'price' => $request->price,
+                'created_at' => Carbon::now(),
+            ];
+        });
+
+        ItemPriceProvince::where('item_price_id', $itemPrice->id)->delete();
+        ItemPriceProvince::insert($provincesWithItemPrice->toArray());
+
+        return response()->json([
+            'status' => 'success',
         ]);
     }
 }
