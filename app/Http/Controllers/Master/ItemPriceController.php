@@ -15,24 +15,30 @@ class ItemPriceController extends Controller
     public function index(Request $request)
     {
 
-        $itemPriceGroups = ItemPriceGroup::query();
-        $id = Hashids::decode($request->province);
+        $itemPrices = null;
 
-        if ($request->has('province')) {
-            $itemPriceGroups->with(['itemPrice' => function($q) use ($request, $id) {
-                $q->with(['price' => function($q) use ($id) {
-                    $q->where('province_id', $id ?? -1);
-                }, 'unit', 'itemPriceGroup'])->orderBy('created_at');
-            }]);
+        if ($request->has('grouped') && $request->grouped == 'true') {
+
+            $itemPriceGroups = ItemPriceGroup::query();
+            $id = Hashids::decode($request->province);
+
+            if ($request->has('province')) {
+                $itemPriceGroups->with(['itemPrice' => function($q) use ($request, $id) {
+                    $q->with(['price' => function($q) use ($id) {
+                        $q->where('province_id', $id ?? -1);
+                    }, 'unit', 'itemPriceGroup'])->orderBy('created_at');
+                }]);
+            }
+
+            $itemPrices = $itemPriceGroups->orderBy('created_at', 'ASC')->get();
+
+        } else {
+            $itemPrices = ItemPrice::all();
         }
-
-        $mappedItemPriceGroups = $itemPriceGroups->orderBy('created_at', 'ASC')->get();
 
         return [
             'status' => 'success',
-            'data' => [
-                'itemPriceGroups' => $mappedItemPriceGroups,
-            ]
+            'data' => compact('itemPrices')
         ];
     }
 
