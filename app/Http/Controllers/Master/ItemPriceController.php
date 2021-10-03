@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ItemPriceBatchUpdateRequest;
 use App\Http\Requests\ItemPriceRequest;
+use App\Models\AhsItem;
 use App\Models\ItemPrice;
 use App\Models\ItemPriceGroup;
 use App\Models\ItemPriceProvince;
@@ -91,7 +92,19 @@ class ItemPriceController extends Controller
     public function destroy(ItemPrice $itemPrice)
     {
         try {
+
+            # Check if there are any ahs depends on this ahs, prevent to delete !
+            $dependantAhsItems = AhsItem::where('ahs_itemable_id', $itemPrice->id);
+
+            if ($dependantAhsItems->count()) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Masih ada item ahs lain yang bergantung dengan harga satuan ini !',
+                ], 400);
+            }
+
             $itemPrice->delete();
+
             return response()->json([
                 'status' => 'success',
             ]);

@@ -65,6 +65,8 @@ class AhsItemController extends Controller
         # Because when ahs item is referenced to ahs, it has customable name
         if ($ahsItem->ahs_itemable_type === Ahs::class && $request->ahs_itemable_type === 'ItemPrice') {
             $dataToMerge = array_merge($dataToMerge, ['name' => null, 'unit_id' => null]);
+        } else if ($ahsItem->ahs_itemable_type === ItemPrice::class && $request->ahs_itemable_type === 'Ahs') {
+            $dataToMerge = array_merge($dataToMerge, ['name' => Ahs::where('id', $request->ahs_itemable_id)->first()->name]);
         }
 
         $request->merge($dataToMerge);
@@ -77,6 +79,14 @@ class AhsItemController extends Controller
             'status' => 'success',
             'data' => compact('ahsItem')
         ]);
+    }
+
+    public function destroy(AhsItem $ahsItem)
+    {
+        $ahsItem->delete();
+        return response()->json([
+            'status' => 'success',
+        ], 204);
     }
 
     private function generateItemableIds()

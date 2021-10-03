@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Master;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AhsRequest;
 use App\Models\Ahs;
+use App\Models\AhsItem;
 use App\Models\ItemPrice;
 use App\Models\ItemPriceProvince;
 use App\Models\Province;
@@ -52,7 +53,20 @@ class AhsController extends Controller
 
     public function destroy(Ahs $ahs)
     {
+
+        # Check if there are any ahs depends on this ahs, prevent to delete !
+        $dependantsAhsItem = AhsItem::where('ahs_itemable_id', $ahs->id);
+
+        if ($dependantsAhsItem->count()) {
+            # FIXME: Make better error handler
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Masih ada item ahs lain yang bergantung dengan AHS ini !',
+            ], 400);
+        }
+
         $ahs->delete();
+
         return response()->json([
             'status' => 'success',
             'message' => 'AHS Deleted'

@@ -104,6 +104,7 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
         Route::get('itemable-ids', [AhsItemController::class, 'getAhsItemableId']);
         Route::get('{ahs}', [AhsItemController::class, 'index']);
         Route::post('{ahs}', [AhsItemController::class, 'store']);
+        Route::get('{ahsItem}/delete', [AhsItemController::class, 'destroy']);
         Route::post('{ahsItem}/update', [AhsItemController::class, 'update']);
     });
 
