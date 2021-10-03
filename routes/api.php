@@ -97,12 +97,14 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
     Route::prefix('ahs')->group(function() {
         Route::get('{ahsId?}', [AhsController::class, 'index']);
         Route::post('{ahsId?}', [AhsController::class, 'store']);
+        Route::get('{ahs}/delete', [AhsController::class, 'destroy']);
     });
 
     Route::prefix('ahs-item')->group(function() {
         Route::get('itemable-ids', [AhsItemController::class, 'getAhsItemableId']);
         Route::get('{ahs}', [AhsItemController::class, 'index']);
         Route::post('{ahs}', [AhsItemController::class, 'store']);
+        Route::post('{ahsItem}/update', [AhsItemController::class, 'update']);
     });
 
 });

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AhsRequest;
 use App\Models\Ahs;
 use App\Models\ItemPrice;
+use App\Models\ItemPriceProvince;
 use App\Models\Province;
 use Exception;
 use Vinkla\Hashids\Facades\Hashids;
@@ -18,7 +19,7 @@ class AhsController extends Controller
     {
 
         $ahs = !is_null($ahsId) ? Ahs::where('id', $ahsId) : Ahs::query();
-        $ahs = $ahs->with(['ahsItem' => function($ahsItem) { $ahsItem->with(['ahsItemable', 'unit']); }])->get();
+        $ahs = $ahs->with(['ahsItem' => function($ahsItem) { $ahsItem->with(['ahsItemable', 'unit']); }])->orderBy('created_at', 'ASC')->get();
         $provinceId = Hashids::decode($request->province);
 
         # Categorizing by section
@@ -49,16 +50,29 @@ class AhsController extends Controller
         ]);
     }
 
+    public function destroy(Ahs $ahs)
+    {
+        $ahs->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'AHS Deleted'
+        ], 204);
+    }
+
     private function countAhsItemTotal($ahsItem, $province = null)
     {
         # Check if ahsItem referenced to item price
         if ($ahsItem->ahs_itemable_type === ItemPrice::class) {
 
-            $itemPrice = $ahsItem->ahsItemable->with(['price' => function($q) use ($province) {
-                $q->where('province_id', $province);
-            }])->first();
+            // $itemPrice = $ahsItem->ahsItemable->with(['price' => function($q) use ($province, $ahsItem) {
+            //     $q->where('province_id', $province);
+            // }])->first();
 
-            $fixedPrice = count($itemPrice->price) > 0 ? $itemPrice->price[0]->price : 0;
+            // HACK: This is a shortcut to get accurate price by province, but it's take 1 query more
+            $itemPrice = ItemPriceProvince::where('province_id', $province)->where('item_price_id', $ahsItem->ahs_itemable_id)->first();
+
+            // $fixedPrice = count($itemPrice->price) > 0 ? $itemPrice->price[0]->price : 0;
+            $fixedPrice = $itemPrice ? ($itemPrice->price ?? 0) : 0;
             $ahsItem->ahsItemable->subtotal = $fixedPrice;
 
             return $fixedPrice * $ahsItem->coefficient;

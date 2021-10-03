@@ -24,10 +24,9 @@ class AhsItemRequest extends FormRequest
     public function rules()
     {
         return [
-            'coefficient' => 'required|numeric',
-            'section' => 'in:labor,ingredients,tools,others',
-            'ahs_itemable_id' => "required",
-            "ahs_itemable_type" => "required"
+            'section' => 'required|in:labor,ingredients,tools,others',
+            'ahs_itemable_id' => 'required',
+            'ahs_itemable_type' => 'required',
         ];
     }
 }

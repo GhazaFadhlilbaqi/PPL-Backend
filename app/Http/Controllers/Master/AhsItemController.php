@@ -9,6 +9,7 @@ use App\Models\AhsItem;
 use App\Models\ItemPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Vinkla\Hashids\Facades\Hashids;
 
 class AhsItemController extends Controller
 {
@@ -49,6 +50,32 @@ class AhsItemController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => compact('ahsItemableIds'),
+        ]);
+    }
+
+
+    public function update(AhsItem $ahsItem, Request $request)
+    {
+
+        $dataToMerge = [];
+
+        if ($request->has('unit_id')) $dataToMerge['unit_id'] = Hashids::decode($request->unit_id)[0];
+        if ($request->has('ahs_itemable_type')) $dataToMerge['ahs_itemable_type'] = 'App\\Models\\' . $request->ahs_itemable_type;
+
+        # Because when ahs item is referenced to ahs, it has customable name
+        if ($ahsItem->ahs_itemable_type === Ahs::class && $request->ahs_itemable_type === 'ItemPrice') {
+            $dataToMerge = array_merge($dataToMerge, ['name' => null, 'unit_id' => null]);
+        }
+
+        $request->merge($dataToMerge);
+
+        $ahsItem->update($request->only([
+            'name', 'ahs_itemable_id', 'ahs_itemable_type', 'coefficient', 'unit_id'
+        ]));
+
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('ahsItem')
         ]);
     }
 
