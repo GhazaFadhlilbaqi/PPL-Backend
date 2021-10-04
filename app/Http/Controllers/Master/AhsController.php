@@ -73,6 +73,19 @@ class AhsController extends Controller
         ], 204);
     }
 
+    public function update(AhsRequest $request, Ahs $ahs)
+    {
+
+        $ahs->update($request->only([
+            'id', 'name'
+        ]));
+
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('ahs')
+        ]);
+    }
+
     private function countAhsItemTotal($ahsItem, $province = null)
     {
         # Check if ahsItem referenced to item price

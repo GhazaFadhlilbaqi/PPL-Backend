@@ -97,6 +97,7 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
     Route::prefix('ahs')->group(function() {
         Route::get('{ahsId?}', [AhsController::class, 'index']);
         Route::post('{ahsId?}', [AhsController::class, 'store']);
+        Route::post('{ahsp}/update', [AhsController::class, 'update']);
         Route::get('{ahs}/delete', [AhsController::class, 'destroy']);
     });
 

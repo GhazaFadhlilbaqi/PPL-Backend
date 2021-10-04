@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AhsRequest extends FormRequest
 {
@@ -24,7 +25,7 @@ class AhsRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'required|unique:ahs,id',
+            'id' => ['required', Rule::unique('ahs', 'id')->ignore($this->ahs, 'id')],
             'name' => 'required'
         ];
     }
