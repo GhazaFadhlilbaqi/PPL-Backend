@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Master\AhsController;
 use App\Http\Controllers\Master\AhsItemController;
+use App\Http\Controllers\Master\EquipmentController;
 use App\Http\Controllers\Master\ItemPriceController;
 use App\Http\Controllers\Master\ItemPriceGroupController;
 use App\Http\Controllers\Master\ProvinceController;
@@ -97,7 +98,7 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
     Route::prefix('ahs')->group(function() {
         Route::get('{ahsId?}', [AhsController::class, 'index']);
         Route::post('{ahsId?}', [AhsController::class, 'store']);
-        Route::post('{ahsp}/update', [AhsController::class, 'update']);
+        Route::post('{ahs}/update', [AhsController::class, 'update']);
         Route::get('{ahs}/delete', [AhsController::class, 'destroy']);
     });
 
@@ -107,6 +108,11 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
         Route::post('{ahs}', [AhsItemController::class, 'store']);
         Route::get('{ahsItem}/delete', [AhsItemController::class, 'destroy']);
         Route::post('{ahsItem}/update', [AhsItemController::class, 'update']);
+    });
+
+    Route::prefix('equipment')->group(function() {
+        Route::get('', [EquipmentController::class, 'index']);
+        Route::post('', [EquipmentController::class, 'store']);
     });
 
 });
