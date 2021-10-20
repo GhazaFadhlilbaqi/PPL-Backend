@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Company\CompanyController;
+use App\Http\Controllers\Master\AhpController;
 use App\Http\Controllers\Master\AhsController;
 use App\Http\Controllers\Master\AhsItemController;
 use App\Http\Controllers\Master\EquipmentController;
@@ -110,11 +111,12 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
         Route::post('{ahsItem}/update', [AhsItemController::class, 'update']);
     });
 
-    Route::prefix('equipment')->group(function() {
-        Route::get('', [EquipmentController::class, 'index']);
-        Route::post('', [EquipmentController::class, 'store']);
+    Route::prefix('ahp')->group(function() {
+        Route::get('', [AhpController::class, 'index']);
+        Route::post('', [AhpController::class, 'store']);
+        Route::get('{ahp}/delete', [AhpController::class, 'destroy']);
+        Route::post('{ahp}', [AhpController::class, 'update']);
     });
-
 });
 
 

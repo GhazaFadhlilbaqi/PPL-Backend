@@ -109,6 +109,6 @@ class AhsItemController extends Controller
             ];
         });
 
-        return $itemPriceIds->merge($ahsIds);
+        return ($ahsIds->count() && $itemPriceIds->count()) ? $itemPriceIds->merge($ahsIds) : [];
     }
 }
