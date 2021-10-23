@@ -44,7 +44,7 @@ class AhpController extends Controller
     public function update(Ahp $ahp, AhpRequest $request)
     {
         $ahp->update($request->only([
-            'Pw', 'Cp', 'A', 'W', 'B', 'i', 'U1', 'U2', 'Mb', 'Ms', 'MP', 'id', 'name'
+            'Pw', 'Cp', 'A', 'W', 'B', 'i', 'U1', 'U2', 'Mb', 'Ms', 'Mp', 'id', 'name'
         ]));
 
         return response()->json([
