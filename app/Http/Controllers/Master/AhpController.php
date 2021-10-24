@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 
 class AhpController extends Controller
 {
+
+    protected $defaultAhpVariables = ['Pw', 'Cp', 'A', 'W', 'B', 'i', 'U1', 'U2', 'Mb', 'Ms', 'Mp', 'p', 'pbb', 'ppl', 'pbk', 'ppp', 'm', 'n'];
+
     public function index()
     {
         $ahps = Ahp::all();
@@ -43,9 +46,7 @@ class AhpController extends Controller
 
     public function update(Ahp $ahp, AhpRequest $request)
     {
-        $ahp->update($request->only([
-            'Pw', 'Cp', 'A', 'W', 'B', 'i', 'U1', 'U2', 'Mb', 'Ms', 'Mp', 'id', 'name'
-        ]));
+        $ahp->update($request->only(array_merge(['id', 'name'], $this->defaultAhpVariables)));
 
         return response()->json([
             'status' => 'success',
@@ -61,6 +62,8 @@ class AhpController extends Controller
         $B = $ahp->B;
         $W = $ahp->W;
         $C = $ahp->C;
+
+        $p = ($W / 10000) / 100;
 
         /**
          * ---------------------------------------
@@ -78,7 +81,7 @@ class AhpController extends Controller
         $E = $W == 0 ? 0 : (($B - $C) * $D) / $W;
 
         # Hitung Asuransi dan lain lain (F)
-        $F = $W == 0 ? 0 : (($W / 1000000) * $B) / $W;
+        $F = $p == 0 ? 0 : ($p * $B / $W);
 
         # Hitung biaya pasti per jam (G)
         $G = $E + $F;
@@ -94,21 +97,30 @@ class AhpController extends Controller
         $Mp = $ahp->Mp;
         $U1 = $ahp->U1;
         $U2 = $ahp->U2;
+        $pbb = $ahp->pbb;
+        $ppl = $ahp->ppl;
+        $pbk = $ahp->pbk;
+        $ppp = $ahp->ppp;
+        $m = $ahp->m;
+        $n = $ahp->n;
 
         # Hitung Bahan Bakar (H)
-        $H = ((0.1 + 0.175) / 2) * $Pw * $Ms;
+        $H = ($pbb / 100) * $Pw * $Ms;
 
         # Hitung Pelumas (I)
-        $I = (0.01 * $Pw) * $Mp;
+        $I = ($ppl / 100) * $Pw * $Mp;
+
+        # Hitung Biaya Bengkel (J)
+        $J = $W == 0 ? 0 : (($pbk / 100) * $B) / $W;
 
         # Perawatan dan Perbaikan (K)
-        $K = $W == 0 ? 0 : ((17.5 / 100) * $B) / $W;
+        $K = $W == 0 ? 0 : (($ppp / 100) * $B) / $W;
 
         # Operator (L)
-        $L = 1 * $U1;
+        $L = $m * $U1;
 
         # Pembantu Operator (M)
-        $M = 0 * $U2;
+        $M = $n * $U2;
 
         # Biaya Operasi per Jam (P)
         $P = $H + $I + $K + $L + $M;
@@ -123,11 +135,13 @@ class AhpController extends Controller
         $ahp->G = $G;
         $ahp->H = $H;
         $ahp->I = $I;
+        $ahp->J = $J;
         $ahp->K = $K;
         $ahp->L = $L;
         $ahp->M = $M;
         $ahp->P = $P;
         $ahp->S = $S;
+        $ahp->p = $p;
 
         return $ahp;
     }

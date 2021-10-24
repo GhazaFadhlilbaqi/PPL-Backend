@@ -27,6 +27,12 @@ class CreateAhpsTable extends Migration
             $table->double('Mb')->default(0);
             $table->double('Ms')->default(0);
             $table->double('Mp')->default(0);
+            $table->double('pbb')->default(0);
+            $table->double('ppl')->default(0);
+            $table->double('pbk')->default(0);
+            $table->double('ppp')->default(0);
+            $table->double('m')->default(0);
+            $table->double('n')->default(0);
             $table->timestamps();
         });
     }
