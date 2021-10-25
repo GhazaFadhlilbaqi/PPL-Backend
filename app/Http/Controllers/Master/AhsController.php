@@ -72,9 +72,17 @@ class AhsController extends CountableItemController
     public function update(AhsRequest $request, Ahs $ahs)
     {
 
+        if ($request->has('id') && ($ahs->id != $request->id)) {
+            $oldId = $ahs->id;
+        }
+
         $ahs->update($request->only([
             'id', 'name'
         ]));
+
+        AhsItem::where('ahs_itemable_id', $oldId)->update([
+            'ahs_itemable_id' => $request->id,
+        ]);
 
         return response()->json([
             'status' => 'success',
