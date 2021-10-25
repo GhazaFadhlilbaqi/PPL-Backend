@@ -127,6 +127,12 @@ class ItemPriceController extends Controller
 
         $itemPrice = ItemPrice::where('id', $itemPriceId)->update($request->only(['id', 'item_price_group_id', 'unit_id', 'name']));
 
+        if ($itemPriceId != $request->id) {
+            AhsItem::where('ahs_itemable_id', $itemPriceId)->update([
+                'ahs_itemable_id' => $request->id
+            ]);
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => compact('itemPrice'),

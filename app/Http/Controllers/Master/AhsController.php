@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers\Master;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\CountableItemController;
 use App\Http\Requests\AhsRequest;
 use App\Models\Ahs;
 use App\Models\AhsItem;
-use App\Models\ItemPrice;
-use App\Models\ItemPriceProvince;
-use App\Models\Province;
-use Exception;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Http\Request;
 
-class AhsController extends Controller
+class AhsController extends CountableItemController
 {
 
     public function index(Request $request, $ahsId = null)
@@ -84,45 +80,5 @@ class AhsController extends Controller
             'status' => 'success',
             'data' => compact('ahs')
         ]);
-    }
-
-    private function countAhsItemTotal($ahsItem, $province = null)
-    {
-        # Check if ahsItem referenced to item price
-        if ($ahsItem->ahs_itemable_type === ItemPrice::class) {
-
-            // $itemPrice = $ahsItem->ahsItemable->with(['price' => function($q) use ($province, $ahsItem) {
-            //     $q->where('province_id', $province);
-            // }])->first();
-
-            // HACK: This is a shortcut to get accurate price by province, but it's take 1 query more
-            $itemPrice = ItemPriceProvince::where('province_id', $province)->where('item_price_id', $ahsItem->ahs_itemable_id)->first();
-
-            // $fixedPrice = count($itemPrice->price) > 0 ? $itemPrice->price[0]->price : 0;
-            $fixedPrice = $itemPrice ? ($itemPrice->price ?? 0) : 0;
-            $ahsItem->ahsItemable->subtotal = $fixedPrice;
-
-            return $fixedPrice * $ahsItem->coefficient;
-
-        } else if ($ahsItem->ahs_itemable_type === Ahs::class) {
-            return $this->countAhsSubtotal($ahsItem->ahsItemable, $province)->subtotal * $ahsItem->coefficient;
-        } else {
-            throw new Exception('Itemable type not compatible with counting');
-        }
-    }
-
-    private function countAhsSubtotal($ahs, $province = null)
-    {
-        $ahsSubtotal = 0;
-
-        foreach ($ahs->ahsItem as $ahsItem) {
-            $ahsItem->subtotal = $this->countAhsItemTotal($ahsItem, $province);
-            $ahsSubtotal += $ahsItem->subtotal;
-        }
-
-        $ahs->subtotal = $ahsSubtotal;
-
-        return $ahs;
-
     }
 }

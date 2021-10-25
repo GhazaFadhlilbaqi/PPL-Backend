@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AhsItemRequest;
+use App\Models\Ahp;
 use App\Models\Ahs;
 use App\Models\AhsItem;
 use App\Models\ItemPrice;
@@ -58,15 +59,21 @@ class AhsItemController extends Controller
     {
 
         $dataToMerge = [];
+        $currentAhsItemItemableType = explode('\\', $ahsItem->ahs_itemable_type)[2];
+        $newAhsItemItemableType = $request->ahs_itemable_type;
 
         if ($request->has('unit_id')) $dataToMerge['unit_id'] = Hashids::decode($request->unit_id)[0];
         if ($request->has('ahs_itemable_type')) $dataToMerge['ahs_itemable_type'] = 'App\\Models\\' . $request->ahs_itemable_type;
 
         # Because when ahs item is referenced to ahs, it has customable name
-        if ($ahsItem->ahs_itemable_type === Ahs::class && $request->ahs_itemable_type === 'ItemPrice') {
+        # TODO: Need more tiddier way to compare between old and new itemable type
+        if (($currentAhsItemItemableType === 'ItemPrice') && ($newAhsItemItemableType === 'Ahp' || $newAhsItemItemableType === 'Ahs')) {
+            if ($newAhsItemItemableType === 'Ahs') $dataToMerge = array_merge($dataToMerge, ['name' => Ahs::where('id', $request->ahs_itemable_id)->first()->name]);
+            else $dataToMerge = array_merge($dataToMerge, ['name' => Ahp::where('id', $request->ahs_itemable_id)->first()->name]);
+        } else if (($currentAhsItemItemableType === 'Ahs' || $currentAhsItemItemableType === 'Ahp') && $newAhsItemItemableType === 'ItemPrice') {
             $dataToMerge = array_merge($dataToMerge, ['name' => null, 'unit_id' => null]);
-        } else if ($ahsItem->ahs_itemable_type === ItemPrice::class && $request->ahs_itemable_type === 'Ahs') {
-            $dataToMerge = array_merge($dataToMerge, ['name' => Ahs::where('id', $request->ahs_itemable_id)->first()->name]);
+        } else if (($currentAhsItemItemableType === 'Ahp' && $newAhsItemItemableType === 'Ahs') || ($currentAhsItemItemableType === 'Ahs' && $newAhsItemItemableType === 'Ahp')) {
+            $dataToMerge = array_merge($dataToMerge, ['name' => ('App\\Models\\' . $newAhsItemItemableType)::where('id', $request->ahs_itemable_id)->first()->name]);
         }
 
         $request->merge($dataToMerge);
@@ -109,6 +116,15 @@ class AhsItemController extends Controller
             ];
         });
 
-        return ($ahsIds->count() && $itemPriceIds->count()) ? $itemPriceIds->merge($ahsIds) : [];
+        # Get AHP ids
+        $ahpIds = Ahp::all()->map(function($ahp) {
+            return [
+                'ahs_itemable_type' => 'App\\Models\\Ahp',
+                'id' => $ahp->id,
+                'display_id' => $ahp->id,
+            ];
+        });
+
+        return ($itemPriceIds->count()) ? $itemPriceIds->merge($ahsIds)->merge($ahpIds) : [];
     }
 }

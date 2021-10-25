@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ItemPrice;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -18,7 +19,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProvinceSeeder::class,
             UnitSeeder::class,
-            ItemPriceGroupSeeder::class
+            ItemPriceGroupSeeder::class,
+            ItemPriceSeeder::class,
+            ItemPriceProvinceSeeder::class,
         ]);
     }
 }

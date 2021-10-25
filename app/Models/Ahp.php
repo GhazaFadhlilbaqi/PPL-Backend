@@ -11,4 +11,9 @@ class Ahp extends Model
 
     public $incrementing = false;
     public $guarded = [];
+
+    public function ahsItem()
+    {
+        return $this->morphMany(AhsItem::class, 'ahsItemable');
+    }
 }
