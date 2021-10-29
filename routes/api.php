@@ -13,6 +13,7 @@ use App\Http\Controllers\Master\ItemPriceGroupController;
 use App\Http\Controllers\Master\ProvinceController;
 use App\Http\Controllers\Master\UnitController;
 use App\Http\Controllers\Payment\PaymentController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -67,6 +68,11 @@ Route::prefix('company')->middleware('auth:sanctum')->group(function() {
     Route::post('{company}', [CompanyController::class, 'update']);
 });
 
+/**
+ * ----------------------
+ * Master Data API
+ * ----------------------
+ */
 Route::prefix('master')->middleware('auth:sanctum')->group(function() {
 
     Route::prefix('provinces')->middleware('auth:sanctum')->group(function() {
@@ -120,3 +126,14 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
 });
 
 
+/**
+ * ----------------------
+ * Project API
+ * ----------------------
+ */
+Route::prefix('project')->middleware('auth:sanctum')->group(function() {
+    Route::get('', [ProjectController::class, 'index']);
+    Route::post('', [ProjectController::class, 'store']);
+    Route::post('{project}', [ProjectController::class, 'update']);
+    Route::get('{project}/delete', [ProjectController::class, 'destroy']);
+});
