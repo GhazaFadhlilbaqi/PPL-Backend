@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
 use App\Models\Project;
+use App\Models\Province;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,18 +13,24 @@ class ProjectController extends Controller
 
     public function index(Request $request)
     {
-        $projects = Auth::user()->project;
-
-        return response()->json([
-            'status' => 'success',
-            'data' => compact('projects')
-        ]);
+        return $this->getTableFormattedData(
+            Project::where('user_id', Auth::user()->id)->with('province'))
+            ->addColumn('last_opened_at_formatted', function($data) {
+                return $data->last_opened_at ? date('d-m-Y', strtotime($data->last_opened_at)) : 'Belum Pernah di Buka';
+            })
+            ->addColumn('created_at_formatted', function($data) {
+                return date('d-m-Y', strtotime($data->created_at));
+            })
+            ->make();
     }
 
     public function store(ProjectRequest $request)
     {
 
-        $request->merge(['user_id' => Auth::user()->id]);
+        $request->merge([
+            'user_id' => Auth::user()->id,
+            'province_id' => Province::findByHashid($request->province_id)->id,
+        ]);
 
         $project = Project::create($request->only([
             'user_id', 'name', 'activity', 'job', 'address', 'province_id', 'fiscal_year', 'profit_margin'
@@ -40,8 +47,10 @@ class ProjectController extends Controller
 
         if ($project->user_id != Auth::user()->id) return $this->giveUnbelongedAccessResponse();
 
+        $request->merge(['province_id' => Province::findByHashid($request->province_id)->id]);
+
         $project->update($request->only([
-            'name', 'activity', 'job', 'address', 'province_id', 'fiscal_year', 'profit_margin'
+            'name', 'activity', 'job', 'address', 'fiscal_year', 'profit_margin', 'province_id'
         ]));
 
         return response()->json([
