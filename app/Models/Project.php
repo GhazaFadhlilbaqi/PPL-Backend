@@ -36,4 +36,9 @@ class Project extends Model
     {
         return $this->belongsTo(Province::class);
     }
+
+    public function rab()
+    {
+        return $this->hasMany(Rab::class);
+    }
 }

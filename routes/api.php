@@ -14,7 +14,9 @@ use App\Http\Controllers\Master\ProvinceController;
 use App\Http\Controllers\Master\UnitController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RabController;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\RabItemController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -136,4 +138,26 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
     Route::post('', [ProjectController::class, 'store']);
     Route::post('{project}', [ProjectController::class, 'update']);
     Route::get('{project}/delete', [ProjectController::class, 'destroy']);
+
+    /**
+     * ----------------------
+     * RAB API
+     * ----------------------
+     */
+    Route::prefix('{project}/rab')->middleware('auth:sanctum')->group(function() {
+        Route::get('', [RabController::class, 'index']);
+        Route::post('', [RabController::class, 'store']);
+        Route::get('{rab}/delete', [RabController::class, 'destroy']);
+        Route::post('{rab}', [RabController::class, 'update']);
+
+        Route::prefix('{rab}/item')->group(function() {
+            Route::get('', [RabItemController::class, 'index']);
+            Route::post('', [RabItemController::class, 'store']);
+            Route::get('{rabItem}/delete', [RabItemController::class, 'destroy']);
+            Route::post('{rabItem}', [RabItemController::class, 'update']);
+        });
+
+    });
+
 });
+
