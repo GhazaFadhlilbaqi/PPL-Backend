@@ -11,12 +11,17 @@ class RabItem extends Model
 {
     use HasFactory, HashidRouting, HasHashid;
 
-    protected $fillable = ['rab_id', 'name', 'ahs_id', 'volume', 'unit_id'];
+    protected $fillable = ['rab_id', 'rab_item_header_id', 'name', 'ahs_id', 'volume', 'unit_id'];
     protected $hidden = ['id'];
     protected $appends = ['hashid'];
 
     public function rab()
     {
         return $this->belongsTo(Rab::class);
+    }
+
+    public function rabItemHeader()
+    {
+        return $this->belongsTo(RabItemHeader::class);
     }
 }

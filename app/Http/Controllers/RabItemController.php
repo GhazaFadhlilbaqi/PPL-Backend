@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\Rab;
 use App\Models\RabItem;
+use App\Models\RabItemHeader;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 
@@ -26,10 +27,11 @@ class RabItemController extends Controller
         $request->merge([
             'rab_id' => $rab->hashidToId($rab->hashid),
             'unit_id' => Unit::findByHashid($request->unit_id)->id,
+            'rab_item_header_id' => RabItemHeader::findByHashid($request->rab_item_header_id)->id,
         ]);
 
         $rabItem = RabItem::create($request->only([
-            'rab_id', 'name', 'ahs_id', 'volume', 'unit_id'
+            'rab_id', 'name', 'ahs_id', 'volume', 'unit_id', 'rab_item_header_id'
         ]));
 
         return response()->json([

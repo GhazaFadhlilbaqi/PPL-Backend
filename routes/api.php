@@ -17,6 +17,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RabController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\RabItemController;
+use App\Http\Controllers\RabItemHeaderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -155,6 +156,13 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
             Route::post('', [RabItemController::class, 'store']);
             Route::get('{rabItem}/delete', [RabItemController::class, 'destroy']);
             Route::post('{rabItem}', [RabItemController::class, 'update']);
+        });
+
+        Route::prefix('{rab}/item-header')->group(function() {
+            Route::get('', [RabItemHeaderController::class, 'index']);
+            Route::post('', [RabItemHeaderController::class, 'store']);
+            Route::post('{rabItemHeader}', [RabItemHeaderController::class, 'update']);
+            Route::get('{rabItemHeader}/delete', [RabItemHeaderController::class, 'destroy']);
         });
 
     });
