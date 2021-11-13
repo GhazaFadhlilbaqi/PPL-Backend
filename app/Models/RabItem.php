@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Mtvs\EloquentHashids\HasHashid;
 use Mtvs\EloquentHashids\HashidRouting;
+use Vinkla\Hashids\Facades\Hashids;
 
 class RabItem extends Model
 {
     use HasFactory, HashidRouting, HasHashid;
 
     protected $fillable = ['rab_id', 'rab_item_header_id', 'name', 'ahs_id', 'volume', 'unit_id'];
-    protected $hidden = ['id'];
-    protected $appends = ['hashid'];
+    protected $hidden = ['id', 'rab_id', 'rab_item_header_id', 'unit_id'];
+    protected $appends = ['hashid', 'hashed_rab_item_header_id', 'hashed_rab_id', 'hashed_unit_id'];
 
     public function rab()
     {
@@ -23,5 +24,20 @@ class RabItem extends Model
     public function rabItemHeader()
     {
         return $this->belongsTo(RabItemHeader::class);
+    }
+
+    public function getHashedRabItemHeaderIdAttribute()
+    {
+        return Hashids::encode($this->rab_item_header_id);
+    }
+
+    public function getHashedRabIdAttribute()
+    {
+        return Hashids::encode($this->rab_id);
+    }
+
+    public function getHashedUnitIdAttribute()
+    {
+        return Hashids::encode($this->unit_id);
     }
 }

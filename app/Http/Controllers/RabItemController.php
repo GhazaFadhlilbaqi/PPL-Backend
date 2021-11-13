@@ -27,7 +27,7 @@ class RabItemController extends Controller
         $request->merge([
             'rab_id' => $rab->hashidToId($rab->hashid),
             'unit_id' => Unit::findByHashid($request->unit_id)->id,
-            'rab_item_header_id' => RabItemHeader::findByHashid($request->rab_item_header_id)->id,
+            'rab_item_header_id' => $request->has('rab_item_header_id') ? RabItemHeader::findByHashid($request->rab_item_header_id)->id : NULL,
         ]);
 
         $rabItem = RabItem::create($request->only([
