@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Mtvs\EloquentHashids\HasHashid;
 use Mtvs\EloquentHashids\HashidRouting;
+use Vinkla\Hashids\Facades\Hashids;
 
 class Project extends Model
 {
     use HasFactory, HasHashid, HashidRouting;
 
-    protected $appends = ['hashid'];
-    protected $hidden = ['id'];
+    protected $appends = ['hashid', 'hashed_province_id'];
+    protected $hidden = ['id', 'province_id'];
 
     protected $fillable = [
         'user_id',
@@ -40,5 +41,10 @@ class Project extends Model
     public function rab()
     {
         return $this->hasMany(Rab::class);
+    }
+
+    public function getHashedProvinceIdAttribute()
+    {
+        return Hashids::encode($this->province_id);
     }
 }

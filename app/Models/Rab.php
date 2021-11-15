@@ -12,9 +12,17 @@ class Rab extends Model
 {
     use HasFactory, HasHashid, HashidRouting;
 
-    protected $fillable = ['name', 'project_id'];
-    protected $hidden = ['id', 'project_id'];
-    protected $appends = ['hashid', 'hashed_project_id'];
+    protected $fillable = [
+        'name', 'project_id'
+    ];
+
+    protected $hidden = [
+        'id', 'project_id'
+    ];
+
+    protected $appends = [
+        'hashid', 'hashed_project_id'
+    ];
 
     public function rabItemHeader()
     {

@@ -6,6 +6,7 @@ use App\Http\Controllers\CountableItemController;
 use App\Http\Requests\AhsRequest;
 use App\Models\Ahs;
 use App\Models\AhsItem;
+use App\Models\Province;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Http\Request;
 
@@ -35,6 +36,11 @@ class AhsController extends CountableItemController
             'status' => 'success',
             'data' => compact('ahs')
         ]);
+    }
+
+    public function getAhsCodes(Province $province)
+    {
+        // Ahs::where('')
     }
 
     public function store(AhsRequest $request)

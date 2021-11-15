@@ -70,6 +70,14 @@ class ProjectController extends Controller
         ], 204);
     }
 
+    public function show(Project $project)
+    {
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('project')
+        ]);
+    }
+
     private function giveUnbelongedAccessResponse()
     {
         return response()->json([
