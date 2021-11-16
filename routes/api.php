@@ -4,10 +4,11 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Company\CompanyController;
+use App\Http\Controllers\CustomItemPriceController;
+use App\Http\Controllers\CustomItemPriceGroupController;
 use App\Http\Controllers\Master\AhpController;
 use App\Http\Controllers\Master\AhsController;
 use App\Http\Controllers\Master\AhsItemController;
-use App\Http\Controllers\Master\EquipmentController;
 use App\Http\Controllers\Master\ItemPriceController;
 use App\Http\Controllers\Master\ItemPriceGroupController;
 use App\Http\Controllers\Master\ProvinceController;
@@ -143,27 +144,40 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
 
     /**
      * ----------------------
-     * RAB API
+     * PROJECT BASED ROUTE  |
      * ----------------------
      */
-    Route::prefix('{project}/rab')->middleware('auth:sanctum')->group(function() {
-        Route::get('', [RabController::class, 'index']);
-        Route::post('', [RabController::class, 'store']);
-        Route::get('{rab}/delete', [RabController::class, 'destroy']);
-        Route::post('{rab}', [RabController::class, 'update']);
+    Route::prefix('{project}')->middleware('auth:sanctum')->group(function() {
 
-        Route::prefix('{rab}/item')->group(function() {
-            Route::get('', [RabItemController::class, 'index']);
-            Route::post('', [RabItemController::class, 'store']);
-            Route::get('{rabItem}/delete', [RabItemController::class, 'destroy']);
-            Route::post('{rabItem}', [RabItemController::class, 'update']);
+        Route::prefix('rab')->group(function() {
+            Route::get('', [RabController::class, 'index']);
+            Route::post('', [RabController::class, 'store']);
+            Route::get('{rab}/delete', [RabController::class, 'destroy']);
+            Route::post('{rab}', [RabController::class, 'update']);
+
+            Route::prefix('{rab}/item')->group(function() {
+                Route::get('', [RabItemController::class, 'index']);
+                Route::post('', [RabItemController::class, 'store']);
+                Route::get('{rabItem}/delete', [RabItemController::class, 'destroy']);
+                Route::post('{rabItem}', [RabItemController::class, 'update']);
+            });
+
+            Route::prefix('{rab}/item-header')->group(function() {
+                Route::get('', [RabItemHeaderController::class, 'index']);
+                Route::post('', [RabItemHeaderController::class, 'store']);
+                Route::post('{rabItemHeader}', [RabItemHeaderController::class, 'update']);
+                Route::get('{rabItemHeader}/delete', [RabItemHeaderController::class, 'destroy']);
+            });
         });
 
-        Route::prefix('{rab}/item-header')->group(function() {
-            Route::get('', [RabItemHeaderController::class, 'index']);
-            Route::post('', [RabItemHeaderController::class, 'store']);
-            Route::post('{rabItemHeader}', [RabItemHeaderController::class, 'update']);
-            Route::get('{rabItemHeader}/delete', [RabItemHeaderController::class, 'destroy']);
+        Route::prefix('custom-item-price-group')->group(function() {
+            Route::get('', [CustomItemPriceGroupController::class, 'index']);
+            Route::post('', [CustomItemPriceGroupController::class, 'store']);
+        });
+
+        Route::prefix('custom-item-price')->group(function() {
+            Route::get('', [CustomItemPriceController::class, 'index']);
+            // Route::post('', [CustomItem])
         });
 
     });

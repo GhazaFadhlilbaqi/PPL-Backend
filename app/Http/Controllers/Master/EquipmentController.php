@@ -11,9 +11,6 @@ class EquipmentController extends Controller
 {
     public function index(Request $request)
     {
-        // if ($request->has('datatable') && $request->datatable == 'false') {
-
-        // }
         return $this->getTableFormattedData(Equipment::query())->make();
     }
 

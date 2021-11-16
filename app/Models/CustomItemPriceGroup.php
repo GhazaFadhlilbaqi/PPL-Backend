@@ -7,21 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 use Mtvs\EloquentHashids\HasHashid;
 use Mtvs\EloquentHashids\HashidRouting;
 
-class ItemPriceGroup extends Model
+class CustomItemPriceGroup extends Model
 {
-    use HasFactory, HasHashid, HashidRouting;
+    use HasFactory, HashidRouting, HasHashid;
 
-    protected $fillable = ['name'];
-    protected $hidden = ['id'];
     protected $appends = ['hashid'];
+    protected $fillable = ['project_id', 'name'];
+    protected $hidden = ['id'];
 
-    public function itemPrice()
-    {
-        return $this->hasMany(ItemPrice::class);
-    }
+    // public function customItemPriceable()
+    // {
+    //     return $this->morphTo();
+    // }
 
     public function customItemPrice()
     {
         return $this->morphMany(CustomItemPrice::class, 'customItemPriceable');
     }
+
 }

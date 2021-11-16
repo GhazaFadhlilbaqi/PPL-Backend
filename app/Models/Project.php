@@ -43,6 +43,16 @@ class Project extends Model
         return $this->hasMany(Rab::class);
     }
 
+    public function customItemPriceGroup()
+    {
+        return $this->hasMany(CustomItemPriceGroup::class);
+    }
+
+    public function customItemPrice()
+    {
+        return $this->hasMany(CustomItemPrice::class);
+    }
+
     public function getHashedProvinceIdAttribute()
     {
         return Hashids::encode($this->province_id);
