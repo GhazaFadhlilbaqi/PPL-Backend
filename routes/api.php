@@ -177,7 +177,8 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
 
         Route::prefix('custom-item-price')->group(function() {
             Route::get('', [CustomItemPriceController::class, 'index']);
-            // Route::post('', [CustomItem])
+            Route::post('', [CustomItemPriceController::class, 'store']);
+            Route::post('{abstractItemPriceId}', [CustomItemPriceController::class, 'update']);
         });
 
     });
