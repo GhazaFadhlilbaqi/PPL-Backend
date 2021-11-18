@@ -17,10 +17,6 @@ class CustomItemPriceController extends Controller
         $masterItemPrices = ItemPrice::all();
         $customItemPrices = $project->customItemPrice;
 
-        // return response()->json([
-        //     'data' => compact('masterItemPrices', 'customItemPrices'),
-        // ]);
-
         $itemPrices = $this->getCustomItemPrices($project, $customItemPrices);
 
         return response()->json([
@@ -116,7 +112,7 @@ class CustomItemPriceController extends Controller
     private function getCustomItemPrices($project, $customItemPrices)
     {
 
-        $customItemPricesAvail = $customItemPrices->map(function($customItemPrice, $index) use ($customItemPrices) {
+        $customItemPricesAvail = $customItemPrices->map(function ($customItemPrice, $index) use ($customItemPrices) {
             $price = $customItemPrice->price;
             unset($customItemPrices[$index]->price);
             $customItemPrices[$index]->price = $price;
@@ -124,7 +120,7 @@ class CustomItemPriceController extends Controller
         });
 
         $itemPrices = ItemPrice::withPriceByProvince($project->province_id)->whereNotIn('id', $customItemPricesAvail)->get();
-        $itemPrices = $itemPrices->map(function($data) {
+        $itemPrices = $itemPrices->map(function ($data) {
             if (count($data->price)) {
                 $price = $data->price[0]->price;
                 unset($data->price);
@@ -136,17 +132,8 @@ class CustomItemPriceController extends Controller
             return $data;
         });
 
-
         $itemPrices = $itemPrices->merge($customItemPrices);
 
         return $itemPrices;
-
-        // $masterItemPricesIdsMaps = $masterItemPrices->map(function($itemPrice) {
-
-        // });
-
-        // foreach ($customItemPrices as $customItemPrice) {
-
-        // }
     }
 }

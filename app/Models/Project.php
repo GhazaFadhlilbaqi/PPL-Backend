@@ -53,6 +53,11 @@ class Project extends Model
         return $this->hasMany(CustomItemPrice::class);
     }
 
+    public function customAhp()
+    {
+        return $this->hasMany(CustomAhp::class);
+    }
+
     public function getHashedProvinceIdAttribute()
     {
         return Hashids::encode($this->province_id);

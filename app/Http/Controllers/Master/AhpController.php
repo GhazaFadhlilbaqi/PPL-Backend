@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class AhpController extends CountableItemController
 {
 
-    protected $defaultAhpVariables = ['Pw', 'Cp', 'A', 'W', 'B', 'i', 'U1', 'U2', 'Mb', 'Ms', 'Mp', 'p', 'pbb', 'ppl', 'pbk', 'ppp', 'm', 'n'];
+    protected $defaultAhpVariables = ['Pw', 'Cp', 'A', 'W', 'B', 'i', 'U1', 'U2', 'Mb', 'Ms', 'Mp', 'pbb', 'ppl', 'pbk', 'ppp', 'm', 'n'];
 
     public function index()
     {

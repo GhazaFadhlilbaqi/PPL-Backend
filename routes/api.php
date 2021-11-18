@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Company\CompanyController;
+use App\Http\Controllers\CustomAhpController;
 use App\Http\Controllers\CustomItemPriceController;
 use App\Http\Controllers\CustomItemPriceGroupController;
 use App\Http\Controllers\Master\AhpController;
@@ -179,6 +180,11 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
             Route::get('', [CustomItemPriceController::class, 'index']);
             Route::post('', [CustomItemPriceController::class, 'store']);
             Route::post('{abstractItemPriceId}', [CustomItemPriceController::class, 'update']);
+        });
+
+        Route::prefix('custom-ahp')->group(function() {
+            Route::get('', [CustomAhpController::class, 'index']);
+            Route::post('', [CustomAhpController::class, 'store']);
         });
 
     });
