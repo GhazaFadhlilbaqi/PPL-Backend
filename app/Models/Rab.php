@@ -39,11 +39,6 @@ class Rab extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function customAhs()
-    {
-        return $this->hasMany(CustomAhs::class);
-    }
-
     public function getHashedProjectIdAttribute($value)
     {
         return Hashids::encode($this->project_id);

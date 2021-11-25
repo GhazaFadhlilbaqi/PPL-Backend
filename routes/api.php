@@ -21,6 +21,7 @@ use App\Http\Controllers\RabController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\RabItemController;
 use App\Http\Controllers\RabItemHeaderController;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -186,6 +187,8 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
         Route::prefix('custom-ahp')->group(function() {
             Route::get('', [CustomAhpController::class, 'index']);
             Route::post('', [CustomAhpController::class, 'store']);
+            Route::post('{customAhp}', [CustomAhpController::class, 'update']);
+            Route::get('{customAhp}/delete', [CustomAhpController::class, 'destroy']);
         });
 
         Route::prefix('custom-ahs')->group(function() {

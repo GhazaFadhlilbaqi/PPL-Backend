@@ -27,10 +27,11 @@ class CustomAhpController extends CountableItemController
         ]);
     }
 
+    // FIXME: Using validation request
     public function store(Project $project, Request $request)
     {
 
-        $isCustomAhpExist = CustomAhp::where('project_id', $project->hashidToId($project->hashid))->where('code', $request->id)->count() >= 0;
+        $isCustomAhpExist = CustomAhp::where('project_id', $project->hashidToId($project->hashid))->where('code', $request->id)->count() > 0;
 
         if ($isCustomAhpExist) {
             return response()->json([
@@ -50,5 +51,28 @@ class CustomAhpController extends CountableItemController
             'status' => 'success',
             'data' => compact('customAhp')
         ]);
+    }
+
+    // FIXME: Using validation request
+    public function update(Project $project, CustomAhp $customAhp, Request $request)
+    {
+
+        // NOTE: We don't need to verify to it's children when deleting ahp because the children should referenced to it's ID, not code
+        $customAhp->update($request->only(array_merge(['code', 'name'], $this->defaultAhpVariables)));
+
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('customAhp')
+        ]);
+    }
+
+    public function destroy(Project $project, CustomAhp $customAhp)
+    {
+        // TODO: Delete it's dependencies
+        $customAhp->delete();
+
+        return response()->json([
+            'status' => 'success',
+        ], 204);
     }
 }

@@ -6,14 +6,13 @@ use App\Http\Requests\CustomAhsRequest;
 use App\Models\CustomAhs;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Vinkla\Hashids\Facades\Hashids;
 
 class CustomAhsController extends Controller
 {
     public function index(Project $project)
     {
-        $customAhs = $project->with(['rab' => function($q) {
-            $q->with('customAhs');
-        }])->get();
+        $customAhs = $project->customAhs;
 
         return response()->json([
             'status' => 'success',
@@ -21,10 +20,13 @@ class CustomAhsController extends Controller
         ]);
     }
 
-    public function update(Project $project, CustomAhs $customAhs, CustomAhsRequest $request)
+    // FIXME: Using validation request
+    public function update(Project $project, CustomAhs $customAhs, Request $request)
     {
+
+        // TODO: Implement update validation, update all child if code updated !
         $customAhs->update($request->only([
-            'id', 'name'
+            'code', 'name'
         ]));
 
         return response()->json([
@@ -42,17 +44,17 @@ class CustomAhsController extends Controller
         ], 204);
     }
 
-    public function store(Project $project, CustomAhsRequest $request)
+    // FIXME: Using validation request
+    public function store(Project $project, Request $request)
     {
 
-        return $project;
-
-        // $request->merge(['rab_id' => 2]);
-
-        return response()->json(['data' => 'testing']);
+        // TODO: Implement validation for same project and ahs id !
+        $request->merge([
+            'project_id' => $project->hashidToId($project->hashid)
+        ]);
 
         $customAhs = CustomAhs::create($request->only([
-            'name', 'code', 'rab_id'
+            'name', 'code', 'project_id'
         ]));
 
         return response()->json([

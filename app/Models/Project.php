@@ -58,6 +58,11 @@ class Project extends Model
         return $this->hasMany(CustomAhp::class);
     }
 
+    public function customAhs()
+    {
+        return $this->hasMany(CustomAhs::class);
+    }
+
     public function getHashedProvinceIdAttribute()
     {
         return Hashids::encode($this->province_id);
