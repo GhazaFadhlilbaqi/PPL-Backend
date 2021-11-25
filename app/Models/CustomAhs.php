@@ -11,12 +11,17 @@ class CustomAhs extends Model
 {
     use HasFactory, HasHashid, HashidRouting;
 
-    protected $fillable = ['code', 'name'];
+    protected $fillable = ['code', 'name', 'rab_id'];
     protected $hidden = ['id'];
     protected $appends = ['hashid'];
 
     public function customAhsItem()
     {
         return $this->hasMany(CustomAhsItem::class);
+    }
+
+    public function rab()
+    {
+        return $this->belongsTo(Rab::class);
     }
 }

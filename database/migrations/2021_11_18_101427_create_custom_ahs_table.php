@@ -17,7 +17,9 @@ class CreateCustomAhsTable extends Migration
             $table->id();
             $table->string('code');
             $table->string('name', 128);
+            $table->unsignedBigInteger('rab_id');
             $table->timestamps();
+            $table->foreign('rab_id')->references('id')->on('rabs')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

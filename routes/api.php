@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\CustomAhpController;
+use App\Http\Controllers\CustomAhsController;
 use App\Http\Controllers\CustomItemPriceController;
 use App\Http\Controllers\CustomItemPriceGroupController;
 use App\Http\Controllers\Master\AhpController;
@@ -185,6 +186,13 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
         Route::prefix('custom-ahp')->group(function() {
             Route::get('', [CustomAhpController::class, 'index']);
             Route::post('', [CustomAhpController::class, 'store']);
+        });
+
+        Route::prefix('custom-ahs')->group(function() {
+            Route::get('', [CustomAhsController::class, 'index']);
+            Route::post('', [CustomAhsController::class, 'store']);
+            Route::post('{customAhs}', [CustomAhsController::class, 'update']);
+            Route::get('{customAhs}/delete', [CustomAhsController::class, 'destroy']);
         });
 
     });

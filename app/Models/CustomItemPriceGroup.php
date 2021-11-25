@@ -15,10 +15,10 @@ class CustomItemPriceGroup extends Model
     protected $fillable = ['project_id', 'name'];
     protected $hidden = ['id'];
 
-    // public function customItemPriceable()
-    // {
-    //     return $this->morphTo();
-    // }
+    public function customItemPriceable()
+    {
+        return $this->morphTo();
+    }
 
     public function customItemPrice()
     {
