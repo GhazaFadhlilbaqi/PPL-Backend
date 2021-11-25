@@ -15,14 +15,9 @@ class CustomItemPriceGroup extends Model
     protected $fillable = ['project_id', 'name'];
     protected $hidden = ['id'];
 
-    public function customItemPriceable()
-    {
-        return $this->morphTo();
-    }
-
     public function customItemPrice()
     {
-        return $this->morphMany(CustomItemPrice::class, 'customItemPriceable');
+        return $this->morphMany(CustomItemPrice::class, 'custom_item_priceable');
     }
 
 }

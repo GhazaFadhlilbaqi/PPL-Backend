@@ -22,6 +22,6 @@ class ItemPriceGroup extends Model
 
     public function customItemPrice()
     {
-        return $this->morphMany(CustomItemPrice::class, 'customItemPriceable');
+        return $this->morphMany(CustomItemPrice::class, 'custom_item_priceable');
     }
 }

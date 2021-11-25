@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomItemPriceGroup;
+use App\Models\ItemPriceGroup;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
@@ -10,11 +11,20 @@ class CustomItemPriceGroupController extends Controller
 {
     public function index(Project $project)
     {
-        $customItemPriceGroups = $project->customItemPriceGroup;
+
+        $itemPriceGroups = ItemPriceGroup::with(['itemPrice', 'customItemPrice' => function($q) use ($project) {
+            $q->where('project_id', $project->hashidToId($project->hashid));
+        }])->get();
+
+        $customItemPriceGroups = CustomItemPriceGroup::where('project_id', $project->hashidToId($project->hashid))->with('customItemPrice')->get();
+
+        $mergedCustomItemPrices = array_merge($itemPriceGroups->toArray(), $customItemPriceGroups->toArray());
 
         return response()->json([
             'status' => 'success',
-            'data' => compact('customItemPriceGroups'),
+            'data' => [
+                'customItemPriceGroups' => $mergedCustomItemPrices,
+            ]
         ]);
     }
 
