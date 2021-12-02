@@ -183,6 +183,7 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
             Route::get('', [CustomItemPriceController::class, 'index']);
             Route::post('', [CustomItemPriceController::class, 'store']);
             Route::post('{abstractItemPriceId}', [CustomItemPriceController::class, 'update']);
+            Route::post('{abstractItemPriceId}/delete', [CustomItemPriceController::class, 'destroy']);
         });
 
         Route::prefix('custom-ahp')->group(function() {

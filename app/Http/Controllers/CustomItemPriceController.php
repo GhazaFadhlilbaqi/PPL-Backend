@@ -6,6 +6,7 @@ use App\Models\CustomItemPrice;
 use App\Models\ItemPrice;
 use App\Models\ItemPriceGroup;
 use App\Models\Project;
+use App\Models\Unit;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Http\Request;
 
@@ -33,8 +34,9 @@ class CustomItemPriceController extends Controller
 
         if ($request->has('custom_item_priceable_id')) $dataToMerge['custom_item_priceable_id'] = Hashids::decode($request->custom_item_priceable_id)[0];
 
-        $dataToMerge['unit_id'] = Hashids::decode($request->unit_id)[0];
+        $dataToMerge['unit_id'] = Unit::first()->id;
         $dataToMerge['project_id'] = $project->hashidToId($project->hashid);
+        $dataToMerge['custom_item_priceable_type'] = 'App\\Models\\' . $request->custom_item_priceable_type;
 
         $request->merge($dataToMerge);
 

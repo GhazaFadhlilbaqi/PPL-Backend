@@ -15,13 +15,13 @@ class CreateCustomItemPricesTable extends Migration
     {
         Schema::create('custom_item_prices', function (Blueprint $table) {
             $table->id();
-            $table->string('code'); // User defined code / id
+            $table->string('code')->nullable(); // User defined code / id
             $table->string('custom_item_priceable_id')->nullable();
             $table->string('custom_item_priceable_type')->nullable();
             $table->unsignedBigInteger('unit_id');
             $table->unsignedBigInteger('project_id');
-            $table->string('name');
-            $table->unsignedInteger('price');
+            $table->string('name')->nullable();
+            $table->unsignedInteger('price')->nullable();
             $table->timestamps();
             $table->foreign('unit_id')->references('id')->on('units')->onDelete('restrict')->onUpdate('cascade');
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade')->onUpdate('cascade');
