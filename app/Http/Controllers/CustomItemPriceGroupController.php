@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CustomItemPrice;
 use App\Models\CustomItemPriceGroup;
 use App\Models\ItemPriceGroup;
 use App\Models\Project;
@@ -41,5 +42,23 @@ class CustomItemPriceGroupController extends Controller
             'status' => 'success',
             'data' => compact('customItemPrice')
         ]);
+    }
+
+    public function destroy(Project $project, CustomItemPriceGroup $customItemPriceGroup)
+    {
+
+        // Delete all childs
+        // TODO: Find all ahs that related to this item price
+        CustomItemPrice::where('custom_item_priceable_type', CustomItemPriceGroup::class)
+          ->where('custom_item_priceable_id', $customItemPriceGroup->hashidToId($customItemPriceGroup->hashid))
+          ->where('project_id', $project->hashidToId($project->hashid))
+          ->delete();
+
+        $customItemPriceGroup->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Custom item price group deleted'
+        ], 200);
     }
 }
