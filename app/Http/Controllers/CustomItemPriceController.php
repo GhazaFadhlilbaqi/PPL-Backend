@@ -51,6 +51,17 @@ class CustomItemPriceController extends Controller
         ]);
     }
 
+    public function destroy(Project $project, $abstractItemPriceId)
+    {
+        // TODO: Check if there are any childerns used this custom item price
+        $customItemPrice = CustomItemPrice::where('project', $project->hashidToId($project->hashid))->where('code', $abstractItemPriceId)->first();
+        $customItemPrice->delete();
+
+        return response()->json([
+            'status' => 'success',
+        ]);
+    }
+
     public function update(Project $project, Request $request, $abstractItemPriceId)
     {
 
