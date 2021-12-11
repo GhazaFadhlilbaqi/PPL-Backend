@@ -51,11 +51,10 @@ class CustomItemPriceController extends Controller
         ]);
     }
 
-    public function destroy(Project $project, $abstractItemPriceId)
+    public function destroy(Project $project, CustomItemPrice $customItemPrice)
     {
         // TODO: Check if there are any childerns used this custom item price
-        $customItemPrice = CustomItemPrice::where('project', $project->hashidToId($project->hashid))->where('code', $abstractItemPriceId)->first();
-        $customItemPrice->delete();
+        $customItemPrice = $customItemPrice->delete();
 
         return response()->json([
             'status' => 'success',
@@ -66,13 +65,14 @@ class CustomItemPriceController extends Controller
     {
 
         $projectId = $project->hashidToId($project->hashid);
-        $referencedItem = ItemPrice::withPriceByProvince(Hashids::decode($project->hashed_province_id)[0])->where('id', $abstractItemPriceId)->first();
 
-        if ($referencedItem) {
+        if ($request->model === 'ItemPrice') {
+
+            $referencedItem = ItemPrice::withPriceByProvince(Hashids::decode($project->hashed_province_id)[0])->where('id', $abstractItemPriceId)->first();
 
             $referencedItemPrice = $referencedItem->price[0]->price;
 
-            $currentCustomItemPriceQuery = CustomItemPrice::where('project_id', $projectId)->where('code', $abstractItemPriceId);
+            $currentCustomItemPriceQuery = CustomItemPrice::where('project_id', $projectId)->where('code', $referencedItem->id);
             $currentCustomItemPrice = $currentCustomItemPriceQuery->first();
 
             if ($currentCustomItemPrice && $referencedItemPrice == $request->price) {
@@ -100,7 +100,7 @@ class CustomItemPriceController extends Controller
 
         } else {
 
-            $itemPrice = CustomItemPrice::where('project_id', $projectId)->where('code', $abstractItemPriceId)->first();
+            $itemPrice = CustomItemPrice::where('id', Hashids::decode($abstractItemPriceId)[0])->first();
 
             if (!$itemPrice) {
                 return response()->json([
@@ -108,6 +108,10 @@ class CustomItemPriceController extends Controller
                     'message' => 'No custom item price match with given criteria'
                 ], 400);
             }
+
+            if ($request->has('unit_id')) $request->merge([
+                'unit_id' => Hashids::decode($request->unit_id)[0],
+            ]);
 
             $itemPrice->update($request->only([
                 'code', 'custom_item_priceable_id', 'custom_item_priceable_type', 'unit_id', 'name', 'price'
@@ -126,13 +130,14 @@ class CustomItemPriceController extends Controller
     {
 
         $customItemPricesAvail = $customItemPrices->map(function ($customItemPrice, $index) use ($customItemPrices) {
-            $price = $customItemPrice->price;
-            unset($customItemPrices[$index]->price);
-            $customItemPrices[$index]->price = $price;
+            // $price = $customItemPrice->price;
+            // unset($customItemPrices[$index]->price);
+            // $customItemPrices[$index]->price = $price;
             return $customItemPrice->code;
         });
 
         $itemPrices = ItemPrice::withPriceByProvince($project->province_id)->whereNotIn('id', $customItemPricesAvail)->get();
+
         $itemPrices = $itemPrices->map(function ($data) {
             if (count($data->price)) {
                 $price = $data->price[0]->price;
