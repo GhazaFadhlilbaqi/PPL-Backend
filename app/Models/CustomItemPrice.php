@@ -13,17 +13,15 @@ class CustomItemPrice extends Model
     use HasFactory, HasHashid, HashidRouting;
 
     protected $hidden = ['id'];
-    // protected $hidden = ['id', 'unit_id', 'project_id'];
-    // protected $appends = ['hashid', 'hashed_unit_id', 'hashed_project_id'];
     protected $appends = ['hashid'];
     protected $with = ['unit'];
     protected $fillable = [
-        'code', 'custom_item_priceable_id', 'custom_item_priceable_type', 'unit_id', 'project_id', 'name', 'price'
+        'code', 'custom_item_price_group_id', 'unit_id', 'project_id', 'name', 'is_default', 'price', 'default_price'
     ];
 
-    public function customItemPriceable()
+    public function customItemPriceGroup()
     {
-        return $this->morphTo();
+        return $this->belongsTo(CustomItemPriceGroup::class);
     }
 
     public function project()
@@ -35,19 +33,4 @@ class CustomItemPrice extends Model
     {
         return $this->belongsTo(Unit::class);
     }
-
-    /**
-     * FIXME: Below methods is commented out because master item price
-     * don't encrypt foreign key relation ! make sure to fix it first
-     */
-
-    // public function getHashedUnitIdAttribute()
-    // {
-    //     return Hashids::encode($this->unit_id);
-    // }
-
-    // public function getHashedProjectIdAttribute()
-    // {
-    //     return Hashids::encode($this->project_id);
-    // }
 }

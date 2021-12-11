@@ -65,5 +65,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'utils.determine-request-data-owner' => \App\Http\Middleware\Utils\DetermineRequestDataOwner::class,
         'company.ensure-user-dont-have-company' => \App\Http\Middleware\Company\EnsureUserDontHaveCompany::class,
+        'project.ensure-project-belonging' => \App\Http\Middleware\Project\EnsureProjectBelongingMiddleware::class,
     ];
 }

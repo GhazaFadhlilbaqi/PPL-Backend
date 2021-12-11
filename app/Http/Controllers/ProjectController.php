@@ -15,13 +15,11 @@ class ProjectController extends Controller
     {
         return $this->getTableFormattedData(
             Project::where('user_id', Auth::user()->id)->with('province'))
-            ->addColumn('last_opened_at_formatted', function($data) {
-                return $data->last_opened_at ? date('d-m-Y', strtotime($data->last_opened_at)) : 'Belum Pernah di Buka';
-            })
-            ->addColumn('created_at_formatted', function($data) {
-                return date('d-m-Y', strtotime($data->created_at));
-            })
-            ->make();
+              ->addColumn('last_opened_at_formatted', function($data) {
+                  return $data->last_opened_at ? date('d-m-Y', strtotime($data->last_opened_at)) : 'Belum Pernah di Buka';
+              })->addColumn('created_at_formatted', function($data) {
+                  return date('d-m-Y', strtotime($data->created_at));
+              })->make();
     }
 
     public function store(ProjectRequest $request)

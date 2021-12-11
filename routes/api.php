@@ -150,7 +150,7 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
      * PROJECT BASED ROUTE  |
      * ----------------------
      */
-    Route::prefix('{project}')->middleware('auth:sanctum')->group(function() {
+    Route::prefix('{project}')->middleware(['auth:sanctum', 'project.ensure-project-belonging'])->group(function() {
 
         Route::prefix('rab')->group(function() {
             Route::get('', [RabController::class, 'index']);
@@ -177,12 +177,13 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
             Route::get('', [CustomItemPriceGroupController::class, 'index']);
             Route::post('', [CustomItemPriceGroupController::class, 'store']);
             Route::get('{customItemPriceGroup}/delete', [CustomItemPriceGroupController::class, 'destroy']);
+            Route::post('{customItemPriceGroup}', [CustomItemPriceGroupController::class, 'update']);
         });
 
         Route::prefix('custom-item-price')->group(function() {
             Route::get('', [CustomItemPriceController::class, 'index']);
             Route::post('', [CustomItemPriceController::class, 'store']);
-            Route::post('{abstractItemPriceId}', [CustomItemPriceController::class, 'update']);
+            Route::post('{customItemPrice}', [CustomItemPriceController::class, 'update']);
             Route::get('{customItemPrice}/delete', [CustomItemPriceController::class, 'destroy']);
         });
 

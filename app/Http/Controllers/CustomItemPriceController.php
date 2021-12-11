@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomItemPrice;
+use App\Models\CustomItemPriceGroup;
 use App\Models\ItemPrice;
 use App\Models\ItemPriceGroup;
 use App\Models\Project;
 use App\Models\Unit;
+use Carbon\Carbon;
+use Exception;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Http\Request;
 
@@ -15,10 +18,7 @@ class CustomItemPriceController extends Controller
     public function index(Project $project)
     {
 
-        $masterItemPrices = ItemPrice::all();
-        $customItemPrices = $project->customItemPrice;
-
-        $itemPrices = $this->getCustomItemPrices($project, $customItemPrices);
+        $itemPrices = $project->customItemPrice;
 
         return response()->json([
             'status' => 'success',
@@ -30,19 +30,15 @@ class CustomItemPriceController extends Controller
     public function store(Project $project, Request $request)
     {
 
-        $dataToMerge = [];
-
-        if ($request->has('custom_item_priceable_id')) $dataToMerge['custom_item_priceable_id'] = Hashids::decode($request->custom_item_priceable_id)[0];
-
-        $dataToMerge['unit_id'] = Unit::first()->id;
-        $dataToMerge['project_id'] = $project->hashidToId($project->hashid);
-        $dataToMerge['custom_item_priceable_type'] = 'App\\Models\\' . $request->custom_item_priceable_type;
-
-        $request->merge($dataToMerge);
+        $request->merge([
+            'custom_item_price_group_id' => Hashids::decode($request->custom_item_price_group_id)[0],
+            'unit_id' => Hashids::decode($request->unit_id)[0],
+            'project_id' => Hashids::decode($request->project_id)[0]
+        ]);
 
         # TODO: Implement unique validation check for code field unique to item price and custom item price table table
         $customItemPrice = CustomItemPrice::create($request->only([
-            'code', 'custom_item_priceable_id', 'custom_item_priceable_type', 'unit_id', 'project_id', 'name', 'price'
+            'code', 'custom_item_price_group_id', 'unit_id', 'project_id', 'name', 'price'
         ]));
 
         return response()->json([
@@ -54,6 +50,13 @@ class CustomItemPriceController extends Controller
     public function destroy(Project $project, CustomItemPrice $customItemPrice)
     {
         // TODO: Check if there are any childerns used this custom item price
+        if ($customItemPrice->is_default) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Default item price can\'t be deleted !',
+            ], 400);
+        }
+
         $customItemPrice = $customItemPrice->delete();
 
         return response()->json([
@@ -61,97 +64,85 @@ class CustomItemPriceController extends Controller
         ]);
     }
 
-    public function update(Project $project, Request $request, $abstractItemPriceId)
+    public function update(Project $project, CustomItemPrice $customItemPrice, Request $request)
     {
+        // TODO: Add validation : if id changed, all the children should changed too
+        try {
 
-        $projectId = $project->hashidToId($project->hashid);
-
-        if ($request->model === 'ItemPrice') {
-
-            $referencedItem = ItemPrice::withPriceByProvince(Hashids::decode($project->hashed_province_id)[0])->where('id', $abstractItemPriceId)->first();
-
-            $referencedItemPrice = $referencedItem->price[0]->price;
-
-            $currentCustomItemPriceQuery = CustomItemPrice::where('project_id', $projectId)->where('code', $referencedItem->id);
-            $currentCustomItemPrice = $currentCustomItemPriceQuery->first();
-
-            if ($currentCustomItemPrice && $referencedItemPrice == $request->price) {
-
-                $currentCustomItemPriceQuery->delete();
-
-            } else if ($currentCustomItemPrice && $referencedItemPrice != $request->price) {
-
-                $currentCustomItemPrice->price = $request->price;
-                $currentCustomItemPrice->save();
-
-            } else if (!$currentCustomItemPrice && $referencedItemPrice != $request->price) {
-
-                $itemPrice = CustomItemPrice::create([
-                    'code' => $referencedItem->id,
-                    'custom_item_priceable_id' => $referencedItem->itemPriceGroup->id,
-                    'custom_item_priceable_type' => ItemPriceGroup::class,
-                    'unit_id' => $referencedItem->unit_id,
-                    'project_id' => $projectId,
-                    'name' => $referencedItem->name,
-                    'price' => $request->price,
-                ]);
-
+            if ($customItemPrice->is_default) {
+                $request->unset(['code', 'unit_id', 'name']);
             }
 
-        } else {
+            // FIXME: Move me to request validation
+            $existedItemPrice = CustomItemPrice::where('project_id', $project->hashidToId($project->hashid))->where('code', $request->code)->get();
 
-            $itemPrice = CustomItemPrice::where('id', Hashids::decode($abstractItemPriceId)[0])->first();
-
-            if (!$itemPrice) {
+            if ($existedItemPrice->count() > 0) {
                 return response()->json([
                     'status' => 'fail',
-                    'message' => 'No custom item price match with given criteria'
+                    'message' => 'This code is not available',
                 ], 400);
             }
 
-            if ($request->has('unit_id')) $request->merge([
-                'unit_id' => Hashids::decode($request->unit_id)[0],
-            ]);
+            if ($request->has('unit_id') && $request->unit_id) {
+                $request->merge([
+                    'unit_id' => Hashids::decode($request->unit_id)[0]
+                ]);
+            }
 
-            $itemPrice->update($request->only([
-                'code', 'custom_item_priceable_id', 'custom_item_priceable_type', 'unit_id', 'name', 'price'
+            $customItemPrice->update($request->only([
+                'code', 'unit_id', 'name', 'price'
             ]));
 
-        }
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Data updated'
+            ]);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'updated'
-        ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
-    # Comparing custom item price with master item price
-    private function getCustomItemPrices($project, $customItemPrices)
+    protected function copyFromMasterItemPrice($projectId)
     {
 
-        $customItemPricesAvail = $customItemPrices->map(function ($customItemPrice, $index) use ($customItemPrices) {
-            // $price = $customItemPrice->price;
-            // unset($customItemPrices[$index]->price);
-            // $customItemPrices[$index]->price = $price;
-            return $customItemPrice->code;
-        });
+        $project = Project::find($projectId);
 
-        $itemPrices = ItemPrice::withPriceByProvince($project->province_id)->whereNotIn('id', $customItemPricesAvail)->get();
+        // Copy all master item price data
+        $itemPriceGroups = ItemPriceGroup::with(['itemPrice' => function($data) use ($project) {
+            $data->with(['price' => function($q) use ($project) {
+                $q->where('province_id', $project->province_id);
+            }]);
+        }])->get();
 
-        $itemPrices = $itemPrices->map(function ($data) {
-            if (count($data->price)) {
-                $price = $data->price[0]->price;
-                unset($data->price);
-                $data->price = $price;
-            } else {
-                unset($data->price);
-                $data->price = 0;
-            }
-            return $data;
-        });
+        $customItemPrices = [];
 
-        $itemPrices = $itemPrices->merge($customItemPrices);
+        foreach ($itemPriceGroups as $itemPriceGroup) {
 
-        return $itemPrices;
+            $customItemPriceGroup = CustomItemPriceGroup::create([
+                'project_id' => $projectId,
+                'is_default' => true,
+                'name' => $itemPriceGroup->name,
+            ]);
+
+            $customItemPrices = CustomItemPrice::insert($itemPriceGroup->itemPrice->map(function($itemPriceMaster) use ($projectId, $customItemPriceGroup) {
+                return [
+                    'code' => $itemPriceMaster->id,
+                    'custom_item_price_group_id' => $customItemPriceGroup->id,
+                    'unit_id' => $itemPriceMaster->unit_id,
+                    'project_id' => $projectId,
+                    'name' => $itemPriceMaster->name,
+                    'is_default' => true,
+                    'price' => count($itemPriceMaster->price) > 0 ? $itemPriceMaster->price[0]->price : 0,
+                    'default_price' => count($itemPriceMaster->price) > 0 ? $itemPriceMaster->price[0]->price : 0,
+                    'created_at' => Carbon::now()
+                ];
+            })->toArray());
+        }
+
+        return $customItemPrices;
     }
 }

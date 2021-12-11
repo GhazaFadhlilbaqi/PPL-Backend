@@ -17,6 +17,7 @@ class CreateCustomItemPriceGroupsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('project_id');
             $table->string('name');
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade')->onUpdate('cascade');
         });

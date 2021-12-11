@@ -12,12 +12,11 @@ class CustomItemPriceGroup extends Model
     use HasFactory, HashidRouting, HasHashid;
 
     protected $appends = ['hashid'];
-    protected $fillable = ['project_id', 'name'];
+    protected $fillable = ['project_id', 'is_default', 'name'];
     protected $hidden = ['id'];
 
     public function customItemPrice()
     {
-        return $this->morphMany(CustomItemPrice::class, 'custom_item_priceable');
+        return $this->hasMany(CustomItemPrice::class);
     }
-
 }

@@ -12,20 +12,11 @@ class CustomItemPriceGroupController extends Controller
 {
     public function index(Project $project)
     {
-
-        $itemPriceGroups = ItemPriceGroup::with(['itemPrice', 'customItemPrice' => function($q) use ($project) {
-            $q->where('project_id', $project->hashidToId($project->hashid));
-        }])->get();
-
-        $customItemPriceGroups = CustomItemPriceGroup::where('project_id', $project->hashidToId($project->hashid))->with('customItemPrice')->get();
-
-        $mergedCustomItemPrices = array_merge($itemPriceGroups->toArray(), $customItemPriceGroups->toArray());
+        $customItemPriceGroups = $project->customItemPriceGroup()->with('customItemPrice')->get();
 
         return response()->json([
             'status' => 'success',
-            'data' => [
-                'customItemPriceGroups' => $mergedCustomItemPrices,
-            ]
+            'data' => compact('customItemPriceGroups')
         ]);
     }
 
@@ -46,19 +37,24 @@ class CustomItemPriceGroupController extends Controller
 
     public function destroy(Project $project, CustomItemPriceGroup $customItemPriceGroup)
     {
-
         // Delete all childs
         // TODO: Find all ahs that related to this item price
-        CustomItemPrice::where('custom_item_priceable_type', CustomItemPriceGroup::class)
-          ->where('custom_item_priceable_id', $customItemPriceGroup->hashidToId($customItemPriceGroup->hashid))
-          ->where('project_id', $project->hashidToId($project->hashid))
-          ->delete();
-
         $customItemPriceGroup->delete();
 
         return response()->json([
             'status' => 'success',
             'message' => 'Custom item price group deleted'
         ], 200);
+    }
+
+    public function update(Project $project, CustomItemPriceGroup $customItemPriceGroup, Request $request)
+    {
+        $customItemPriceGroup->update($request->only([
+            'name'
+        ]));
+
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 }
