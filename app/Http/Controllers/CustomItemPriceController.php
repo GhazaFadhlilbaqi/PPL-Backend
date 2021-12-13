@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\CustomItemPrice;
 use App\Models\CustomItemPriceGroup;
-use App\Models\ItemPrice;
 use App\Models\ItemPriceGroup;
 use App\Models\Project;
-use App\Models\Unit;
+use App\Traits\UnitTrait;
 use Carbon\Carbon;
 use Exception;
 use Vinkla\Hashids\Facades\Hashids;
@@ -15,6 +14,9 @@ use Illuminate\Http\Request;
 
 class CustomItemPriceController extends Controller
 {
+
+    use UnitTrait;
+
     public function index(Project $project)
     {
 
@@ -32,7 +34,7 @@ class CustomItemPriceController extends Controller
 
         $request->merge([
             'custom_item_price_group_id' => Hashids::decode($request->custom_item_price_group_id)[0],
-            'unit_id' => Hashids::decode($request->unit_id)[0],
+            'unit_id' => $request->has('unit_id') ? Hashids::decode($request->unit_id)[0] : $this->getFirstUnit()->id,
             'project_id' => Hashids::decode($request->project_id)[0]
         ]);
 
@@ -69,18 +71,23 @@ class CustomItemPriceController extends Controller
         // TODO: Add validation : if id changed, all the children should changed too
         try {
 
+            $unsets = collect(['code', 'name', 'unit_id']);
+
             if ($customItemPrice->is_default) {
-                $request->unset(['code', 'unit_id', 'name']);
+                $unsets->each(function($data) use ($request) { $request->offsetUnset($data); });
             }
 
-            // FIXME: Move me to request validation
-            $existedItemPrice = CustomItemPrice::where('project_id', $project->hashidToId($project->hashid))->where('code', $request->code)->get();
+            if ($request->code) {
 
-            if ($existedItemPrice->count() > 0) {
-                return response()->json([
-                    'status' => 'fail',
-                    'message' => 'This code is not available',
-                ], 400);
+                // FIXME: Move me to request validation
+                $existedItemPrice = CustomItemPrice::where('project_id', $project->hashidToId($project->hashid))->where('id', '!=', $customItemPrice->hashidToId($customItemPrice->hashid))->where('code', $request->code)->get();
+
+                if ($existedItemPrice->count() > 0) {
+                    return response()->json([
+                        'status' => 'fail',
+                        'message' => 'This code is not available',
+                    ], 400);
+                }
             }
 
             if ($request->has('unit_id') && $request->unit_id) {

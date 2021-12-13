@@ -20,6 +20,32 @@ class CustomItemPriceGroupController extends Controller
         ]);
     }
 
+    // public function query(Project $project, Request $request)
+    // {
+
+    //     $itemPriceGroupsSearch = $project->customItemPriceGroup();
+
+    //     if ($request->has('q') && $request->q) {
+    //         $itemPriceGroupsSearch->whereHas('customItemPrice', function ($q) use ($requ) {
+    //             $q->where('player_id', $playerId);
+    //         })->where(function ($query) {
+    //             $query->where('status', 'Pending')
+    //                 ->orWhereHas('GamePlayer', function (Builder $query) {
+    //                     $query->where('request_status', 'Confirm');
+    //                 });
+    //         })->get();
+    //     }
+
+    //     $itemPriceGroupsSearch = $itemPriceGroupsSearch->get();
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'data' => [
+    //             'itemPriceGroups' => $itemPriceGroupsSearch,
+    //         ],
+    //     ]);
+    // }
+
     public function store(Project $project, Request $request)
     {
 

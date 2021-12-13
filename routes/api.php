@@ -176,6 +176,7 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
         Route::prefix('custom-item-price-group')->group(function() {
             Route::get('', [CustomItemPriceGroupController::class, 'index']);
             Route::post('', [CustomItemPriceGroupController::class, 'store']);
+            Route::get('query', [CustomItemPriceGroupController::class, 'query']);
             Route::get('{customItemPriceGroup}/delete', [CustomItemPriceGroupController::class, 'destroy']);
             Route::post('{customItemPriceGroup}', [CustomItemPriceGroupController::class, 'update']);
         });
