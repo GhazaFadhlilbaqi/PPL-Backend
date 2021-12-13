@@ -15,6 +15,7 @@ class UserController extends Controller
 {
 
     const PHOTO_PROFILE_PATH = '/storage/uploads/users/profile-photo/';
+    const DEFAULT_PHOTO_NAME = 'default-profile-picture.svg';
 
     public function show(User $user)
     {
@@ -35,7 +36,7 @@ class UserController extends Controller
                 $request->file('photo-update')->move(public_path(self::PHOTO_PROFILE_PATH), $randomName);
 
                 // Delete old photo
-                if ($user->photo !== 'default-user-photo.png') {
+                if ($user->photo !== self::DEFAULT_PHOTO_NAME) {
                     if (File::exists(public_path(self::PHOTO_PROFILE_PATH) . $user->photo)) File::delete(public_path(self::PHOTO_PROFILE_PATH) . $user->photo);
                 }
 
