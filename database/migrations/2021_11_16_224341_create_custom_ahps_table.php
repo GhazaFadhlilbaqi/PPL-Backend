@@ -15,7 +15,7 @@ class CreateCustomAhpsTable extends Migration
     {
         Schema::create('custom_ahps', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 16);
+            $table->string('code', 32);
             $table->unsignedBigInteger('project_id');
             $table->string('name', 64);
             $table->double('Pw')->default(0);

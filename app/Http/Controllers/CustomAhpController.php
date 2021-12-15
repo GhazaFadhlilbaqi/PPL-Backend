@@ -42,10 +42,9 @@ class CustomAhpController extends CountableItemController
 
         $request->merge([
             'project_id' =>$project->hashidToId($project->hashid),
-            'code' => $request->id,
         ]);
 
-        $customAhp = CustomAhp::create($request->only(array_merge($this->defaultAhpVariables, ['project_id', 'code', 'name'])));
+        $customAhp = CustomAhp::create($request->only(['project_id', 'code', 'name']));
 
         return response()->json([
             'status' => 'success',

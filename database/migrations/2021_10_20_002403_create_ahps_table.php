@@ -14,7 +14,7 @@ class CreateAhpsTable extends Migration
     public function up()
     {
         Schema::create('ahps', function (Blueprint $table) {
-            $table->string('id', 16)->unique()->primary();
+            $table->string('id', 32)->unique()->primary();
             $table->string('name', 64);
             $table->double('Pw')->default(0);
             $table->double('Cp')->default(0);
