@@ -35,6 +35,7 @@ class CreateCustomAhpsTable extends Migration
             $table->double('ppp')->default(0);
             $table->double('m')->default(0);
             $table->double('n')->default(0);
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
             $table->foreign('project_id')->references('id')->on('projects')->onUpdate('cascade')->onDelete('cascade');
         });

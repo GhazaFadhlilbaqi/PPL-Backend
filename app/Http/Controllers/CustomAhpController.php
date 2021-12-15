@@ -15,10 +15,8 @@ class CustomAhpController extends CountableItemController
     # FIXME: Make below's method focused on fetching custom ahp only ! not mixed, or call it with different method
     public function index(Project $project)
     {
-        $customAhps = $project->customAhp;
-        $customAhps = $customAhps->merge(Ahp::all());
-        $customAhps = $customAhps->map(function($customAhp) {
-            return $this->countAhpItem($customAhp);
+        $customAhps = $project->customAhp->map(function($data) {
+            return $this->countAhpItem($data);
         });
 
         return response()->json([
@@ -44,7 +42,20 @@ class CustomAhpController extends CountableItemController
             'project_id' =>$project->hashidToId($project->hashid),
         ]);
 
-        $customAhp = CustomAhp::create($request->only(['project_id', 'code', 'name']));
+        # Check if user choose to copy from master
+        if ($request->has('selected_reference') && $request->selected_reference) {
+
+            return $this->copyAhpFromMaster($request, $project->hashidToId($project->hashid), explode('~', $request->selected_reference)[0]);
+
+        } else {
+
+            $ahp = CustomAhp::create($request->only(['code', 'name', 'project_id']));
+
+            return response()->json([
+                'status' => 'success',
+                'data' => compact('ahp')
+            ]);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -73,5 +84,36 @@ class CustomAhpController extends CountableItemController
         return response()->json([
             'status' => 'success',
         ], 204);
+    }
+
+    private function copyAhpFromMaster(Request $request, $projectId, $referenceAhpId)
+    {
+        $referenceAhp = Ahp::find($referenceAhpId);
+
+        if ($referenceAhp) {
+
+            $ahp = CustomAhp::create(array_merge(
+                [
+                    'name' => $request->name,
+                    'code' => $request->code,
+                    'project_id' => $projectId,
+                    'is_default' => false,
+                ],
+                $referenceAhp->select($this->defaultAhpVariables)->first()->toArray()
+            ));
+
+            return response()->json([
+                'status' => 'success',
+                'data' => compact('ahp')
+            ]);
+
+        } else {
+
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Reference AHP not found'
+            ], 400);
+
+        }
     }
 }

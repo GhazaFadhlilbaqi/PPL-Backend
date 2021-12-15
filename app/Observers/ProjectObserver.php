@@ -4,9 +4,13 @@ namespace App\Observers;
 
 use App\Http\Controllers\CustomItemPriceController;
 use App\Models\Project;
+use App\Traits\CustomAhpTrait;
 
 class ProjectObserver extends CustomItemPriceController
 {
+
+    use CustomAhpTrait;
+
     /**
      * Handle the Project "created" event.
      *
@@ -16,6 +20,7 @@ class ProjectObserver extends CustomItemPriceController
     public function created(Project $project)
     {
         $this->copyFromMasterItemPrice($project->id);
+        $this->copyAhpFromMaster($project->id);
     }
 
     /**

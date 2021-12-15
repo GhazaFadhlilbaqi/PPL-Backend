@@ -66,5 +66,7 @@ class Kernel extends HttpKernel
         'utils.determine-request-data-owner' => \App\Http\Middleware\Utils\DetermineRequestDataOwner::class,
         'company.ensure-user-dont-have-company' => \App\Http\Middleware\Company\EnsureUserDontHaveCompany::class,
         'project.ensure-project-belonging' => \App\Http\Middleware\Project\EnsureProjectBelongingMiddleware::class,
+        'custom-ahp.protect-default-model' => \App\Http\Middleware\CustomAhp\ProtectDefaultModelMiddleware::class,
+        'custom-item-price.protect-default-model' => \App\Http\Middleware\CustomItemPrice\ProtectDefaultModelMiddleware::class,
     ];
 }

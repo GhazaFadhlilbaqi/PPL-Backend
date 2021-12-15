@@ -184,15 +184,15 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
         Route::prefix('custom-item-price')->group(function() {
             Route::get('', [CustomItemPriceController::class, 'index']);
             Route::post('', [CustomItemPriceController::class, 'store']);
-            Route::post('{customItemPrice}', [CustomItemPriceController::class, 'update']);
-            Route::get('{customItemPrice}/delete', [CustomItemPriceController::class, 'destroy']);
+            Route::post('{customItemPrice}', [CustomItemPriceController::class, 'update'])->middleware('custom-item-price.protect-default-model');
+            Route::get('{customItemPrice}/delete', [CustomItemPriceController::class, 'destroy'])->middleware('custom-item-price.protect-default-model');
         });
 
         Route::prefix('custom-ahp')->group(function() {
             Route::get('', [CustomAhpController::class, 'index']);
             Route::post('', [CustomAhpController::class, 'store']);
-            Route::post('{customAhp}', [CustomAhpController::class, 'update']);
-            Route::get('{customAhp}/delete', [CustomAhpController::class, 'destroy']);
+            Route::post('{customAhp}', [CustomAhpController::class, 'update'])->middleware('custom-ahp.protect-default-model');
+            Route::get('{customAhp}/delete', [CustomAhpController::class, 'destroy'])->middleware('custom-ahp.protect-default-model');
         });
 
         Route::prefix('custom-ahs')->group(function() {
