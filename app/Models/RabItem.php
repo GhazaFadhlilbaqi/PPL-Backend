@@ -13,7 +13,7 @@ class RabItem extends Model
     use HasFactory, HashidRouting, HasHashid;
 
     protected $fillable = [
-        'rab_id', 'rab_item_header_id', 'name', 'ahs_id', 'volume', 'unit_id'
+        'rab_id', 'rab_item_header_id', 'name', 'custom_ahs_id', 'volume', 'unit_id'
     ];
 
     protected $hidden = [
@@ -32,6 +32,11 @@ class RabItem extends Model
     public function rabItemHeader()
     {
         return $this->belongsTo(RabItemHeader::class);
+    }
+
+    public function customAhs()
+    {
+        return $this->belongsTo(CustomAhs::class);
     }
 
     public function getHashedRabItemHeaderIdAttribute()

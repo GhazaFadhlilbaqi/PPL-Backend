@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\CustomAhpController;
 use App\Http\Controllers\CustomAhsController;
+use App\Http\Controllers\CustomAhsItemController;
 use App\Http\Controllers\CustomItemPriceController;
 use App\Http\Controllers\CustomItemPriceGroupController;
 use App\Http\Controllers\Master\AhpController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\RabController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\RabItemController;
 use App\Http\Controllers\RabItemHeaderController;
+use App\Models\CustomAhsItem;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -184,7 +186,7 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
         Route::prefix('custom-item-price')->group(function() {
             Route::get('', [CustomItemPriceController::class, 'index']);
             Route::post('', [CustomItemPriceController::class, 'store']);
-            Route::post('{customItemPrice}', [CustomItemPriceController::class, 'update'])->middleware('custom-item-price.protect-default-model');
+            Route::post('{customItemPrice}', [CustomItemPriceController::class, 'update']);
             Route::get('{customItemPrice}/delete', [CustomItemPriceController::class, 'destroy'])->middleware('custom-item-price.protect-default-model');
         });
 
@@ -200,6 +202,12 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
             Route::post('', [CustomAhsController::class, 'store']);
             Route::post('{customAhs}', [CustomAhsController::class, 'update']);
             Route::get('{customAhs}/delete', [CustomAhsController::class, 'destroy']);
+        });
+
+        Route::prefix('custom-ahs-item')->group(function() {
+            Route::post('', [CustomAhsItemController::class, 'store']);
+            Route::get('{customAhsItem}/delete', [CustomAhsItemController::class, 'destroy']);
+            Route::post('{customAhsItem}', [CustomAhsItemController::class, 'update']);
         });
 
     });

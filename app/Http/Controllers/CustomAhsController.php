@@ -12,7 +12,7 @@ class CustomAhsController extends Controller
 {
     public function index(Project $project)
     {
-        $customAhs = $project->customAhs;
+        $customAhs = CustomAhs::where('project_id', $project->hashidToId($project->hashid))->with(['customAhsItem'])->get();
 
         return response()->json([
             'status' => 'success',

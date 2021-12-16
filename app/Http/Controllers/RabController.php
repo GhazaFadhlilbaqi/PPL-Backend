@@ -12,7 +12,9 @@ class RabController extends Controller
     public function index(Request $request, Project $project)
     {
         $rabs = Rab::where('project_id', $project->hashidToId($project->hashid))
-          ->with(['rabItemHeader.rabItem'])
+          ->with(['rabItemHeader.rabItem' => function($q) {
+              $q->with('customAhs');
+          }])
           ->with('rabItem', function($q) {
             $q->where('rab_item_header_id', NULL);
           })

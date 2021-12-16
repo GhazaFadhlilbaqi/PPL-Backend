@@ -8,6 +8,7 @@ use App\Models\RabItem;
 use App\Models\RabItemHeader;
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Vinkla\Hashids\Facades\Hashids;
 
 class RabItemController extends Controller
 {
@@ -31,7 +32,7 @@ class RabItemController extends Controller
         ]);
 
         $rabItem = RabItem::create($request->only([
-            'rab_id', 'name', 'ahs_id', 'volume', 'unit_id', 'rab_item_header_id'
+            'rab_id', 'name', 'custom_ahs_id', 'volume', 'unit_id', 'rab_item_header_id'
         ]));
 
         return response()->json([
@@ -42,8 +43,15 @@ class RabItemController extends Controller
 
     public function update(Project $project, Rab $rab, RabItem $rabItem, Request $request)
     {
+        $dataToMerge = [];
+
+        if ($request->has('unit_id')) $dataToMerge['unit_id'] = Hashids::decode($request->unit_id)[0];
+        if ($request->has('custom_ahs_id')) $dataToMerge['custom_ahs_id'] = Hashids::decode($request->custom_ahs_id)[0];
+
+        $request->merge($dataToMerge);
+
         $rabItem->update($request->only([
-            'name', 'ahs_id', 'volume', 'unit_id'
+            'name', 'custom_ahs_id', 'volume', 'unit_id'
         ]));
 
         return response()->json([
