@@ -24,9 +24,14 @@ class AhsController extends CountableItemController
         if ($request->arrange == 'true' && $request->has('province')) {
 
             $itemArranged = [];
+
             foreach ($ahs as $key => $a) {
+
+                # Categorizing by it's section. (e.g labor, ingredients, etc)
                 foreach ($a->ahsItem as $key2 => $aItem) $itemArranged[$aItem->section][] = $aItem;
+
                 $ahs[$key]['item_arranged'] = $itemArranged;
+
                 $itemArranged = [];
                 $ahs[$key] = $this->countAhsSubtotal($a, $provinceId);
             }

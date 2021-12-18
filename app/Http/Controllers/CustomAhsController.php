@@ -8,11 +8,25 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Vinkla\Hashids\Facades\Hashids;
 
-class CustomAhsController extends Controller
+class CustomAhsController extends CountableItemController
 {
-    public function index(Project $project)
+    public function index(Project $project, Request $request)
     {
-        $customAhs = CustomAhs::where('project_id', $project->hashidToId($project->hashid))->with(['customAhsItem'])->get();
+        $customAhs = CustomAhs::where('project_id', $project->hashidToId($project->hashid))->with(['customAhsItem' => function($q) {
+            $q->with(['unit', 'customAhsItemable']);
+        }])->get();
+
+        if ($request->has('arrange') && $request->arrange == 'true') {
+
+            $arrangedCustomAhs = [];
+
+            foreach ($customAhs as $key => $cAhs) {
+                foreach ($cAhs->customAhsItem as $cAhsItem) $arrangedCustomAhs[$cAhsItem->section][] = $cAhsItem;
+                $customAhs[$key]['item_arranged'] = $arrangedCustomAhs;
+                $arrangedCustomAhs = [];
+                $customAhs[$key] = $this->countCustomAhsSubtotal($cAhs, $project->province->id);
+            }
+        }
 
         return response()->json([
             'status' => 'success',

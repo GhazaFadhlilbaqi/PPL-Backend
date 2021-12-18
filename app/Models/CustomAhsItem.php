@@ -24,4 +24,9 @@ class CustomAhsItem extends Model
     {
         return $this->morphTo();
     }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
 }
