@@ -152,6 +152,7 @@ class CountableItemController extends Controller
 
     }
 
+    // FIXME: Definitely need more improovement
     protected function countCustomAhsItemTotal($customAhsItem)
     {
 
@@ -169,7 +170,7 @@ class CountableItemController extends Controller
 
         } else if ($customAhsItem->custom_ahs_itemable_type === CustomAhp::class) {
 
-            return $this->countAhpItem($customAhsItem->ahsItemable)->S * $customAhsItem->coefficient;
+            return $this->countAhpItem($customAhsItem->customAhsItemable)->S * $customAhsItem->coefficient;
 
         } else {
 
@@ -192,48 +193,4 @@ class CountableItemController extends Controller
         return $customAhs;
 
     }
-
-    // FIXME: Definitely need more improovement
-    // protected function countCustomAhsItemTotal($customAhsItem, $province = null)
-    // {
-
-    //     # Check if ahsItem referenced to item price
-    //     if ($customAhsItem->custom_ahs_itemable_type === CustomItemPrice::class) {
-
-    //         // $itemPrice = $ahsItem->ahsItemable->with(['price' => function($q) use ($province, $ahsItem) {
-    //         //     $q->where('province_id', $province);
-    //         // }])->first();
-
-    //         // HACK: This is a shortcut to get accurate price by province, but it's take 1 query more
-    //         $customItemPrice = CustomItemPrice::find($customAhsItem->custom_ahs_itemable_id);
-
-    //         // $fixedPrice = count($itemPrice->price) > 0 ? $itemPrice->price[0]->price : 0;
-    //         $fixedPrice = $customItemPrice ? ($customItemPrice->price ?? 0) : 0;
-    //         $customAhsItem->ahsItemable->subtotal = $fixedPrice;
-
-    //         return $fixedPrice * $customItemPrice->coefficient;
-
-    //     } else if ($customAhsItem->custom_ahs_itemable_type === CustomAhs::class) {
-    //         return $this->countAhsSubtotal($customAhsItem->ahsItemable, $province)->subtotal * $customAhsItem->coefficient;
-    //     } else if ($customAhsItem->ahs_itemable_type === CustomAhp::class) {
-    //         return $this->countAhpItem($customAhsItem->ahsItemable)->S * $customAhsItem->coefficient;
-    //     } else {
-    //         throw new Exception('Itemable type not supported');
-    //     }
-    // }
-
-    // protected function countCustomAhsSubtotal($customAhs, $province = null)
-    // {
-    //     $ahsSubtotal = 0;
-
-    //     foreach ($customAhs->customAhsItem as $customAhsItem) {
-    //         $customAhsItem->subtotal = $this->countCustomAhsItemTotal($customAhsItem, $province);
-    //         $ahsSubtotal += $customAhsItem->subtotal;
-    //     }
-
-    //     $customAhs->subtotal = $ahsSubtotal;
-
-    //     return $customAhs;
-
-    // }
 }

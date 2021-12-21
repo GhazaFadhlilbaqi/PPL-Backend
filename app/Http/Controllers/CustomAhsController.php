@@ -76,4 +76,19 @@ class CustomAhsController extends CountableItemController
             'data' => compact('customAhs')
         ]);
     }
+
+    public function getAhsIds(Project $project)
+    {
+        $ahsItemIds = $project->customAhs->map(function($data) {
+            return [
+                'hashid' => $data->hashid,
+                'name' => $data->name
+            ];
+        })->toArray();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('ahsItemIds')
+        ]);
+    }
 }

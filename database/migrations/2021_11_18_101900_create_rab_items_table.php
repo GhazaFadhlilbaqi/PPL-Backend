@@ -20,6 +20,7 @@ class CreateRabItemsTable extends Migration
             $table->string('name')->nullable();
             $table->unsignedBigInteger('custom_ahs_id')->nullable();
             $table->double('volume')->default(0.0);
+            $table->double('price')->nullable()->default(null);
             $table->unsignedBigInteger('unit_id');
             $table->timestamps();
             $table->foreign('rab_item_header_id')->references('id')->on('rab_item_headers')->onUpdate('cascade')->onDelete('cascade');

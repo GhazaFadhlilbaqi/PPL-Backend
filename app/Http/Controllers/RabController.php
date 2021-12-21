@@ -6,19 +6,47 @@ use App\Models\Project;
 use App\Models\Rab;
 use Illuminate\Http\Request;
 
-class RabController extends Controller
+class RabController extends CountableItemController
 {
 
     public function index(Request $request, Project $project)
     {
         $rabs = Rab::where('project_id', $project->hashidToId($project->hashid))
           ->with(['rabItemHeader.rabItem' => function($q) {
-              $q->with('customAhs');
+              $q->when($q->customAhs, function($j) {
+                $j->with(['customAhs']);
+              });
           }])
           ->with('rabItem', function($q) {
-            $q->where('rab_item_header_id', NULL);
+              $q->where('rab_item_header_id', NULL);
+              $q->with('customAhs');
           })
           ->get();
+
+        $rabSubtotal = 0;
+
+        foreach ($rabs as $key => $rab) {
+            if ($rab->rabItem) {
+                foreach ($rab->rabItem as $key2 => $rabItem) {
+                    if ($rabItem->customAhs) {
+                        $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
+                        $countedAhs->price = $countedAhs->subtotal;
+                        $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
+                        $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
+                        $rabSubtotal += $countedAhs->subtotal;
+                    } else {
+                        $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
+                        $rabs[$key]->rabItem[$key2] = $rabItem;
+                        $rabSubtotal += $rabItem->subtotal;
+                    }
+                }
+            } else {
+                $rabSubtotal += 0;
+            }
+
+            $rabs[$key]->subtotal = $rabSubtotal;
+            $rabSubtotal = 0;
+        }
 
         return response()->json([
             'status' => 'success',
