@@ -43,9 +43,20 @@ class AhsController extends CountableItemController
         ]);
     }
 
-    public function getAhsCodes(Province $province)
+    public function getAhsIds()
     {
-        // Ahs::where('')
+        $ahses = Ahs::all()->map(function($ahs) {
+            return [
+                'name' => $ahs->name,
+                'code' => $ahs->code,
+                'id' => $ahs->id,
+            ];
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('ahses')
+        ]);
     }
 
     public function store(AhsRequest $request)

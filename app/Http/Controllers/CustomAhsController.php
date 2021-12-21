@@ -82,6 +82,7 @@ class CustomAhsController extends CountableItemController
         $ahsItemIds = $project->customAhs->map(function($data) {
             return [
                 'hashid' => $data->hashid,
+                'code' => $data->code,
                 'name' => $data->name
             ];
         })->toArray();
