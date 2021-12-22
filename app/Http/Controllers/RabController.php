@@ -13,9 +13,9 @@ class RabController extends CountableItemController
     {
         $rabs = Rab::where('project_id', $project->hashidToId($project->hashid))
           ->with(['rabItemHeader.rabItem' => function($q) {
-              $q->when($q->customAhs, function($j) {
-                $j->with(['customAhs']);
-              });
+            //   $q->when($q->customAhs(), function($j) {
+            //     $j->with(['customAhs']);
+            //   });
           }])
           ->with('rabItem', function($q) {
               $q->where('rab_item_header_id', NULL);

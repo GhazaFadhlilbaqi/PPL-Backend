@@ -24,4 +24,9 @@ class CustomAhs extends Model
     {
         return $this->belongsTo(Project::class);
     }
+
+    public function rabItemHeader()
+    {
+        return $this->hasMany(RabItemHeader::class);
+    }
 }
