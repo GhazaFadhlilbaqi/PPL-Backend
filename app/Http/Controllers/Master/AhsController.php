@@ -45,13 +45,31 @@ class AhsController extends CountableItemController
 
     public function getAhsIds()
     {
-        $ahses = Ahs::all()->map(function($ahs) {
+
+        // FIXME: Definiteluy need more improovement !
+        $ahses = Ahs::all();
+        $arrayAhses = [];
+
+        $ahses = $ahses->filter(function($ahs) {
+            foreach ($ahs->ahsItem as $ahsItem) {
+                if ($ahsItem->ahs_itemable_type == Ahs::class) return false;
+            }
+            return true;
+        });
+
+        $ahses = $ahses->map(function($ahs) {
             return [
                 'name' => $ahs->name,
                 'code' => $ahs->code,
                 'id' => $ahs->id,
             ];
         });
+
+        foreach ($ahses as $ahs) {
+            $arrayAhses[] = $ahs;
+        }
+
+        $ahses = $arrayAhses;
 
         return response()->json([
             'status' => 'success',

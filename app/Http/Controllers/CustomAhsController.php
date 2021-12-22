@@ -3,9 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CustomAhsRequest;
+use App\Models\Ahp;
+use App\Models\Ahs;
+use App\Models\CustomAhp;
 use App\Models\CustomAhs;
+use App\Models\CustomAhsItem;
+use App\Models\CustomItemPrice;
+use App\Models\ItemPrice;
 use App\Models\Project;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Vinkla\Hashids\Facades\Hashids;
 
 class CustomAhsController extends CountableItemController
@@ -67,13 +76,17 @@ class CustomAhsController extends CountableItemController
             'project_id' => $project->hashidToId($project->hashid)
         ]);
 
-        $customAhs = CustomAhs::create($request->only([
-            'name', 'code', 'project_id'
-        ]));
+        if ($request->has('selected_reference') && $request->selected_reference) {
+            $this->copyCustomAhsFromAhs($project, $request->selected_reference);
+        } else {
+            $customAhs = CustomAhs::create($request->only([
+                'name', 'code', 'project_id'
+            ]));
+        }
 
         return response()->json([
             'status' => 'success',
-            'data' => compact('customAhs')
+            'data' => []
         ]);
     }
 
@@ -91,5 +104,71 @@ class CustomAhsController extends CountableItemController
             'status' => 'success',
             'data' => compact('ahsItemIds')
         ]);
+    }
+
+    private function copyCustomAhsFromAhs(Project $project, $ahsReferenceId)
+    {
+
+        $referencedAhs = Ahs::find($ahsReferenceId);
+
+        if ($referencedAhs) {
+
+            DB::transaction(function() use ($project, $referencedAhs) {
+
+                $customAhsItemRemapped = [];
+
+                foreach ($referencedAhs->ahsItem as $ahsItem) {
+                    if ($ahsItem->ahs_itemable_type == Ahs::class) {
+                        return false;
+                    }
+                }
+
+                $customAhs = CustomAhs::create([
+                    'code' => $referencedAhs->id,
+                    'name' => $referencedAhs->name,
+                    'project_id' => $project->hashidToId($project->hashid),
+                ]);
+
+                foreach ($referencedAhs->ahsItem as $ahsItem2) {
+
+                    $relatedDependency = $this->getRelatedCustomAhsItemDependency($ahsItem2);
+
+                    $customAhsItemRemapped[] = [
+                        'custom_ahs_id' => $customAhs->id,
+                        'name' => $ahsItem2->name,
+                        'unit_id' => $ahsItem2->unit_id,
+                        'coefficient' => $ahsItem2->coefficient,
+                        'section' => $ahsItem2->section,
+                        'custom_ahs_itemable_id' => $relatedDependency['model']->id,
+                        'custom_ahs_itemable_type' => $relatedDependency['type'],
+                        'created_at' => Carbon::now()
+                    ];
+                }
+
+                CustomAhsItem::insert($customAhsItemRemapped);
+
+            });
+
+        } else {
+            throw new Exception('No parent reference found');
+        }
+    }
+
+    private function getRelatedCustomAhsItemDependency($ahsItem)
+    {
+        switch ($ahsItem->ahs_itemable_type) {
+            case Ahp::class :
+                return [
+                    'model' => CustomAhp::where('code', $ahsItem->ahsItemable->id)->first(),
+                    'type' => CustomAhp::class,
+                ];
+            case ItemPrice::class :
+                return [
+                    'model' => CustomItemPrice::where('code', $ahsItem->ahsItemable->id)->first(),
+                    'type' => CustomItemPrice::class,
+                ];
+            default :
+                throw new Exception('No compatible itemable class');
+        }
     }
 }
