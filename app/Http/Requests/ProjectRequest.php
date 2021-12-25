@@ -30,7 +30,8 @@ class ProjectRequest extends FormRequest
             'address' => 'required',
             'province_id' => 'required',
             'fiscal_year' => 'required|numeric',
-            'profit_margin' => 'required|numeric'
+            'profit_margin' => 'required|numeric',
+            'ppn' => 'required|numeric|max:100'
         ];
     }
 }

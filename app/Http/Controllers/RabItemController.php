@@ -43,6 +43,7 @@ class RabItemController extends Controller
 
     public function update(Project $project, Rab $rab, RabItem $rabItem, Request $request)
     {
+
         $dataToMerge = [];
 
         if ($request->has('unit_id') && $request->unit_id) $dataToMerge['unit_id'] = Hashids::decode($request->unit_id)[0];

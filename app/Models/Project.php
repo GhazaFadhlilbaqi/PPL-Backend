@@ -25,7 +25,8 @@ class Project extends Model
         'province_id',
         'fiscal_year',
         'profit_margin',
-        'last_opened_at'
+        'last_opened_at',
+        'ppn'
     ];
 
     public function user()

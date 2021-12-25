@@ -23,6 +23,7 @@ class CreateProjectsTable extends Migration
             $table->unsignedTinyInteger('province_id');
             $table->integer('fiscal_year');
             $table->integer('profit_margin');
+            $table->integer('ppn')->comment('The percentage of PPN')->default(0);
             $table->timestamp('last_opened_at')->nullable();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');

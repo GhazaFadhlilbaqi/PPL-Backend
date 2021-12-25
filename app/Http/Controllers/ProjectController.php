@@ -31,7 +31,7 @@ class ProjectController extends Controller
         ]);
 
         $project = Project::create($request->only([
-            'user_id', 'name', 'activity', 'job', 'address', 'province_id', 'fiscal_year', 'profit_margin'
+            'user_id', 'name', 'activity', 'job', 'address', 'province_id', 'fiscal_year', 'profit_margin', 'ppn'
         ]));
 
         return response()->json([
@@ -48,7 +48,7 @@ class ProjectController extends Controller
         $request->merge(['province_id' => Province::findByHashid($request->province_id)->id]);
 
         $project->update($request->only([
-            'name', 'activity', 'job', 'address', 'fiscal_year', 'profit_margin', 'province_id'
+            'name', 'activity', 'job', 'address', 'fiscal_year', 'profit_margin', 'province_id', 'ppn'
         ]));
 
         return response()->json([

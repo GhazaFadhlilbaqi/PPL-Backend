@@ -165,7 +165,7 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
                 Route::get('', [RabItemController::class, 'index']);
                 Route::post('', [RabItemController::class, 'store']);
                 Route::get('{rabItem}/delete', [RabItemController::class, 'destroy']);
-                Route::post('{rabItem}', [RabItemController::class, 'update']);
+                Route::post('{rabItem}', [RabItemController::class, 'update'])->middleware('request.strip-empty-char-on-request:unit_id,volume');
             });
 
             Route::prefix('{rab}/item-header')->group(function() {

@@ -12,11 +12,7 @@ class RabController extends CountableItemController
     public function index(Request $request, Project $project)
     {
         $rabs = Rab::where('project_id', $project->hashidToId($project->hashid))
-          ->with(['rabItemHeader.rabItem' => function($q) {
-            //   $q->when($q->customAhs(), function($j) {
-            //     $j->with(['customAhs']);
-            //   });
-          }])
+          ->with(['rabItemHeader.rabItem'])
           ->with('rabItem', function($q) {
               $q->where('rab_item_header_id', NULL);
               $q->with('customAhs');
@@ -26,7 +22,7 @@ class RabController extends CountableItemController
         $rabSubtotal = 0;
 
         foreach ($rabs as $key => $rab) {
-            if ($rab->rabItem) {
+            if ($rab->rabItem || ($rab->rabItemHeader && $rab->rabItemHeader->rabItem)) {
                 foreach ($rab->rabItem as $key2 => $rabItem) {
                     if ($rabItem->customAhs) {
                         $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
@@ -38,6 +34,22 @@ class RabController extends CountableItemController
                         $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
                         $rabs[$key]->rabItem[$key2] = $rabItem;
                         $rabSubtotal += $rabItem->subtotal;
+                    }
+                }
+
+                foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
+                    foreach ($rabItemHeader->rabItem as $rabItem) {
+                        if ($rabItem->customAhs) {
+                            $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
+                            $countedAhs->price = $countedAhs->subtotal;
+                            $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
+                            $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
+                            $rabSubtotal += $countedAhs->subtotal;
+                        } else {
+                            $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
+                            $rabs[$key]->rabItem[$key2] = $rabItem;
+                            $rabSubtotal += $rabItem->subtotal;
+                        }
                     }
                 }
             } else {
