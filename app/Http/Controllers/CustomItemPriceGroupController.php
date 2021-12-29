@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CustomItemPrice;
 use App\Models\CustomItemPriceGroup;
-use App\Models\ItemPriceGroup;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
 class CustomItemPriceGroupController extends Controller
 {
+
+    const ALLOWED_SEARCH_CRITERIA = ['header', 'item'];
+
     public function index(Project $project)
     {
         $customItemPriceGroups = $project->customItemPriceGroup()->with('customItemPrice')->get();
@@ -20,31 +21,39 @@ class CustomItemPriceGroupController extends Controller
         ]);
     }
 
-    // public function query(Project $project, Request $request)
-    // {
+    public function query(Project $project, Request $request)
+    {
 
-    //     $itemPriceGroupsSearch = $project->customItemPriceGroup();
+        $projectId = $project->hashidToId($project->hashid);
+        $searchQuery = urldecode($request->q);
+        $result = null;
 
-    //     if ($request->has('q') && $request->q) {
-    //         $itemPriceGroupsSearch->whereHas('customItemPrice', function ($q) use ($requ) {
-    //             $q->where('player_id', $playerId);
-    //         })->where(function ($query) {
-    //             $query->where('status', 'Pending')
-    //                 ->orWhereHas('GamePlayer', function (Builder $query) {
-    //                     $query->where('request_status', 'Confirm');
-    //                 });
-    //         })->get();
-    //     }
+        // Validate request query
+        if (!$request->has('category') || $request->category == '' || !in_array($request->category, self::ALLOWED_SEARCH_CRITERIA)) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Search category must be provided and between of [' . implode(', ', self::ALLOWED_SEARCH_CRITERIA) . ']'
+            ], 422);
+        }
 
-    //     $itemPriceGroupsSearch = $itemPriceGroupsSearch->get();
+        switch (strtolower($request->category)) {
+            case self::ALLOWED_SEARCH_CRITERIA[0]:
+                $result = $this->queryByHeader($projectId, $searchQuery);
+            break;
+            case self::ALLOWED_SEARCH_CRITERIA[1]:
+                $result = $this->queryByItem($projectId, $searchQuery);
+            break;
+        }
 
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'data' => [
-    //             'itemPriceGroups' => $itemPriceGroupsSearch,
-    //         ],
-    //     ]);
-    // }
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'result' => $result,
+                'search_query' => $searchQuery,
+                'search_by' => $request->category
+            ]
+        ]);
+    }
 
     public function store(Project $project, Request $request)
     {
@@ -82,5 +91,45 @@ class CustomItemPriceGroupController extends Controller
         return response()->json([
             'status' => 'success',
         ]);
+    }
+
+    private function queryBySpecificResult($projectId, Request $request)
+    {
+        // Standart Se
+        $itemPriceGroupsSearch = CustomItemPriceGroup::where('project_id', $projectId)->where(function($q) use ($projectId, $request) {
+            $q->where('project_id', $projectId)->where('name', 'LIKE', '%' . $request->q . '%' );
+        })->orWhere(function($q) use ($request) {
+            $q->whereHas('customItemPrice', function($customItemPrice) use ($request) {
+                $customItemPrice->where('name', 'LIKE', '%' . $request->q . '%');
+            });
+        })
+        ->with(['customItemPrice' => function($r) use ($request) {
+            $r->where('name', 'LIKE', '%' . $request->q . '%');
+        }])
+        ->get();
+
+        return $itemPriceGroupsSearch;
+    }
+
+    private function queryByHeader($projectId, $searchQuery)
+    {
+        // Search by header
+        $itemPriceGroupsSearch = CustomItemPriceGroup::where('project_id', $projectId)->where('name', 'LIKE', '%' . $searchQuery . '%')->with('customItemPrice')->get();
+
+        return $itemPriceGroupsSearch;
+    }
+
+    private function queryByItem($projectId, $searchQuery)
+    {
+        // Standart Se
+        $itemPriceGroupsSearch = CustomItemPriceGroup::where('project_id', $projectId)->whereHas('customItemPrice', function($q) use ($searchQuery) {
+            $q->where('name', 'LIKE', '%' . $searchQuery . '%');
+        })
+        ->with('customItemPrice', function($q) use ($searchQuery) {
+            $q->where('name', 'LIKE', '%' . $searchQuery . '%');
+        })
+        ->get();
+
+        return $itemPriceGroupsSearch;
     }
 }
