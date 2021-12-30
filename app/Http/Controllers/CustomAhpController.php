@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ahp;
+use App\Models\Ahs;
 use App\Models\CustomAhp;
+use App\Models\CustomAhs;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
@@ -79,6 +81,17 @@ class CustomAhpController extends CountableItemController
     public function destroy(Project $project, CustomAhp $customAhp)
     {
         // TODO: Delete it's dependencies
+
+        $deps = $this->getCustomAhpDependencies($project->hashidToId($project->hashid), $customAhp->id);
+        $hasDependencies = $deps['ahs']->count() > 0;
+
+        if ($hasDependencies) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Data AHP ini masih terhubung dengan data lain !'
+            ], 400);
+        }
+
         $customAhp->delete();
 
         return response()->json([
@@ -115,5 +128,16 @@ class CustomAhpController extends CountableItemController
             ], 400);
 
         }
+    }
+
+    private function getCustomAhpDependencies($projectId, $customAhpId)
+    {
+        $ahsDeps = CustomAhs::where('project_id', $projectId)->whereHas('customAhsItem', function($q) use ($customAhpId) {
+            $q->where('custom_ahs_itemable_type', CustomAhp::class)->where('custom_ahs_itemable_id', $customAhpId);
+        })->get();
+
+        return [
+            'ahs' => $ahsDeps
+        ];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ahs;
+use App\Models\CustomAhs;
 use App\Models\CustomItemPrice;
 use App\Models\CustomItemPriceGroup;
 use App\Models\ItemPriceGroup;
@@ -12,7 +14,7 @@ use Exception;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Http\Request;
 
-class CustomItemPriceController extends Controller
+class CustomItemPriceController extends CustomItemPriceBaseController
 {
 
     use UnitTrait;
@@ -52,6 +54,17 @@ class CustomItemPriceController extends Controller
     public function destroy(Project $project, CustomItemPrice $customItemPrice)
     {
         // TODO: Check if there are any childerns used this custom item price
+
+        $customItemPriceDeps = $this->getCustomItemPriceDependencies($project->hashidToId($project->hashid), $customItemPrice->id);
+        $hasDependencies = $customItemPriceDeps['ahs']->count() > 0;
+
+        if ($hasDependencies) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Harga Satuan ini masih terhubung dengan data lain !'
+            ], 400);
+        }
+
         if ($customItemPrice->is_default) {
             return response()->json([
                 'status' => 'fail',

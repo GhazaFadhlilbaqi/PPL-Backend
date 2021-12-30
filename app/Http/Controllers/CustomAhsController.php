@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CustomAhsRequest;
 use App\Models\Ahp;
 use App\Models\Ahs;
 use App\Models\CustomAhp;
@@ -11,6 +10,7 @@ use App\Models\CustomAhsItem;
 use App\Models\CustomItemPrice;
 use App\Models\ItemPrice;
 use App\Models\Project;
+use App\Models\Rab;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -60,8 +60,20 @@ class CustomAhsController extends CountableItemController
 
     public function destroy(Project $project, CustomAhs $customAhs)
     {
+        // Check it's dependency
+        $deps = $this->getCustomAhsDependencies($project->hashidToId($project->hashid), $customAhs->id);
+        $hasDependencies = $deps['rab']->count() > 0 || $deps['customAhs']->count() > 0;
+
+        // FIXME: Give user information about what it's dependencies so user can easily resolve it !
+        if ($hasDependencies) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'AHS ini masih terhubung dengan data RAB / AHS lain'
+            ], 400);
+        }
+
         $customAhs->delete();
-        // TODO: Implement delete AHS Item and it's relation
+
         return response()->json([
             'status' => 'success',
         ], 204);
@@ -170,5 +182,21 @@ class CustomAhsController extends CountableItemController
             default :
                 throw new Exception('No compatible itemable class');
         }
+    }
+
+    private function getCustomAhsDependencies($projectId, $customAhsId)
+    {
+        $rabDeps = Rab::where('project_id', $projectId)->whereHas('rabItem', function($q) use ($customAhsId) {
+            $q->where('custom_ahs_id', $customAhsId);
+        })->get();
+
+        $customAhsDeps = CustomAhs::where('project_id', $projectId)->whereHas('customAhsItem', function($q) use ($customAhsId) {
+            $q->where('custom_ahs_itemable_type', CustomAhs::class)->where('custom_ahs_itemable_id', $customAhsId);
+        })->get();
+
+        return [
+            'rab' => $rabDeps,
+            'customAhs' => $customAhsDeps
+        ];
     }
 }

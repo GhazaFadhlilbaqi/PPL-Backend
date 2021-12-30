@@ -6,7 +6,7 @@ use App\Models\CustomItemPriceGroup;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
-class CustomItemPriceGroupController extends Controller
+class CustomItemPriceGroupController extends CustomItemPriceBaseController
 {
 
     const ALLOWED_SEARCH_CRITERIA = ['header', 'item'];
@@ -72,8 +72,27 @@ class CustomItemPriceGroupController extends Controller
 
     public function destroy(Project $project, CustomItemPriceGroup $customItemPriceGroup)
     {
-        // Delete all childs
         // TODO: Find all ahs that related to this item price
+
+        $deps = [];
+
+        foreach ($customItemPriceGroup->customItemPrice as $customItemPrice) {
+            $currentDeps = $this->getCustomItemPriceDependencies($project->hashidToId($project->hashid), $customItemPrice->id);
+            if ($currentDeps['ahs']->count() > 0) {
+                $deps[$customItemPrice->id] = [
+                    'customItemPrice' => $customItemPrice,
+                    'deps' => $currentDeps,
+                ];
+            }
+        }
+
+        if (count($deps) > 0) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Data dari harga satuan di kelompok ini masih terhubung dengan data lain !'
+            ], 400);
+        }
+
         $customItemPriceGroup->delete();
 
         return response()->json([
