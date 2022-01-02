@@ -27,6 +27,20 @@ class CustomAhpController extends CountableItemController
         ]);
     }
 
+    public function query(Project $project, Request $request)
+    {
+        $customAhps = CustomAhp::where('project_id', $project->hashidToId($project->hashid))->where(function($q) use ($request) {
+            $q->where('name', 'LIKE', '%' . urldecode($request->q) . '%')->orWhere('code', 'LIKE', '%' . urldecode($request->q) . '%');
+        })->get()->map(function($data) {
+            return $this->countAhpItem($data);
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('customAhps')
+        ]);
+    }
+
     // FIXME: Using validation request
     public function store(Project $project, Request $request)
     {

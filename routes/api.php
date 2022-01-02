@@ -196,6 +196,7 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
             Route::post('', [CustomAhpController::class, 'store']);
             Route::post('{customAhp}', [CustomAhpController::class, 'update'])->middleware('custom-ahp.protect-default-model');
             Route::get('{customAhp}/delete', [CustomAhpController::class, 'destroy'])->middleware('custom-ahp.protect-default-model');
+            Route::get('query', [CustomAhpController::class, 'query']);
         });
 
         Route::prefix('custom-ahs')->group(function() {
