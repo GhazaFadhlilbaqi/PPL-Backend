@@ -16,7 +16,7 @@ class CreateCustomAhsTable extends Migration
         Schema::create('custom_ahs', function (Blueprint $table) {
             $table->id();
             $table->string('code');
-            $table->string('name', 128);
+            $table->string('name', 255);
             $table->unsignedBigInteger('project_id');
             $table->timestamps();
             $table->foreign('project_id')->references('id')->on('projects')->onUpdate('cascade')->onDelete('cascade');

@@ -9,15 +9,35 @@ use Illuminate\Http\Request;
 class RabController extends CountableItemController
 {
 
+    const ALLOWED_SEARCH_CRITERIA = ['header', 'item'];
+
     public function index(Request $request, Project $project)
     {
-        $rabs = Rab::where('project_id', $project->hashidToId($project->hashid))
-          ->with(['rabItemHeader.rabItem'])
-          ->with('rabItem', function($q) {
-              $q->where('rab_item_header_id', NULL);
-              $q->with('customAhs');
-          })
-          ->get();
+
+        if ($request->has('q') && $request->q != '' && $request->has('category') && $request->category != '' && in_array($request->category, self::ALLOWED_SEARCH_CRITERIA)) {
+            $rabs = Rab::where('project_id', $project->hashidToId($project->hashid));
+
+            if ($request->category == 'header') {
+                $rabs = $rabs->where('name', 'LIKE', '%' . $request->q . '%');
+            } else {
+                // TODO: Implement search by header feature
+            }
+
+            $rabs = $rabs->with(['rabItemHeader.rabItem'])
+                ->with('rabItem', function($q) {
+                    $q->where('rab_item_header_id', NULL);
+                    $q->with('customAhs');
+                })->get();
+
+        } else {
+            $rabs = Rab::where('project_id', $project->hashidToId($project->hashid))
+                ->with(['rabItemHeader.rabItem'])
+                ->with('rabItem', function($q) {
+                    $q->where('rab_item_header_id', NULL);
+                    $q->with('customAhs');
+                })
+                ->get();
+        }
 
         $rabSubtotal = 0;
 

@@ -17,7 +17,7 @@ class CreateCustomAhpsTable extends Migration
             $table->id();
             $table->string('code', 32);
             $table->unsignedBigInteger('project_id');
-            $table->string('name', 64);
+            $table->string('name', 255);
             $table->double('Pw')->default(0);
             $table->double('Cp')->default(0);
             $table->double('A')->default(0);
