@@ -205,6 +205,7 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
             Route::post('{customAhs}', [CustomAhsController::class, 'update']);
             Route::get('{customAhs}/delete', [CustomAhsController::class, 'destroy']);
             Route::get('ids', [CustomAhsController::class, 'getAhsIds']);
+            Route::get('query', [CustomAhsController::class, 'query']);
         });
 
         Route::prefix('custom-ahs-item')->group(function() {

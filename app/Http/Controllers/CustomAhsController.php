@@ -19,6 +19,9 @@ use Vinkla\Hashids\Facades\Hashids;
 
 class CustomAhsController extends CountableItemController
 {
+
+    const ALLOWED_SEARCH_CRITERIA = ['header', 'item'];
+
     public function index(Project $project, Request $request)
     {
         $customAhs = CustomAhs::where('project_id', $project->hashidToId($project->hashid))->with(['customAhsItem' => function($q) {
@@ -115,6 +118,51 @@ class CustomAhsController extends CountableItemController
         return response()->json([
             'status' => 'success',
             'data' => compact('ahsItemIds')
+        ]);
+    }
+
+    public function query(Project $project, Request $request)
+    {
+
+        if (!$request->has('category') || $request->category == '' || !in_array($request->category, self::ALLOWED_SEARCH_CRITERIA)) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Search category must be provided and between of [' . implode(', ', self::ALLOWED_SEARCH_CRITERIA) . ']'
+            ]);
+        }
+
+        $customAhs = CustomAhs::where('project_id', $project->hashidToId($project->hashid));
+        $x = [];
+
+        // TODO: Implement item search
+        if ($request->category == 'header') {
+            $customAhs = $customAhs->where('name', 'LIKE', '%' . $request->q . '%')->orWhere('code', 'LIKE', '%' . $request->q . '%')->with(['customAhsItem' => function($q) use ($request) {
+                $q->with(['unit', 'customAhsItemable']);
+            }])->get();
+        } else {
+            // $customAhs = $customAhs->whereHas('customAhsItem', function($q) use ($request, $x) {}) ;
+        }
+
+        // return response()->json([
+        //     'status' => 'success',
+        //     'data' => $x,
+        // ]);
+
+        if ($request->has('arrange') && $request->arrange == 'true') {
+
+            $arrangedCustomAhs = [];
+
+            foreach ($customAhs as $key => $cAhs) {
+                foreach ($cAhs->customAhsItem as $cAhsItem) $arrangedCustomAhs[$cAhsItem->section][] = $cAhsItem;
+                $customAhs[$key]['item_arranged'] = $arrangedCustomAhs;
+                $arrangedCustomAhs = [];
+                $customAhs[$key] = $this->countCustomAhsSubtotal($cAhs, $project->province->id);
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $customAhs,
         ]);
     }
 
