@@ -155,6 +155,8 @@ Route::prefix('project')->middleware('auth:sanctum')->group(function() {
      */
     Route::prefix('{project}')->middleware(['auth:sanctum', 'project.ensure-project-belonging'])->group(function() {
 
+        Route::get('export', [ProjectController::class, 'export'])->middleware('project.ensure-project-eligible-to-export');
+
         Route::prefix('rab')->group(function() {
             Route::get('', [RabController::class, 'index']);
             Route::post('', [RabController::class, 'store']);

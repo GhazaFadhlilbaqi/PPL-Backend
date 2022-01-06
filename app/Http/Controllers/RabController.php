@@ -41,6 +41,10 @@ class RabController extends CountableItemController
 
         $rabSubtotal = 0;
 
+        // return response()->json([
+        //     'd' => $rabs
+        // ]);
+
         foreach ($rabs as $key => $rab) {
             if ($rab->rabItem || ($rab->rabItemHeader && $rab->rabItemHeader->rabItem)) {
                 foreach ($rab->rabItem as $key2 => $rabItem) {
@@ -67,7 +71,6 @@ class RabController extends CountableItemController
                             $rabSubtotal += $countedAhs->subtotal;
                         } else {
                             $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
-                            $rabs[$key]->rabItem[$key2] = $rabItem;
                             $rabSubtotal += $rabItem->subtotal;
                         }
                     }

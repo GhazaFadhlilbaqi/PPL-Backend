@@ -76,6 +76,11 @@ class ProjectController extends Controller
         ]);
     }
 
+    public function export(Project $project, Request $request)
+    {
+        // $project-
+    }
+
     private function giveUnbelongedAccessResponse()
     {
         return response()->json([
