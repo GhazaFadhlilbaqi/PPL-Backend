@@ -145,6 +145,10 @@ return [
         'form_route' => '/auth/reset-password',
     ],
 
+    'login_redirect_url' => [
+        'callback_route' => 'http://localhost:8080/auth/login',
+    ],
+
     'providers' => [
 
         /*

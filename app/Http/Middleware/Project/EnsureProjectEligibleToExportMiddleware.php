@@ -18,7 +18,7 @@ class EnsureProjectEligibleToExportMiddleware
     {
 
         // TODO: Should be query to database to check if user already pay for export
-        $isBayar = false;
+        $isBayar = true;
 
         if (!$isBayar) return abort(400, 'You can\'t download this file right now, please try again later');
 

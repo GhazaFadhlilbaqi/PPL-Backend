@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProjectRabExport;
 use App\Http\Requests\ProjectRequest;
 use App\Models\Project;
 use App\Models\Province;
@@ -76,9 +77,10 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function export(Project $project, Request $request)
+    public function export(Project $project)
     {
-        // $project-
+        // $user = Auth::user();
+        return (new ProjectRabExport($project->hashidToId($project->hashid)))->download('exports.xlsx');
     }
 
     private function giveUnbelongedAccessResponse()

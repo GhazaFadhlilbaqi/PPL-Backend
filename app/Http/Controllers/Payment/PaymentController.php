@@ -7,10 +7,16 @@ use Exception;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Midtrans\Config;
 use App\Http\Controllers\Midtrans\Snap;
+use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Vinkla\Hashids\Facades\Hashids;
 
 class PaymentController extends Controller
 {
+
+    const productPrice = 10000;
+
     public function fetchSnapToken(Request $request)
     {
         Config::$serverKey = env('MIDTRANS_SERVER_KEY');
@@ -25,25 +31,25 @@ class PaymentController extends Controller
 
         // NOTE: For demo purpose only
         $buyedItems = [];
-        $cartsSubtotal = 0;
-
-        foreach ($request->carts as $product) {
-            $buyedItems[] = [
-                'id' => $product['id'],
-                'price' => $product['priceRaw'],
-                'quantity' => 1 ,
-                'name' => $product['title'],
-            ];
-
-            $cartsSubtotal += $product['priceRaw'];
-        }
-
-        $transactionDetails = [
-            'order_id' => rand(),
-            'gross_amount' => $cartsSubtotal
-        ];
+        $cartsSubtotal = self::productPrice;
 
         $customer = Auth::user();
+        $orderId = $this->generateOrderId();
+
+        // Check if the order already created or not
+        $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0]);
+
+        $buyedItems[] = [
+            'id' => uniqid(),
+            'price' => self::productPrice,
+            'quantity' => 1,
+            'name' => 'Export RAB user ' . $customer->first_name . ' ' . ($customer->last_name ?? ''),
+        ];
+
+       $transactionDetails = [
+            'order_id' => $orderId,
+            'gross_amount' => $cartsSubtotal
+        ];
 
         $customerDetails = [
             'first_name' => $customer->first_name,
@@ -92,5 +98,19 @@ class PaymentController extends Controller
                 'current_token_amount' => $user->token_amount,
             ]
         ]);
+    }
+
+    private function setOrder($orderId, $customer, $projectId)
+    {
+        Order::create([
+            'order_id' => $orderId,
+            'user_id' => $customer->id,
+            'project_id' => $projectId,
+        ]);
+    }
+
+    private function generateOrderId()
+    {
+        return strtoupper(Str::random(16));
     }
 }
