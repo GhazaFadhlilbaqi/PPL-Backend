@@ -20,7 +20,8 @@ class ProjectRabExport implements WithMultipleSheets
     public function sheets(): array {
 
         $sheets = [
-            // new RabSummaryExportSheet(),
+            new RabSummaryExportSheet($this->projectId),
+            new AhsExportSheet($this->projectId),
             new ItemPriceExportSheet($this->projectId),
             new AhpExportSheet($this->projectId),
         ];

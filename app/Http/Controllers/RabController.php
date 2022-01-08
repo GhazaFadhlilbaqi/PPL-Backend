@@ -41,10 +41,6 @@ class RabController extends CountableItemController
 
         $rabSubtotal = 0;
 
-        // return response()->json([
-        //     'd' => $rabs
-        // ]);
-
         foreach ($rabs as $key => $rab) {
             if ($rab->rabItem || ($rab->rabItemHeader && $rab->rabItemHeader->rabItem)) {
                 foreach ($rab->rabItem as $key2 => $rabItem) {

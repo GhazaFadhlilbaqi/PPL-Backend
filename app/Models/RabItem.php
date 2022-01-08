@@ -29,6 +29,11 @@ class RabItem extends Model
         return $this->belongsTo(Rab::class);
     }
 
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
+    }
+
     public function rabItemHeader()
     {
         return $this->belongsTo(RabItemHeader::class);
