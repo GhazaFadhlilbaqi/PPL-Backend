@@ -1,6 +1,21 @@
 @foreach ($ahs as $a)
 <table>
     <thead>
+        <tr></tr>
+        <tr>
+            <td><b>KEGIATAN</b></td>
+            <td><b>{{ $project->activity }}</b></td>
+        </tr>
+        <tr>
+            <td><b>NAMA PEKERJAAN</b></td>
+            <td><b>{{ $project->job }}</b></td>
+        </tr>
+        <tr>
+            <td><b>TAHUN ANGGARAN</b></td>
+            <td><b>{{ $project->fiscal_year }}</b></td>
+        </tr>
+        <tr></tr>
+        <tr></tr>
         <tr>
             <td>{{ $a->code }}</td>
             <td>{{ $a->name }}</td>

@@ -16,6 +16,20 @@
             <td></td>
             <td></td>
         </tr>
+        <tr>
+            <td><b>KEGIATAN</b></td>
+            <td><b>{{ $project->activity }}</b></td>
+        </tr>
+        <tr>
+            <td><b>PEKERJAAN</b></td>
+            <td><b>{{ $project->job }}</b></td>
+        </tr>
+        <tr>
+            <td><b>TAHUN ANGGARAN</b></td>
+            <td><b>{{ $project->fiscal_year }}</b></td>
+        </tr>
+        <tr></tr>
+        <tr></tr>
         @foreach ($customItemPricesGroups as $customItemPriceGroup)
             <tr>
                 <td>{{ numToAlphabet($loop->index) }}</td>

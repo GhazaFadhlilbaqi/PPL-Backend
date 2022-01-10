@@ -33,6 +33,7 @@ class AhsExportSheet extends CountableItemController implements FromView, WithTi
     public function columnWidths(): array
     {
         return [
+            'A' => 25,
             'B' => 75,
             'F' => 25,
             'G' => 25,

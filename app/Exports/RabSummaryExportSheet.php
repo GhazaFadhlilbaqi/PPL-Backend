@@ -5,21 +5,24 @@ namespace App\Exports;
 use App\Http\Controllers\CountableItemController;
 use App\Models\Rab;
 use App\Models\Project;
+use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
 class RabSummaryExportSheet extends CountableItemController implements FromView, WithTitle, WithColumnWidths
 {
 
-    private $projectId, $project;
+    private $projectId, $project, $company = null;
 
     public function __construct($projectId)
     {
         $this->projectId = $projectId;
         $this->project = Project::find($projectId);
+        $this->company = User::find(1)->company;
     }
 
     public function view(): View
@@ -27,6 +30,7 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
         return view('exports.rab.rab', [
             'rabs' => $this->generateRab(),
             'project' => $this->project,
+            'company' => $this->company
         ]);
     }
 
@@ -87,6 +91,7 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
     public function columnWidths(): array
     {
         return [
+            'A' => 25,
             'B' => 40,
             'C' => 17,
             'D' => 17,

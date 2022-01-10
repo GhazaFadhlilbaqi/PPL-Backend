@@ -1,3 +1,24 @@
+<table>
+    <tr></tr>
+    <tr>
+        <td><b>KEGIATAN</b></td>
+        <td><b>{{ $project->activity }}</b></td>
+    </tr>
+    <tr>
+        <td><b>NAMA PEKERJAAN</b></td>
+        <td><b>{{ $project->job }}</b></td>
+    </tr>
+    <tr>
+        <td><b>LOKASI PEKERJAAN</b></td>
+        <td><b>{{ $project->province->name }}</b></td>
+    </tr>
+    <tr>
+        <td><b>TAHUN ANGGARAN</b></td>
+        <td><b>{{ $project->fiscal_year }}</b></td>
+    </tr>
+    <tr></tr>
+    <tr></tr>
+</table>
 @foreach ($ahps as $ahp)
 <table border="1">
     <thead>

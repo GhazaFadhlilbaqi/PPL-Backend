@@ -35,12 +35,14 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
 
         return view('exports.rab.ahp', [
             'ahps' => $customAhps,
+            'project' => $this->project,
         ]);
     }
 
     public function columnWidths(): array
     {
         return [
+            'A' => 25,
             'B' => 75,
             'C' => 15,
             'D' => 15,
@@ -53,7 +55,7 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
     {
 
         $customAhpCount = $this->project->customAhp->count();
-        $currentAIndex = 1;
+        $currentAIndex = 9;
 
         for ($i = 0; $i < $customAhpCount; $i++) {
 
