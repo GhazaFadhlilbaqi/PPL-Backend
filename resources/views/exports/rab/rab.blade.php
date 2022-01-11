@@ -30,7 +30,6 @@
             <td><b>{{ $project->fiscal_year }}</b></td>
         </tr>
         <tr></tr>
-        <tr></tr>
         <tr>
             <th>No</th>
             <th>URAIAN PEKERJAAN</th>
@@ -69,7 +68,7 @@
                     <td><b>A</b></td>
                     <td><b>{{ $rabItemHeader->name }}</b></td>
                 </tr>
-                @foreach ($rabItemHeader->rab_item ?? [] as $rabItem)
+                @foreach ($rabItemHeader->rabItem ?? [] as $rabItem)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $rabItem->name }}</td>
@@ -82,6 +81,7 @@
                 @endforeach
             @endforeach
         @endforeach
+        <tr></tr>
         <tr>
             <td></td>
             <td></td>

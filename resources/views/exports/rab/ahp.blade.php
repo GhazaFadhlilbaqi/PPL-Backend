@@ -16,8 +16,6 @@
         <td><b>TAHUN ANGGARAN</b></td>
         <td><b>{{ $project->fiscal_year }}</b></td>
     </tr>
-    <tr></tr>
-    <tr></tr>
 </table>
 @foreach ($ahps as $ahp)
 <table border="1">

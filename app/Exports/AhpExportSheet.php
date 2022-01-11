@@ -55,16 +55,21 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
     {
 
         $customAhpCount = $this->project->customAhp->count();
-        $currentAIndex = 9;
+        $currentAIndex = 7;
 
         for ($i = 0; $i < $customAhpCount; $i++) {
 
             $sheet->getStyle('A' . $currentAIndex . ':F' . ($currentAIndex + 30))->applyFromArray(['borders' => [
-                'outline' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                     'color' => ['rgb' => '000'],
                 ],
             ]]);
+
+            $headerStyle = $sheet->getStyle('A' . $currentAIndex . ':F' . $currentAIndex);
+
+            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
+            $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
 
             $currentAIndex += 33;
         }

@@ -1,4 +1,25 @@
 <table>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>KEGIATAN</b></td>
+        <td><b>{{ $project->activity }}</b></td>
+    </tr>
+    <tr>
+        <td><b>PEKERJAAN</b></td>
+        <td><b>{{ $project->job }}</b></td>
+    </tr>
+    <tr>
+        <td><b>TAHUN ANGGARAN</b></td>
+        <td><b>{{ $project->fiscal_year }}</b></td>
+    </tr>
+</table>
+<table>
     <thead>
         <tr style="background-color: #08283D">
             <th>NO</th>
@@ -9,26 +30,6 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td><b>KEGIATAN</b></td>
-            <td><b>{{ $project->activity }}</b></td>
-        </tr>
-        <tr>
-            <td><b>PEKERJAAN</b></td>
-            <td><b>{{ $project->job }}</b></td>
-        </tr>
-        <tr>
-            <td><b>TAHUN ANGGARAN</b></td>
-            <td><b>{{ $project->fiscal_year }}</b></td>
-        </tr>
-        <tr></tr>
         <tr></tr>
         @foreach ($customItemPricesGroups as $customItemPriceGroup)
             <tr>

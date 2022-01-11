@@ -1,7 +1,5 @@
-@foreach ($ahs as $a)
 <table>
-    <thead>
-        <tr></tr>
+    <tr></tr>
         <tr>
             <td><b>KEGIATAN</b></td>
             <td><b>{{ $project->activity }}</b></td>
@@ -14,11 +12,13 @@
             <td><b>TAHUN ANGGARAN</b></td>
             <td><b>{{ $project->fiscal_year }}</b></td>
         </tr>
-        <tr></tr>
-        <tr></tr>
+</table>
+@foreach ($ahs as $a)
+<table>
+    <thead>
         <tr>
-            <td>{{ $a->code }}</td>
-            <td>{{ $a->name }}</td>
+            <td><b>{{ $a->code }}</b></td>
+            <td><b>{{ $a->name }}</b></td>
         </tr>
         <tr>
             <th>No</th>
@@ -35,6 +35,7 @@
             <td><b>A</b></td>
             <td><b>TENAGA KERJA</b></td>
         </tr>
+        @php $laborAhsSum = 0 @endphp
         @foreach ($a['item_arranged']['labor'] ?? [] as $laborAhs)
             <tr>
                 <td>{{ $loop->iteration }}</td>
@@ -45,11 +46,22 @@
                 <td>{{ $laborAhs->customAhsItemable->subtotal }}</td>
                 <td>{{ $laborAhs->customAhsItemable->subtotal * $laborAhs->coefficient }}</td>
             </tr>
+            @php $laborAhsSum += $laborAhs->subtotal @endphp
         @endforeach
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><b>JUMLAH TENAGA KERJA (A)</b></td>
+            <td><b>{{ $laborAhsSum }}</b></td>
+        </tr>
         <tr>
             <td><b>B</b></td>
             <td><b>BAHAN</b></td>
         </tr>
+        @php $ingredientsAhsSum = 0 @endphp
         @foreach ($a['item_arranged']['ingredients'] ?? [] as $ingredientsAhs)
             <tr>
                 <td>{{ $loop->iteration }}</td>
@@ -60,11 +72,22 @@
                 <td>{{ $ingredientsAhs->customAhsItemable->subtotal }}</td>
                 <td>{{ $ingredientsAhs->customAhsItemable->subtotal * $ingredientsAhs->coefficient }}</td>
             </tr>
+            @php $laborAhsSum += $ingredientsAhs->subtotal @endphp
         @endforeach
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><b>JUMLAH BAHAN (B)</b></td>
+            <td><b>{{ $ingredientsAhsSum }}</b></td>
+        </tr>
         <tr>
             <td><b>C</b></td>
             <td><b>PERALATAN</b></td>
         </tr>
+        @php $toolsAhsSum = 0 @endphp
         @foreach ($a['item_arranged']['tools'] ?? [] as $toolsAhs)
             <tr>
                 <td>{{ $loop->iteration }}</td>
@@ -75,11 +98,22 @@
                 <td>{{ $toolsAhs->customAhsItemable->subtotal }}</td>
                 <td>{{ $toolsAhs->customAhsItemable->subtotal * $toolsAhs->coefficient }}</td>
             </tr>
+            @php $toolsAhsSum += $toolsAhs->subtotal @endphp
         @endforeach
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><b>JUMLAH PERALATAN (C)</b></td>
+            <td><b>{{ $toolsAhsSum }}</b></td>
+        </tr>
         <tr>
             <td><b>D</b></td>
             <td><b>LAIN - LAIN</b></td>
         </tr>
+        @php $othersAhsSum = 0 @endphp
         @foreach ($a['item_arranged']['others'] ?? [] as $othersAhs)
             <tr>
                 <td>{{ $loop->iteration }}</td>
@@ -90,7 +124,17 @@
                 <td>{{ $othersAhs->customAhsItemable->subtotal }}</td>
                 <td>{{ $othersAhs->customAhsItemable->subtotal * $othersAhs->coefficient }}</td>
             </tr>
+            @php $othersAhsSum += $othersAhs->subtotal @endphp
         @endforeach
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><b>JUMLAH LAIN - LAIN (C)</b></td>
+            <td><b>{{ $othersAhsSum }}</b></td>
+        </tr>
         <tr>
             <td><b>E</b></td>
             <td><b>JUMLAH HARGA TENAGA, BAHAN DAN PERALATAN</b></td>
