@@ -35,9 +35,23 @@ class PaymentController extends Controller
 
         $customer = Auth::user();
         $orderId = $this->generateOrderId();
+        $projectId = Hashids::decode($request->project_id)[0];
+
+        $pendingOrder = Auth::user()->order()->where('project_id', $projectId)->where('status', 'pending')->first();
+
+        if ($pendingOrder) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Masih terdapat pembayaran yang pending ! mohon tunggu hingga anda mendapatkan email konfirmasi pembayaran'
+            ], 400);
+        }
 
         // Check if the order already created or not
-        $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0]);
+        $order = Auth::user()->order()->where('project_id', $projectId)->where('status', 'waiting_for_payment')->first();
+
+        if (!$order) {
+            $order = $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0], self::productPrice);
+        }
 
         $buyedItems[] = [
             'id' => uniqid(),
@@ -58,10 +72,14 @@ class PaymentController extends Controller
             'phone' => $customer->phone_number,
         ];
 
-        $enabledPayments = ["credit_card", "cimb_clicks",
-        "bca_klikbca", "bca_klikpay", "bri_epay", "echannel", "permata_va",
-        "bca_va", "bni_va", "bri_va", "other_va", "gopay", "indomaret",
-        "danamon_online", "akulaku", "shopeepay"];
+        // NOTE: Metode yg lain butuh handle yang lain jg
+        // $enabledPayments = [
+        //     "credit_card", "cimb_clicks", "bca_klikbca", "bca_klikpay", "bri_epay", "echannel", "permata_va", "bca_va", "bni_va", "bri_va", "other_va", "gopay", "indomaret", "danamon_online", "shopeepay"
+        // ];
+
+        $enabledPayments = [
+            "credit_card"
+        ];
 
         $transaction = [
             'enabled_payments' => $enabledPayments,
@@ -71,7 +89,11 @@ class PaymentController extends Controller
         ];
 
         try {
-            $snapToken = Snap::getSnapToken($transaction);
+            $snapToken = $order->midtrans_snap_token ?? Snap::getSnapToken($transaction);
+
+            $order->midtrans_snap_token = $snapToken;
+            $order->save();
+
             return response()->json([
                 'status' => 'success',
                 'data' => [
@@ -100,13 +122,16 @@ class PaymentController extends Controller
         ]);
     }
 
-    private function setOrder($orderId, $customer, $projectId)
+    private function setOrder($orderId, $customer, $projectId, $grossAmount)
     {
-        Order::create([
+        $order = Order::create([
             'order_id' => $orderId,
             'user_id' => $customer->id,
             'project_id' => $projectId,
+            'gross_amount' => $grossAmount,
         ]);
+
+        return $order;
     }
 
     private function generateOrderId()

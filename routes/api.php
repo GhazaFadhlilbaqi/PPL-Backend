@@ -16,6 +16,7 @@ use App\Http\Controllers\Master\ItemPriceController;
 use App\Http\Controllers\Master\ItemPriceGroupController;
 use App\Http\Controllers\Master\ProvinceController;
 use App\Http\Controllers\Master\UnitController;
+use App\Http\Controllers\Order\OrderController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RabController;
@@ -39,6 +40,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::prefix('order')->group(function() {
+    Route::post('notify', [OrderController::class, 'notify']);
+
+    Route::middleware('auth:sanctum')->group(function() {
+        Route::post('by-project/{project}', [OrderController::class, 'orderStatusByProject']);
+    });
 });
 
 Route::prefix('auth')->group(function() {

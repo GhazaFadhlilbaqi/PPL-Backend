@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Exports\ProjectRabExport;
 use App\Http\Requests\ProjectRequest;
+use App\Models\Order;
 use App\Models\Project;
 use App\Models\Province;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -79,8 +81,18 @@ class ProjectController extends Controller
 
     public function export(Project $project)
     {
-        // $user = Auth::user();
-        return (new ProjectRabExport($project->hashidToId($project->hashid)))->download('exports.xlsx');
+        $projectId = $project->hashidToId($project->hashid);
+
+        // FIXME: SECURITY HOLE ! if somemone unauthorized access this route with knowing project id, then the user might lost his order to export
+        $order = Order::where('project_id', $projectId)->where('status', 'completed')->where('used_at', null)->first();
+
+        if ($order) {
+            $order->used_at = Carbon::now();
+            $order->save();
+            return (new ProjectRabExport($projectId))->download('exports.xlsx');
+        } else {
+            return abort(403);
+        }
     }
 
     private function giveUnbelongedAccessResponse()
