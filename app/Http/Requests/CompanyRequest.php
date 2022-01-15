@@ -28,6 +28,7 @@ class CompanyRequest extends FormRequest
             'email' => 'required_without:update_picture|email',
             'director_name' => 'required_without:update_picture',
             'phone_number' => 'required_without:update_picture',
+            'address' => 'required',
             'update_picture' => 'sometimes|mimes:png,jpg,jpeg,bmp|max:2048'
         ];
     }

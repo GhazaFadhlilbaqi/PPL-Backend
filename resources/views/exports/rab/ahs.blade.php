@@ -1,4 +1,29 @@
 <table>
+    @if ($company)
+        <tr></tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ $company->name }}</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ $company->address }}</td>
+            <td></td>
+        </tr>
+        <tr></tr>
+        <tr></tr>
+    @endif
     <tr></tr>
         <tr>
             <td><b>KEGIATAN</b></td>

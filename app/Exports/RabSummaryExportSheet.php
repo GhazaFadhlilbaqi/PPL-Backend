@@ -19,7 +19,8 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
 {
 
     private $projectId, $project, $company = null;
-    private $rabStartingIdx = 8, $prevIdx = 0;
+    private $rabStartingIdx = 13, $prevIdx = 0;
+    private $rabCount = 0;
     private $rabStyleArr = [];
 
     const RAB_HEADER = 'rabHeader';
@@ -116,6 +117,8 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
             $rabSubtotal = 0;
         }
 
+        $this->rabCount = $rabs->count();
+
         return $rabs;
     }
 
@@ -141,14 +144,26 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
             $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
         }
 
-        $sheet->getStyle('A' . ($this->rabStartingIdx - 1) . ':G' . ($this->rabStartingIdx + $this->prevIdx))->applyFromArray(['borders' => [
+        // Kop Surat
+        $sheet->getStyle('G2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
+        $sheet->getStyle('G2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('G3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A4:G4')->applyFromArray([
+            'borders' => [
+                'bottom' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE
+                ]
+            ]
+        ]);
+
+        $sheet->getStyle('A' . ($this->rabStartingIdx - 1) . ':G' . (($this->rabStartingIdx + $this->prevIdx) - ($this->rabCount <= 0 ? 1 : 0)))->applyFromArray(['borders' => [
             'allBorders' => [
                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                 'color' => ['rgb' => '000'],
             ],
         ]]);
 
-        $sheet->getStyle('F' . (($this->rabStartingIdx + $this->prevIdx) + 2) . ':G' . (($this->rabStartingIdx + $this->prevIdx) + 4))->applyFromArray(['borders' => [
+        $sheet->getStyle('F' . (($this->rabStartingIdx + $this->prevIdx) + ($this->rabCount <= 0 ? 1 : 2)) . ':G' . (($this->rabStartingIdx + $this->prevIdx) + ($this->rabCount <= 0 ? 3 : 4)))->applyFromArray(['borders' => [
             'allBorders' => [
                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                 'color' => ['rgb' => '000'],

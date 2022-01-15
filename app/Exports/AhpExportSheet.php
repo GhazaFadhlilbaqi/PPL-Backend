@@ -5,6 +5,7 @@ namespace App\Exports;
 use App\Http\Controllers\CountableItemController;
 use App\Models\Project;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
@@ -17,11 +18,13 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
 
     private $projectId;
     private $project;
+    private $company;
 
     public function __construct($projectId)
     {
         $this->projectId = $projectId;
         $this->project = $project = Project::find($this->projectId);
+        $this->company = Auth::user()->company;
     }
 
     /**
@@ -36,6 +39,7 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
         return view('exports.rab.ahp', [
             'ahps' => $customAhps,
             'project' => $this->project,
+            'company' => $this->company,
         ]);
     }
 
@@ -55,7 +59,19 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
     {
 
         $customAhpCount = $this->project->customAhp->count();
-        $currentAIndex = 7;
+        $currentAIndex = 12;
+
+        // Kop Surat
+        $sheet->getStyle('G2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
+        $sheet->getStyle('G2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('G3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A4:G4')->applyFromArray([
+            'borders' => [
+                'bottom' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE
+                ]
+            ]
+        ]);
 
         for ($i = 0; $i < $customAhpCount; $i++) {
 

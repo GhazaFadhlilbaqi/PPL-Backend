@@ -6,6 +6,7 @@ use App\Models\CustomItemPriceGroup;
 use App\Models\ItemPrice;
 use App\Models\Project;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -15,12 +16,13 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class ItemPriceExportSheet implements FromView, WithTitle, WithColumnWidths, WithStyles
 {
 
-    private $projectId, $project, $customItemPriceGroupsCount;
+    private $projectId, $project, $company, $customItemPriceGroupsCount;
 
     public function __construct($projectId)
     {
         $this->projectId = $projectId;
         $this->project = Project::find($projectId);
+        $this->company = Auth::user()->company;
     }
 
     public function view() : View
@@ -35,12 +37,13 @@ class ItemPriceExportSheet implements FromView, WithTitle, WithColumnWidths, Wit
         return view('exports.rab.item-price', [
             'customItemPricesGroups' => $customItemPriceGroups,
             'project' => $this->project,
+            'company' => $this->company,
         ]);
     }
 
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A' . 6 . ':E' . (6 + $this->customItemPriceGroupsCount))->applyFromArray([
+        $sheet->getStyle('A' . 11 . ':E' . (11 + $this->customItemPriceGroupsCount))->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
@@ -49,7 +52,19 @@ class ItemPriceExportSheet implements FromView, WithTitle, WithColumnWidths, Wit
             ]
         ]);
 
-        $headerStyle = $sheet->getStyle('A6:E6');
+        // Kop Surat
+        $sheet->getStyle('G2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
+        $sheet->getStyle('G2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('G3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A4:G4')->applyFromArray([
+            'borders' => [
+                'bottom' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE
+                ]
+            ]
+        ]);
+
+        $headerStyle = $sheet->getStyle('A11:E11');
         $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
         $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
     }

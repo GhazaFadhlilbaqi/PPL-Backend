@@ -8,6 +8,7 @@ use App\Models\CustomAhs;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
@@ -16,12 +17,13 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class AhsExportSheet extends CountableItemController implements FromView, WithTitle, WithColumnWidths, WithStyles
 {
 
-    private $projectId, $project, $customAhsCount;
+    private $projectId, $project, $company, $customAhsCount;
 
     public function __construct($projectId)
     {
         $this->projectId = $projectId;
         $this->project = Project::find($projectId);
+        $this->company = Auth::user()->company;
     }
 
     public function view(): View
@@ -33,6 +35,7 @@ class AhsExportSheet extends CountableItemController implements FromView, WithTi
         return view('exports.rab.ahs', [
             'ahs' => $arrangedCustomAhs['customAhs'],
             'project' => $this->project,
+            'company' => $this->company,
         ]);
     }
 
@@ -76,7 +79,19 @@ class AhsExportSheet extends CountableItemController implements FromView, WithTi
     public function styles(Worksheet $sheet)
     {
 
-        $currIndexPointer = 6;
+        $currIndexPointer = 11;
+
+        // Kop Surat
+        $sheet->getStyle('G2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
+        $sheet->getStyle('G2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('G3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A4:G4')->applyFromArray([
+            'borders' => [
+                'bottom' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE
+                ]
+            ]
+        ]);
 
         foreach ($this->customAhsCount as $customAhsCount) {
             $sheet->getStyle('A' . ($currIndexPointer + 1) . ':G' . ($currIndexPointer + $customAhsCount))->applyFromArray(['borders' => [

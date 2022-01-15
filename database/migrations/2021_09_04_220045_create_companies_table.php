@@ -20,6 +20,7 @@ class CreateCompaniesTable extends Migration
             $table->string('email', 64);
             $table->string('director_name', 64);
             $table->string('phone_number', 16);
+            $table->text('address')->nullable();
             $table->string('picture', 64)->nullable()->default(null);
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');

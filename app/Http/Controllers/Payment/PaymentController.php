@@ -48,7 +48,7 @@ class PaymentController extends Controller
 
         $order = Auth::user()->order()->where('project_id', $projectId)->orderBy('created_at', 'DESC')->take(1)->first();
 
-        if ($order && in_array($order->status, ['pending', 'waiting_for_payment'])) {
+        if ($order && in_array($order->status, ['pending', 'waiting_for_payment']) && $order->used_at == null) {
 
             // Check midtrans status
             $midtransStatus = $this->checkStatusOrder($order->order_id);
@@ -61,6 +61,8 @@ class PaymentController extends Controller
                 $order = $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0], self::productPrice);
             }
 
+        } else {
+            $order = $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0], self::productPrice);
         }
 
         // Check if there's a pending order

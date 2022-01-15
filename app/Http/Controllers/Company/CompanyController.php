@@ -32,7 +32,7 @@ class CompanyController extends Controller
         ]);
 
         $company = Company::create($request->only([
-            'user_id', 'name', 'email', 'director_name', 'phone_number', 'picture',
+            'user_id', 'name', 'email', 'director_name', 'phone_number', 'address', 'picture',
         ]));
 
         return response()->json([
@@ -61,7 +61,7 @@ class CompanyController extends Controller
         }
 
         $company->update($request->only([
-            'name', 'email', 'director_name', 'phone_number', 'picture'
+            'name', 'email', 'director_name', 'address', 'phone_number', 'picture'
         ]));
 
         return response()->json([
