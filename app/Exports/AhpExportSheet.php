@@ -62,10 +62,10 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
         $currentAIndex = 12;
 
         // Kop Surat
-        $sheet->getStyle('G2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
-        $sheet->getStyle('G2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('G3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('A4:G4')->applyFromArray([
+        $sheet->getStyle('F2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
+        $sheet->getStyle('F2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('F3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A4:F4')->applyFromArray([
             'borders' => [
                 'bottom' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE
@@ -89,6 +89,8 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
 
             $currentAIndex += 33;
         }
+
+        $sheet->getStyle('F' . $currentAIndex . ':F' . ($currentAIndex + 8))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
     }
 
     public function title() : string {

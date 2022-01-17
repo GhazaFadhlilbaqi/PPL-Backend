@@ -53,10 +53,10 @@ class ItemPriceExportSheet implements FromView, WithTitle, WithColumnWidths, Wit
         ]);
 
         // Kop Surat
-        $sheet->getStyle('G2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
-        $sheet->getStyle('G2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('G3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('A4:G4')->applyFromArray([
+        $sheet->getStyle('E2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
+        $sheet->getStyle('E2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('E3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A4:E4')->applyFromArray([
             'borders' => [
                 'bottom' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE
@@ -67,6 +67,8 @@ class ItemPriceExportSheet implements FromView, WithTitle, WithColumnWidths, Wit
         $headerStyle = $sheet->getStyle('A11:E11');
         $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
         $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
+
+        $sheet->getStyle('E' . (12 + $this->customItemPriceGroupsCount) . ':E' . (20 + $this->customItemPriceGroupsCount))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
     }
 
     public function title() : string

@@ -204,6 +204,8 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
             ],
         ]]);
 
+        $sheet->getStyle('G' . (8 + $this->finalPointerLocation) . ':G' . (18 + $this->finalPointerLocation))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
         // return dd($this->rabStyleArr);
     }
 
