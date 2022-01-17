@@ -58,7 +58,7 @@
         @foreach ($rabs ?? [] as $rab)
             @php $rabSum += $rab->subtotal @endphp
             <tr>
-                <td><b>I</b></td>
+                <td><b>{{ numToAlphabet($loop->index) }}</b></td>
                 <td><b>{{ $rab->name }}</b></td>
                 <td></td>
                 <td></td>
@@ -69,7 +69,7 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $rabItem->name }}</td>
-                    <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '' }}</td>
+                    <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '-' }}</td>
                     <td>{{ $rabItem->volume }}</td>
                     <td>{{ $rabItem->unit->name }}</td>
                     <td>{{ $rabItem->custom_ahs_id ? $rabItem['custom_ahs']['subtotal'] : $rabItem->price }}</td>
@@ -78,14 +78,14 @@
             @endforeach
             @foreach($rab->rabItemHeader ?? [] as $rabItemHeader)
                 <tr>
-                    <td><b>A</b></td>
+                    <td><b>{{ numToRoman($loop->iteration) }}</b></td>
                     <td><b>{{ $rabItemHeader->name }}</b></td>
                 </tr>
                 @foreach ($rabItemHeader->rabItem ?? [] as $rabItem)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $rabItem->name }}</td>
-                        <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '' }}</td>
+                        <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '-' }}</td>
                         <td>{{ $rabItem->volume }}</td>
                         <td>{{ $rabItem->unit->name }}</td>
                         <td>{{ $rabItem->custom_ahs_id ? $rabItem['custom_ahs']['subtotal'] : $rabItem->price }}</td>
@@ -111,7 +111,8 @@
             <td></td>
             <td></td>
             <td><b>PPN {{ $project->ppn }}%</b></td>
-            <td>{{ $project->ppn / 100 * $rabSum }}</td>
+            @php $ppn = $project->ppn / 100 * $rabSum @endphp
+            <td>{{ $ppn }}</td>
         </tr>
         <tr>
             <td></td>
@@ -120,7 +121,16 @@
             <td></td>
             <td></td>
             <td><b>JUMLAH TOTAL DENGAN PPN {{ $project->ppn }}%</b></td>
-            <td>{{ $rabSum + ($project->ppn / 100 * $rabSum) }}</td>
+            <td>{{ $rabSum + $ppn }}</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><b>TERBILANG</b></td>
+            <td>{{ strtoupper(terbilang($rabSum + $ppn)) }} RUPIAH</td>
         </tr>
     </tbody>
 </table>

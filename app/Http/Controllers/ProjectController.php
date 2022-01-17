@@ -86,8 +86,11 @@ class ProjectController extends Controller
         // FIXME: SECURITY HOLE ! if somemone unauthorized access this route with knowing project id, then the user might lost his order to export
         $order = Order::where('project_id', $projectId)->where('status', 'completed')->where('used_at', null)->first();
 
+        // return dd($order);
+
         if ($order) {
-            $order->used_at = Carbon::now();
+            // $order->used_at = Carbon::now();
+            $order->used_at = null;
             $order->save();
             return (new ProjectRabExport($projectId))->download('exports.xlsx');
         } else {

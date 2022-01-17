@@ -19,12 +19,12 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
 {
 
     private $projectId, $project, $company = null;
-    private $rabStartingIdx = 13, $prevIdx = 0;
-    private $rabCount = 0;
     private $rabStyleArr = [];
+    private $globalStartingIndex = 13, $finalPointerLocation = 0;
 
     const RAB_HEADER = 'rabHeader';
     const RAB_ITEM_HEADER = 'rabItemHeader';
+    const RAB_ITEM_CONTENT = 'rabItemContent';
 
     public function __construct($projectId)
     {
@@ -35,9 +35,6 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
 
     public function view(): View
     {
-
-        // return dd($this->generateRab());
-
         return view('exports.rab.rab', [
             'rabs' => $this->generateRab(),
             'project' => $this->project,
@@ -48,76 +45,97 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
     private function generateRab()
     {
 
-        $rabs = Rab::where('project_id', $this->projectId)
-                ->with(['rabItemHeader.rabItem'])
-                ->with('rabItem', function($q) {
-                    $q->where('rab_item_header_id', NULL);
-                    $q->with('customAhs');
-                })
-                ->get();
-
         $rabSubtotal = 0;
+        $pointer = $this->globalStartingIndex;
+
+        $rabs = Rab::where('project_id', $this->projectId)
+          ->with(['rabItemHeader.rabItem'])
+          ->with('rabItem', function($q) {
+              $q->where('rab_item_header_id', NULL);
+              $q->with('customAhs');
+          })
+          ->get();
 
         foreach ($rabs as $key => $rab) {
+
+            $this->rabStyleArr[] = [
+                'pointer' => $pointer,
+                'type' => self::RAB_HEADER
+            ];
+
             if ($rab->rabItem || ($rab->rabItemHeader && $rab->rabItemHeader->rabItem)) {
+
                 foreach ($rab->rabItem as $key2 => $rabItem) {
+
                     if ($rabItem->customAhs) {
+
                         $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
                         $countedAhs->price = $countedAhs->subtotal;
                         $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
                         $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
                         $rabSubtotal += $countedAhs->subtotal;
+
                     } else {
+
                         $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
                         $rabs[$key]->rabItem[$key2] = $rabItem;
                         $rabSubtotal += $rabItem->subtotal;
+
                     }
+
+                    $pointer++;
+
+                    $this->rabStyleArr[] = [
+                        'pointer' => $pointer,
+                        'type' => self::RAB_ITEM_CONTENT
+                    ];
+
                 }
-
-                $this->rabStyleArr[] = [
-                    'index' => $this->rabStartingIdx + $this->prevIdx,
-                    'type' => self::RAB_HEADER
-                ];
-
-                $prevRabItemCount = 0;
-                $overallHeaderRabCount = 0;
 
                 foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
 
+                    $pointer++;
+
+                    $this->rabStyleArr[] = [
+                        'pointer' => $pointer,
+                        'type' => self::RAB_ITEM_HEADER
+                    ];
+
                     foreach ($rabItemHeader->rabItem as $rabItem) {
+
                         if ($rabItem->customAhs) {
+
                             $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
                             $countedAhs->price = $countedAhs->subtotal;
                             $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
                             $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
                             $rabSubtotal += $countedAhs->subtotal;
+
                         } else {
+
                             $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
                             $rabSubtotal += $rabItem->subtotal;
+
                         }
+
+                        $pointer++;
+
+                        $this->rabStyleArr[] = [
+                            'pointer' => $pointer,
+                            'type' => self::RAB_ITEM_CONTENT
+                        ];
+
                     }
-
-                    $this->rabStyleArr[] = [
-                        'index' => $this->rabStartingIdx + $this->prevIdx + $rab->rabItem->count() + $prevRabItemCount + 1,
-                        'type' => self::RAB_ITEM_HEADER
-                    ];
-
-                    $prevRabItemCount = $rabItemHeader->rabItem->count();
-                    $overallHeaderRabCount += $prevRabItemCount + 1;
                 }
-
-                $this->prevIdx = $overallHeaderRabCount + $rab->rabItem->count();
 
             } else {
                 $rabSubtotal += 0;
-                $this->prevIdx = 0;
             }
 
-            $rabs[$key]->subtotal = $rabSubtotal;
-            $rabSubtotal = 0;
+            $pointer++;
         }
 
-        $this->rabCount = $rabs->count();
+        $this->finalPointerLocation = $pointer - 1;
 
         return $rabs;
     }
@@ -131,7 +149,7 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
             'D' => 17,
             'E' => 17,
             'F' => 45,
-            'G' => 23,
+            'G' => 35,
         ];
     }
 
@@ -139,10 +157,26 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
     {
 
         foreach ($this->rabStyleArr as $styleArr) {
-            $headerStyle = $sheet->getStyle('A' . $styleArr['index'] . ':G' . $styleArr['index']);
-            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB( $styleArr['type'] == self::RAB_HEADER ? '153346' : '465059');
-            $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
+
+            if ($styleArr['type'] == self::RAB_HEADER || $styleArr['type'] == self::RAB_ITEM_HEADER) {
+                // Styling for rab item header or rab header
+                // Set background color
+                $headerStyle = $sheet->getStyle('A' . $styleArr['pointer'] . ':G' . $styleArr['pointer']);
+                $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB( $styleArr['type'] == self::RAB_HEADER ? '153346' : '465059');
+                $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
+            } else {
+                // Styling for rab item
+                $sheet->getStyle('E' . $styleArr['pointer'])->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            }
+
+
+            if ($styleArr['type'] == self::RAB_ITEM_HEADER) {
+                $sheet->getStyle('A' . $styleArr['pointer'])->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            }
         }
+
+        // Centerize header
+        $sheet->getStyle(('A' . ($this->globalStartingIndex - 1)) . (':G' . ($this->globalStartingIndex - 1)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // Kop Surat
         $sheet->getStyle('G2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
@@ -156,14 +190,14 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
             ]
         ]);
 
-        $sheet->getStyle('A' . ($this->rabStartingIdx - 1) . ':G' . (($this->rabStartingIdx + $this->prevIdx) - ($this->rabCount <= 0 ? 1 : 0)))->applyFromArray(['borders' => [
+        $sheet->getStyle('A' . ($this->globalStartingIndex - 1) . ':G' . $this->finalPointerLocation)->applyFromArray(['borders' => [
             'allBorders' => [
                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                 'color' => ['rgb' => '000'],
             ],
         ]]);
 
-        $sheet->getStyle('F' . (($this->rabStartingIdx + $this->prevIdx) + ($this->rabCount <= 0 ? 1 : 2)) . ':G' . (($this->rabStartingIdx + $this->prevIdx) + ($this->rabCount <= 0 ? 3 : 4)))->applyFromArray(['borders' => [
+        $sheet->getStyle('F' . ($this->finalPointerLocation + 2) . ':G' . ($this->finalPointerLocation + 5))->applyFromArray(['borders' => [
             'allBorders' => [
                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                 'color' => ['rgb' => '000'],

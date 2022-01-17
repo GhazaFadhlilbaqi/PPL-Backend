@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c35f634479bba7c9d22996d1960b51cc",
+    "content-hash": "4e7d7b93c6ac7ad84a1e4271a3d81abe",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2226,6 +2226,57 @@
                 }
             ],
             "time": "2021-07-05T08:18:36+00:00"
+        },
+        {
+            "name": "nasution/terbilang",
+            "version": "v0.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mul14/terbilang-php.git",
+                "reference": "9f156ed15d63df5115904944073adca4a06fda66"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mul14/terbilang-php/zipball/9f156ed15d63df5115904944073adca4a06fda66",
+                "reference": "9f156ed15d63df5115904944073adca4a06fda66",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">= 5.3.3"
+            },
+            "require-dev": {
+                "phpspec/phpspec": "~2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Nasution\\": "src/Nasution"
+                },
+                "files": [
+                    "src/terbilang.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "WTFPL"
+            ],
+            "authors": [
+                {
+                    "name": "Mulia Arifandi Nasution",
+                    "email": "mul14.net@gmail.com"
+                }
+            ],
+            "description": "Convert numbers into words in Indonesian language",
+            "homepage": "https://github.com/mul14/terbilang-php",
+            "keywords": [
+                "indonesia",
+                "terbilang"
+            ],
+            "support": {
+                "issues": "https://github.com/mul14/terbilang-php/issues",
+                "source": "https://github.com/mul14/terbilang-php/tree/v0.0.4"
+            },
+            "time": "2019-10-03T09:23:27+00:00"
         },
         {
             "name": "nesbot/carbon",
