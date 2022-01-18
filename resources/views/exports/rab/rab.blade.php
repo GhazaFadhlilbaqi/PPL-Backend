@@ -72,8 +72,8 @@
                     <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '-' }}</td>
                     <td>{{ $rabItem->volume }}</td>
                     <td>{{ $rabItem->unit->name }}</td>
-                    <td>{{ $rabItem->custom_ahs_id ? $rabItem['custom_ahs']['subtotal'] : $rabItem->price }}</td>
-                    <td>{{ ($rabItem->custom_ahs_id ? $rabItem['custom_ahs']['subtotal'] : $rabItem->price) * $rabItem->volume }}</td>
+                    <td>{{ $rabItem->customAhs ? $rabItem->customAhs->subtotal : $rabItem->price }}</td>
+                    <td>{{ ($rabItem->customAhs ? $rabItem->customAhs->subtotal : $rabItem->price) * $rabItem->volume }}</td>
                 </tr>
             @endforeach
             @foreach($rab->rabItemHeader ?? [] as $rabItemHeader)
@@ -88,8 +88,12 @@
                         <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '-' }}</td>
                         <td>{{ $rabItem->volume }}</td>
                         <td>{{ $rabItem->unit->name }}</td>
-                        <td>{{ $rabItem->custom_ahs_id ? $rabItem['custom_ahs']['subtotal'] : $rabItem->price }}</td>
-                        <td>{{ ($rabItem->custom_ahs_id ? $rabItem['custom_ahs']['subtotal'] : $rabItem->price) * $rabItem->volume }}</td>
+                        <td>{{ $rabItem->customAhs ? $rabItem->customAhs->subtotal : $rabItem->price }}</td>
+                        <td>{{ ($rabItem->customAhs ? $rabItem->customAhs->subtotal : $rabItem->price) * $rabItem->volume }}</td>
+                        {{-- <td>{{ $rabItem->custom_ahs_id != 'null' ? 'true' : $rabItem->price }}</td>
+                        <td>{{ ($rabItem->custom_ahs_id != 'null' ? 'true' : $rabItem->price)}}</td> --}}
+                        {{-- <td>{{ $rabItem }}</td>
+                        <td>{{ $rabItem }}</td> --}}
                     </tr>
                 @endforeach
             @endforeach

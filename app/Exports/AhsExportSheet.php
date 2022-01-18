@@ -103,13 +103,14 @@ class AhsExportSheet extends CountableItemController implements FromView, WithTi
 
             $headerStyle = $sheet->getStyle('A' . ($currIndexPointer + 1) . ':G' . ($currIndexPointer + 1));
 
+            $headerStyle->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
             $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
 
             $currIndexPointer = $currIndexPointer + $customAhsCount + 2;
         }
 
-        $sheet->getStyle('G' . ($currIndexPointer + 1) . ':G' . ($currIndexPointer + 8))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('G' . ($currIndexPointer + 1) . ':G' . ($currIndexPointer + 11))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
     }
 
     public function title(): string

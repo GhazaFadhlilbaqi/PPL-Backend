@@ -68,7 +68,8 @@ class ItemPriceExportSheet implements FromView, WithTitle, WithColumnWidths, Wit
         $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
         $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
 
-        $sheet->getStyle('E' . (12 + $this->customItemPriceGroupsCount) . ':E' . (20 + $this->customItemPriceGroupsCount))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('E' . (12 + $this->customItemPriceGroupsCount) . ':E' . (25 + $this->customItemPriceGroupsCount))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A11:E11')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
     }
 
     public function title() : string

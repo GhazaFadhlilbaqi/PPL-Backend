@@ -59,7 +59,8 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
     {
 
         $customAhpCount = $this->project->customAhp->count();
-        $currentAIndex = 12;
+        $startingIndex = 12;
+        $currentAIndex = $startingIndex;
 
         // Kop Surat
         $sheet->getStyle('F2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
@@ -84,13 +85,14 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
 
             $headerStyle = $sheet->getStyle('A' . $currentAIndex . ':F' . $currentAIndex);
 
+            $headerStyle->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
             $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
 
             $currentAIndex += 33;
         }
 
-        $sheet->getStyle('F' . $currentAIndex . ':F' . ($currentAIndex + 8))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('F' . ($currentAIndex) . ':F' . ($currentAIndex + 13))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
     }
 
     public function title() : string {
