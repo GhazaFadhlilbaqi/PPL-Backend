@@ -24,15 +24,15 @@ class RolePermissionSeeder extends Seeder
         $this->createPermissions();
 
         $rootPermissions = [
-            'read dashboard'
+            'read-dashboard', 'access-project-page', 'access-project-page', 'access-account-page', 'access-master-page'
         ];
 
         $ownerPermission = [
-            'read dashboard'
+            'read-dashboard', 'access-project-page', 'access-project-page', 'access-account-page'
         ];
 
         $consultanPermissions = [
-            'read dashboard'
+            'read-dashboard'
         ];
 
         # Assigning Permission
@@ -62,7 +62,10 @@ class RolePermissionSeeder extends Seeder
     private function createPermissions()
     {
         return Permission::insert([
-            ['name' => 'read dashboard', 'guard_name' => 'api']
+            ['name' => 'read-dashboard', 'guard_name' => 'api'],
+            ['name' => 'access-project-page', 'guard_name' => 'api'],
+            ['name' => 'access-master-page', 'guard_name' => 'api'],
+            ['name' => 'access-account-page', 'guard_name' => 'api'],
         ]);
     }
 }

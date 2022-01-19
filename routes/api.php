@@ -89,7 +89,7 @@ Route::prefix('company')->middleware('auth:sanctum')->group(function() {
  * Master Data API
  * ----------------------
  */
-Route::prefix('master')->middleware('auth:sanctum')->group(function() {
+Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
 
     Route::prefix('provinces')->middleware('auth:sanctum')->group(function() {
         Route::get('', [ProvinceController::class, 'index']);
@@ -148,7 +148,7 @@ Route::prefix('master')->middleware('auth:sanctum')->group(function() {
  * Project API
  * ----------------------
  */
-Route::prefix('project')->middleware('auth:sanctum')->group(function() {
+Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page'])->group(function() {
     Route::get('', [ProjectController::class, 'index']);
     Route::post('', [ProjectController::class, 'store']);
     Route::post('{project}', [ProjectController::class, 'update']);

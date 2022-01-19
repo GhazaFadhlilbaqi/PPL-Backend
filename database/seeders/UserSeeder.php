@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
 
         // User::truncate();
 
-        $rootUser = User::factory()->create([
+        $rootUsers = User::factory()->create([
             'first_name' => 'Mizuhara',
             'last_name' => 'Chizuru',
             'password' => Hash::make(1234),
@@ -28,14 +28,24 @@ class UserSeeder extends Seeder
             'address' => 'Jln. Pahlawan No. 7 Gambiran, Banyuwangi'
         ]);
 
-        $rootUser->each(function($user) {
+        $rootUsers->each(function($user) {
             $user->assignRole('root');
         });
 
-        $users = User::factory(10)->create();
+        $ownerUsers = User::factory()->create([
+            'password' => Hash::make(1234),
+            'email' => 'owner@gmail.com',
+            'email_verified_at' => Carbon::now(),
+        ]);
 
-        $users->each(function($user) {
+        $ownerUsers->each(function($user) {
             $user->assignRole('owner');
         });
+
+        // $users = User::factory(10)->create();
+
+        // $users->each(function($user) {
+        //     $user->assignRole('owner');
+        // });
     }
 }
