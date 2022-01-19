@@ -90,7 +90,6 @@ class ProjectController extends Controller
 
         if ($order) {
             $order->used_at = Carbon::now();
-            $order->used_at = null;
             $order->save();
             return (new ProjectRabExport($projectId))->download('exports.xlsx');
         } else {
