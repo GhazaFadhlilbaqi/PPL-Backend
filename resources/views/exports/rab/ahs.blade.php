@@ -66,7 +66,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ determineCustomAhsItemName($laborAhs) }}</td>
                 <td>{{ $laborAhs->customAhsItemable->code }}</td>
-                <td>{{ $laborAhs->unit->name }}</td>
+                <td>{{ $laborAhs->customAhsItemable->unit->name }}</td>
                 <td>{{ $laborAhs->coefficient }}</td>
                 <td>{{ $laborAhs->customAhsItemable->subtotal }}</td>
                 <td>{{ $laborAhs->customAhsItemable->subtotal * $laborAhs->coefficient }}</td>
@@ -92,7 +92,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ determineCustomAhsItemName($ingredientsAhs) }}</td>
                 <td>{{ $ingredientsAhs->customAhsItemable->code }}</td>
-                <td>{{ $ingredientsAhs->unit->name }}</td>
+                <td>{{ $ingredientsAhs->customAhsItemable->unit->name }}</td>
                 <td>{{ $ingredientsAhs->coefficient }}</td>
                 <td>{{ $ingredientsAhs->customAhsItemable->subtotal }}</td>
                 <td>{{ $ingredientsAhs->customAhsItemable->subtotal * $ingredientsAhs->coefficient }}</td>
@@ -118,7 +118,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ determineCustomAhsItemName($toolsAhs) }}</td>
                 <td>{{ $toolsAhs->customAhsItemable->code }}</td>
-                <td>{{ $toolsAhs->unit->name }}</td>
+                <td>{{ $toolsAhs->customAhsItemable->unit->name }}</td>
                 <td>{{ $toolsAhs->coefficient }}</td>
                 <td>{{ $toolsAhs->customAhsItemable->subtotal }}</td>
                 <td>{{ $toolsAhs->customAhsItemable->subtotal * $toolsAhs->coefficient }}</td>
@@ -144,7 +144,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ determineCustomAhsItemName($othersAhs) }}</td>
                 <td>{{ $othersAhs->customAhsItemable->code }}</td>
-                <td>{{ $othersAhs->unit->name }}</td>
+                <td>{{ $othersAhs->customAhsItemable->unit->name }}</td>
                 <td>{{ $othersAhs->coefficient }}</td>
                 <td>{{ $othersAhs->customAhsItemable->subtotal }}</td>
                 <td>{{ $othersAhs->customAhsItemable->subtotal * $othersAhs->coefficient }}</td>
