@@ -56,7 +56,6 @@
     <tbody>
         @php $rabSum = 0; @endphp
         @foreach ($rabs ?? [] as $rab)
-            @php $rabSum += $rab->subtotal @endphp
             <tr>
                 <td><b>{{ numToAlphabet($loop->index) }}</b></td>
                 <td><b>{{ $rab->name }}</b></td>
@@ -72,9 +71,10 @@
                     <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '-' }}</td>
                     <td>{{ $rabItem->volume }}</td>
                     <td>{{ $rabItem->unit->name }}</td>
-                    <td>{{ $rabItem->customAhs ? $rabItem->customAhs->subtotal : $rabItem->price }}</td>
-                    <td>{{ ($rabItem->customAhs ? $rabItem->customAhs->subtotal : $rabItem->price) * $rabItem->volume }}</td>
+                    <td>{{ $rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price }}</td>
+                    <td>{{ ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume }}</td>
                 </tr>
+                @php $rabSum += ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume @endphp
             @endforeach
             @foreach($rab->rabItemHeader ?? [] as $rabItemHeader)
                 <tr>
@@ -88,12 +88,13 @@
                         <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '-' }}</td>
                         <td>{{ $rabItem->volume }}</td>
                         <td>{{ $rabItem->unit->name }}</td>
-                        <td>{{ $rabItem->customAhs ? $rabItem->customAhs->subtotal : $rabItem->price }}</td>
-                        <td>{{ ($rabItem->customAhs ? $rabItem->customAhs->subtotal : $rabItem->price) * $rabItem->volume }}</td>
+                        <td>{{ $rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price }}</td>
+                        <td>{{ ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume }}</td>
                         {{-- <td>{{ $rabItem->custom_ahs_id != 'null' ? 'true' : $rabItem->price }}</td>
                         <td>{{ ($rabItem->custom_ahs_id != 'null' ? 'true' : $rabItem->price)}}</td> --}}
                         {{-- <td>{{ $rabItem }}</td>
                         <td>{{ $rabItem }}</td> --}}
+                        @php $rabSum += ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume @endphp
                     </tr>
                 @endforeach
             @endforeach
