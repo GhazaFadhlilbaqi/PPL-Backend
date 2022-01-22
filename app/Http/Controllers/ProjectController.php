@@ -60,6 +60,16 @@ class ProjectController extends Controller
         ]);
     }
 
+    public function updateLastOpenedAt(Project $project)
+    {
+        $project->last_opened_at = Carbon::now();
+        $project->update();
+
+        return response()->json([
+            'status' => 'success',
+        ]);
+    }
+
     public function destroy(Project $project)
     {
         if ($project->user_id != Auth::user()->id) return $this->giveUnbelongedAccessResponse();

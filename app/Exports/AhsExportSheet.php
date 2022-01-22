@@ -110,6 +110,7 @@ class AhsExportSheet extends CountableItemController implements FromView, WithTi
             $currIndexPointer = $currIndexPointer + $customAhsCount + 2;
         }
 
+        $sheet->getStyle('B9')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
         $sheet->getStyle('G' . ($currIndexPointer + 1) . ':G' . ($currIndexPointer + 11))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
     }
 

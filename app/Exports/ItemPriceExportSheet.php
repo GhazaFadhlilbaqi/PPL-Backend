@@ -70,6 +70,8 @@ class ItemPriceExportSheet implements FromView, WithTitle, WithColumnWidths, Wit
 
         $sheet->getStyle('E' . (12 + $this->customItemPriceGroupsCount) . ':E' . (25 + $this->customItemPriceGroupsCount))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('A11:E11')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getStyle('B9')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
     }
 
     public function title() : string

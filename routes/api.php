@@ -154,6 +154,7 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
     Route::post('{project}', [ProjectController::class, 'update']);
     Route::get('{project}', [ProjectController::class, 'show']);
     Route::get('{project}/delete', [ProjectController::class, 'destroy']);
+    Route::get('{project}/update-last-opened-at', [ProjectController::class, 'updateLastOpenedAt'])->middleware(['project.ensure-project-belonging']);
 
     /**
      * ----------------------

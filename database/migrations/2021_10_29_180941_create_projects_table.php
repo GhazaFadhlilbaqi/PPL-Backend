@@ -22,7 +22,7 @@ class CreateProjectsTable extends Migration
             $table->text('address')->nullable();
             $table->unsignedTinyInteger('province_id');
             $table->integer('fiscal_year');
-            $table->integer('profit_margin');
+            $table->integer('profit_margin')->comment('The percentage of Profit Margin');
             $table->integer('ppn')->comment('The percentage of PPN')->default(0);
             $table->timestamp('last_opened_at')->nullable();
             $table->timestamps();

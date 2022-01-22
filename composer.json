@@ -17,7 +17,7 @@
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
         "mtvs/eloquent-hashids": "^3.1",
-        "nasution/terbilang": "^0.0.4",
+        "riskihajar/terbilang": "^1.2",
         "santigarcor/laravel-vuetable": "^1.1",
         "spatie/laravel-permission": "^4.2"
     },

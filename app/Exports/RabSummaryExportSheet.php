@@ -30,7 +30,7 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
     {
         $this->projectId = $projectId;
         $this->project = Project::find($projectId);
-        $this->company = User::find(1)->company;
+        $this->company = Auth::user()->company;
     }
 
     public function view(): View
@@ -199,6 +199,9 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
                 ]
             ]
         ]);
+
+        // Pekerjaan Detail
+        $sheet->getStyle('B10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
         $sheet->getStyle('A' . ($this->globalStartingIndex - 1) . ':G' . $this->finalPointerLocation)->applyFromArray(['borders' => [
             'allBorders' => [

@@ -4,7 +4,7 @@ use App\Models\CustomAhp;
 use App\Models\CustomAhs;
 use App\Models\CustomAhsItem;
 use App\Models\CustomItemPrice;
-use Nasution\Terbilang;
+use Riskihajar\Terbilang\Facades\Terbilang;
 use App\Models\RabItem;
 
 if (!function_exists('determineCustomAhsItemName')) {
@@ -25,7 +25,7 @@ if (!function_exists('determineCustomAhsItemName')) {
 if (!function_exists('terbilang')) {
     function terbilang($number)
     {
-        return Terbilang::convert($number);
+        return Terbilang::make($number);
     }
 }
 

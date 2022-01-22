@@ -92,6 +92,7 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
             $currentAIndex += 33;
         }
 
+        $sheet->getStyle('B10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
         $sheet->getStyle('F' . ($currentAIndex) . ':F' . ($currentAIndex + 13))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
     }
 

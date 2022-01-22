@@ -66,7 +66,7 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ determineCustomAhsItemName($laborAhs) }}</td>
                 <td>{{ $laborAhs->customAhsItemable->code }}</td>
-                <td>{{ $laborAhs->customAhsItemable->unit->name }}</td>
+                <td>{{ $laborAhs->customAhsItemable ? ($laborAhs->custom_ahs_itemable_type == 'App\\Models\\CustomAhs' ? $laborAhs->unit->name : $laborAhs->customAhsItemable->unit->name) : $laborAhs->unit->name }}</td>
                 <td>{{ $laborAhs->coefficient }}</td>
                 <td>{{ $laborAhs->customAhsItemable->subtotal }}</td>
                 <td>{{ $laborAhs->customAhsItemable->subtotal * $laborAhs->coefficient }}</td>
@@ -162,11 +162,11 @@
         </tr>
         <tr>
             <td><b>E</b></td>
-            <td><b>JUMLAH HARGA TENAGA, BAHAN DAN PERALATAN</b></td>
+            <td><b>JUMLAH HARGA TENAGA, BAHAN, PERALATAN, DAN LAIN LAIN</b></td>
             <td></td>
             <td></td>
             <td></td>
-            <td><b>(A+B+C)</b></td>
+            <td><b>(A+B+C+D)</b></td>
             <td><b>{{ $a->subtotal }}</b></td>
         </tr>
         <tr>
@@ -175,17 +175,17 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><b>x D</b></td>
+            <td><b>x E</b></td>
             {{-- FIXME: Add overhead --}}
             <td><b>{{ ($project->profit_margin / 100) * $a->subtotal }}</b></td>
         </tr>
         <tr>
-            <td><b>H</b></td>
+            <td><b>G</b></td>
             <td><b>HARGA SATUAN PEKERJAAN</b></td>
             <td></td>
             <td></td>
             <td></td>
-            <td><b>(D+E)</b></td>
+            <td><b>(E+F)</b></td>
             <td><b>{{ $a->subtotal + 0 }}</b></td>
         </tr>
     </tbody>
@@ -201,7 +201,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>{{ $project->province->name }}</td>
+        <td>{{ $project->province->name }}, {{ date('d-m-Y') }}</td>
     </tr>
     <tr>
         <td></td>

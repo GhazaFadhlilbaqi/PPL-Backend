@@ -146,7 +146,7 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>{{ $project->province->name }}</td>
+            <td>{{ $project->province->name }}, {{ date('d-m-Y') }}</td>
         </tr>
         <tr>
             <td></td>
