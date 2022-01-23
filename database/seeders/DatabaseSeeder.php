@@ -18,10 +18,10 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             UserSeeder::class,
             ProvinceSeeder::class,
-            UnitSeeder::class,
-            ItemPriceGroupSeeder::class,
-            ItemPriceSeeder::class,
-            ItemPriceProvinceSeeder::class,
+            // UnitSeeder::class,
+            // ItemPriceGroupSeeder::class,
+            // ItemPriceSeeder::class,
+            // ItemPriceProvinceSeeder::class,
         ]);
     }
 }
