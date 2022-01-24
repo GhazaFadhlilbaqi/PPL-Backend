@@ -176,8 +176,8 @@
             <td></td>
             <td></td>
             <td><b>x E</b></td>
-            {{-- FIXME: Add overhead --}}
-            <td><b>{{ ($project->profit_margin / 100) * $a->subtotal }}</b></td>
+            @php $profitMarginAndOverhead = ($project->profit_margin / 100) * $a->subtotal @endphp
+            <td><b>{{ $profitMarginAndOverhead }}</b></td>
         </tr>
         <tr>
             <td><b>G</b></td>
@@ -186,7 +186,7 @@
             <td></td>
             <td></td>
             <td><b>(E+F)</b></td>
-            <td><b>{{ $a->subtotal + 0 }}</b></td>
+            <td><b>{{ $a->subtotal + $profitMarginAndOverhead }}</b></td>
         </tr>
     </tbody>
 </table>
