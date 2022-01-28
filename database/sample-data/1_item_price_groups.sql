@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 24, 2022 at 12:08 AM
+-- Generation Time: Jan 28, 2022 at 09:53 PM
 -- Server version: 10.3.32-MariaDB-cll-lve
 -- PHP Version: 7.3.33
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `u6592316_rencanakan_preview`
+-- Database: `u6592316_rencanakan_app_db`
 --
 
 --

@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.7
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jan 24, 2022 at 12:10 AM
--- Server version: 10.3.32-MariaDB-cll-lve
--- PHP Version: 7.3.33
+-- Host: localhost
+-- Generation Time: Jan 28, 2022 at 02:43 PM
+-- Server version: 10.6.5-MariaDB
+-- PHP Version: 7.4.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -19,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `u6592316_rencanakan_preview`
+-- Database: `rencanakan_cloud_2`
 --
 
 --
@@ -42,10 +41,14 @@ INSERT INTO `ahs` (`id`, `name`, `created_at`, `updated_at`) VALUES
 ('B.06.b', 'Beton mutu 1 m3, fc = 16,9 MPa (K200), slump (12±2) cm, w/c = 0,61 dengan menggunakan molen', '2022-01-17 07:21:48', '2022-01-17 07:21:48'),
 ('B.07.a', 'Beton mutu 1 m3, fc = 19,3 MPa (K225), slump (12±2) cm, w/c = 0,58 dengan cara manual', '2022-01-17 07:35:08', '2022-01-17 07:35:08'),
 ('B.07.b', 'Beton mutu 1 m3, fc = 19,3 MPa (K225), slump (12±2) cm, w/c = 0,58 dengan menggunakan molen', '2022-01-17 08:00:49', '2022-01-17 08:00:49'),
-('B.08.a', 'Beton mutu, fc = 21,7 Mpa (K250) kedap air, slump (12±2) cm, w/c = 0.56 dengan cara manual', '2022-01-17 08:08:47', '2022-01-17 08:18:28'),
-('B.08.b', 'Beton mutu, fc = 21,7 Mpa (K250) kedap air, slump (12±2) cm, w/c = 0.56 menggunakan molen', '2022-01-17 08:17:30', '2022-01-17 08:17:30'),
-('B.09.a', 'Beton mutu, fc = 24,0 Mpa (K275) kedap air, slump (12±2) cm, w/c = 0.53 dengan cara manual', '2022-01-17 08:34:31', '2022-01-17 08:34:31'),
-('B.09.b', 'Beton mutu, fc = 24,0 Mpa (K275) kedap air, slump (12±2) cm, w/c = 0.53 dengan menggunakan molen', '2022-01-17 08:47:49', '2022-01-17 08:47:49'),
+('B.08.a', 'Beton mutu 1 m3, fc = 21,7 Mpa (K250) kedap air, slump (12±2) cm, w/c = 0.56 dengan cara manual', '2022-01-17 08:08:47', '2022-01-25 01:50:15'),
+('B.08.b', 'Beton mutu 1 m3, fc = 21,7 Mpa (K250) kedap air, slump (12±2) cm, w/c = 0.56 dengan menggunakan molen', '2022-01-25 01:54:01', '2022-01-25 01:54:01'),
+('B.09.a', 'Beton mutu 1 m3, fc = 24,0 MPa (K275) kedap air, slump (12±2) cm, w/c = 0,53 dengan cara manual', '2022-01-25 02:07:44', '2022-01-25 02:07:44'),
+('B.09.b', 'Beton mutu 1 m3, fc = 24,0 MPa (K275) kedap air, slump (12±2) cm, w/c = 0,53 dengan menggunakan molen', '2022-01-25 02:14:45', '2022-01-25 02:14:45'),
+('B.10.a', 'Beton mutu 1 m3, fc = 26,4 MPa (K300) kedap air, slump (12±2) cm, w/c = 0,52 (kedap air) dengan cara manual', '2022-01-25 02:34:05', '2022-01-25 02:34:05'),
+('B.10.b', 'Beton mutu 1 m3, fc = 26,4 MPa (K300) kedap air, slump (12±2) cm, w/c = 0,52 (kedap air) dengan menggunakan molen', '2022-01-25 02:41:25', '2022-01-25 02:41:25'),
+('B.11.a', 'Beton mutu 1 m3, fc = 28,8 MPa (K325) kedap air, slump (12±2) cm, w/c = 0,49 (kedap air) dengan cara manual', '2022-01-25 03:01:57', '2022-01-25 03:01:57'),
+('B.11.b', 'Beton mutu 1 m3, fc = 28,8 MPa (K325) kedap air, slump (12±2) cm, w/c = 0,49 (kedap air) dengan menggunakan molen', '2022-01-25 03:14:16', '2022-01-25 03:14:16'),
 ('P.01.a.1', 'Pasangan 1 m3  batu dengan mortar tipe M (1 PC: 2 PP) dengan cara manual', '2021-12-24 09:08:29', '2021-12-24 09:08:29'),
 ('P.01.a.2', 'Pasangan 1 m3 batu mortar tipe M  (1 PC : 2 PP) dengan menggunakan molen', '2021-12-24 09:10:52', '2021-12-24 09:10:52'),
 ('P.01.b.1', 'Pasangan 1 m3 batu dengan mortar tipe S (1 PC:3PP) dengan cara manual', '2021-12-29 02:40:14', '2021-12-29 02:40:14'),

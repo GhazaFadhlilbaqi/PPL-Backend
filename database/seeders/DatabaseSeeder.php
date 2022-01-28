@@ -14,10 +14,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        # Some seeders are commented because it's populated from /database/sample-data
         $this->call([
             RolePermissionSeeder::class,
             UserSeeder::class,
-            ProvinceSeeder::class,
+            // ProvinceSeeder::class,
             // UnitSeeder::class,
             // ItemPriceGroupSeeder::class,
             // ItemPriceSeeder::class,

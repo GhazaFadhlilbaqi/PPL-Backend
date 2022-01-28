@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.7
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jan 24, 2022 at 12:11 AM
--- Server version: 10.3.32-MariaDB-cll-lve
--- PHP Version: 7.3.33
+-- Host: localhost
+-- Generation Time: Jan 28, 2022 at 02:43 PM
+-- Server version: 10.6.5-MariaDB
+-- PHP Version: 7.4.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -19,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `u6592316_rencanakan_preview`
+-- Database: `rencanakan_cloud_2`
 --
 
 --
@@ -1072,23 +1071,57 @@ INSERT INTO `ahs_items` (`id`, `ahs_id`, `name`, `unit_id`, `coefficient`, `sect
 (1082, 'B.08.a', NULL, NULL, 692.00, 'ingredients', 'M.14.a', 'App\\Models\\ItemPrice', '2022-01-17 08:12:52', '2022-01-17 08:13:26'),
 (1083, 'B.08.a', NULL, NULL, 1039.00, 'ingredients', 'M.12', 'App\\Models\\ItemPrice', '2022-01-17 08:13:26', '2022-01-17 08:14:03'),
 (1084, 'B.08.a', NULL, NULL, 215.00, 'ingredients', 'M.02', 'App\\Models\\ItemPrice', '2022-01-17 08:14:14', '2022-01-17 08:15:56'),
-(1085, 'B.08.b', NULL, NULL, 1.32, 'labor', 'L.01', 'App\\Models\\ItemPrice', '2022-01-17 08:18:46', '2022-01-17 08:19:16'),
-(1086, 'B.08.b', NULL, NULL, 0.19, 'labor', 'L.02.c', 'App\\Models\\ItemPrice', '2022-01-17 08:19:16', '2022-01-17 08:21:07'),
-(1087, 'B.08.b', NULL, NULL, 0.02, 'labor', 'L.03', 'App\\Models\\ItemPrice', '2022-01-17 08:21:07', '2022-01-17 08:22:04'),
-(1088, 'B.08.b', NULL, NULL, 0.13, 'labor', 'L.04', 'App\\Models\\ItemPrice', '2022-01-17 08:22:04', '2022-01-17 08:22:50'),
-(1089, 'B.08.b', NULL, NULL, 384.00, 'ingredients', 'M.15.a', 'App\\Models\\ItemPrice', '2022-01-17 08:22:50', '2022-01-17 08:25:39'),
-(1090, 'B.08.b', NULL, NULL, 692.00, 'ingredients', 'M.14.a', 'App\\Models\\ItemPrice', '2022-01-17 08:25:39', '2022-01-17 08:26:18'),
-(1091, 'B.08.b', NULL, NULL, 1039.00, 'ingredients', 'M.12', 'App\\Models\\ItemPrice', '2022-01-17 08:26:18', '2022-01-17 08:29:43'),
-(1092, 'B.08.b', NULL, NULL, 215.00, 'ingredients', 'M.02', 'App\\Models\\ItemPrice', '2022-01-17 08:29:44', '2022-01-17 08:31:01'),
-(1093, 'B.08.b', NULL, NULL, 0.25, 'tools', 'E.29', 'App\\Models\\ItemPrice', '2022-01-17 08:31:01', '2022-01-17 08:32:10'),
-(1094, 'B.09.a', NULL, NULL, 1.65, 'labor', 'L.01', 'App\\Models\\ItemPrice', '2022-01-17 08:38:50', '2022-01-17 08:39:22'),
-(1095, 'B.09.a', NULL, NULL, 0.28, 'labor', 'L.02.c', 'App\\Models\\ItemPrice', '2022-01-17 08:39:23', '2022-01-17 08:39:55'),
-(1096, 'B.09.a', NULL, NULL, 0.03, 'labor', 'L.03', 'App\\Models\\ItemPrice', '2022-01-17 08:39:56', '2022-01-17 08:41:28'),
-(1097, 'B.09.a', NULL, NULL, 0.16, 'labor', 'L.04', 'App\\Models\\ItemPrice', '2022-01-17 08:41:28', '2022-01-17 08:42:10'),
-(1098, 'B.09.a', NULL, NULL, 406.00, 'ingredients', 'M.15.a', 'App\\Models\\ItemPrice', '2022-01-17 08:42:10', '2022-01-17 08:43:26'),
-(1099, 'B.09.a', NULL, NULL, 684.00, 'ingredients', 'M.14.a', 'App\\Models\\ItemPrice', '2022-01-17 08:43:26', '2022-01-17 08:44:12'),
-(1100, 'B.09.a', NULL, NULL, 1026.00, 'ingredients', 'M.12', 'App\\Models\\ItemPrice', '2022-01-17 08:44:12', '2022-01-17 08:45:25'),
-(1101, 'B.09.a', NULL, NULL, 215.00, 'ingredients', 'M.02', 'App\\Models\\ItemPrice', '2022-01-17 08:45:26', '2022-01-17 08:46:02');
+(1102, 'B.08.b', NULL, NULL, 1.32, 'labor', 'L.01', 'App\\Models\\ItemPrice', '2022-01-25 01:54:55', '2022-01-25 01:55:39'),
+(1103, 'B.08.b', NULL, NULL, 0.19, 'labor', 'L.02.c', 'App\\Models\\ItemPrice', '2022-01-25 01:55:40', '2022-01-25 01:58:52'),
+(1104, 'B.08.b', NULL, NULL, 0.02, 'labor', 'L.03', 'App\\Models\\ItemPrice', '2022-01-25 01:58:52', '2022-01-25 02:00:47'),
+(1105, 'B.08.b', NULL, NULL, 0.13, 'labor', 'L.04', 'App\\Models\\ItemPrice', '2022-01-25 02:00:47', '2022-01-25 02:01:22'),
+(1106, 'B.08.b', NULL, NULL, 384.00, 'ingredients', 'M.15.a', 'App\\Models\\ItemPrice', '2022-01-25 02:01:22', '2022-01-25 02:01:56'),
+(1107, 'B.08.b', NULL, NULL, 692.00, 'ingredients', 'M.14.a', 'App\\Models\\ItemPrice', '2022-01-25 02:01:56', '2022-01-25 02:02:35'),
+(1108, 'B.08.b', NULL, NULL, 1039.00, 'ingredients', 'M.12', 'App\\Models\\ItemPrice', '2022-01-25 02:02:35', '2022-01-25 02:03:15'),
+(1109, 'B.08.b', NULL, NULL, 215.00, 'ingredients', 'M.02', 'App\\Models\\ItemPrice', '2022-01-25 02:03:15', '2022-01-25 02:04:00'),
+(1110, 'B.08.b', NULL, NULL, 0.25, 'tools', 'E.29', 'App\\Models\\ItemPrice', '2022-01-25 02:04:09', '2022-01-25 02:05:33'),
+(1111, 'B.09.a', NULL, NULL, 1.65, 'labor', 'L.01', 'App\\Models\\ItemPrice', '2022-01-25 02:08:44', '2022-01-25 02:09:17'),
+(1112, 'B.09.a', NULL, NULL, 0.28, 'labor', 'L.02.c', 'App\\Models\\ItemPrice', '2022-01-25 02:09:17', '2022-01-25 02:09:57'),
+(1113, 'B.09.a', NULL, NULL, 0.03, 'labor', 'L.03', 'App\\Models\\ItemPrice', '2022-01-25 02:10:06', '2022-01-25 02:10:37'),
+(1114, 'B.09.a', NULL, NULL, 0.16, 'labor', 'L.04', 'App\\Models\\ItemPrice', '2022-01-25 02:10:37', '2022-01-25 02:11:09'),
+(1115, 'B.09.a', NULL, NULL, 406.00, 'ingredients', 'M.15.a', 'App\\Models\\ItemPrice', '2022-01-25 02:11:09', '2022-01-25 02:11:39'),
+(1116, 'B.09.a', NULL, NULL, 684.00, 'ingredients', 'M.14.a', 'App\\Models\\ItemPrice', '2022-01-25 02:11:40', '2022-01-25 02:12:14'),
+(1117, 'B.09.a', NULL, NULL, 1026.00, 'ingredients', 'M.12', 'App\\Models\\ItemPrice', '2022-01-25 02:12:14', '2022-01-25 02:12:52'),
+(1118, 'B.09.a', NULL, NULL, 215.00, 'ingredients', 'M.02', 'App\\Models\\ItemPrice', '2022-01-25 02:12:53', '2022-01-25 02:13:31'),
+(1119, 'B.09.b', NULL, NULL, 1.32, 'labor', 'L.01', 'App\\Models\\ItemPrice', '2022-01-25 02:15:27', '2022-01-25 02:16:01'),
+(1120, 'B.09.b', NULL, NULL, 0.19, 'labor', 'L.02.c', 'App\\Models\\ItemPrice', '2022-01-25 02:16:01', '2022-01-25 02:16:35'),
+(1121, 'B.09.b', NULL, NULL, 0.02, 'labor', 'L.03', 'App\\Models\\ItemPrice', '2022-01-25 02:16:35', '2022-01-25 02:17:13'),
+(1122, 'B.09.b', NULL, NULL, 0.13, 'labor', 'L.04', 'App\\Models\\ItemPrice', '2022-01-25 02:17:13', '2022-01-25 02:17:47'),
+(1123, 'B.09.b', NULL, NULL, 406.00, 'ingredients', 'M.15.a', 'App\\Models\\ItemPrice', '2022-01-25 02:17:46', '2022-01-25 02:18:15'),
+(1124, 'B.09.b', NULL, NULL, 684.00, 'ingredients', 'M.14.a', 'App\\Models\\ItemPrice', '2022-01-25 02:18:15', '2022-01-25 02:18:53'),
+(1125, 'B.09.b', NULL, NULL, 1026.00, 'ingredients', 'M.12', 'App\\Models\\ItemPrice', '2022-01-25 02:18:53', '2022-01-25 02:19:23'),
+(1126, 'B.09.b', NULL, NULL, 215.00, 'ingredients', 'M.02', 'App\\Models\\ItemPrice', '2022-01-25 02:19:24', '2022-01-25 02:19:53'),
+(1127, 'B.09.b', NULL, NULL, 0.25, 'tools', 'E.29', 'App\\Models\\ItemPrice', '2022-01-25 02:19:53', '2022-01-25 02:28:02'),
+(1128, 'B.10.a', NULL, NULL, 1.65, 'labor', 'L.01', 'App\\Models\\ItemPrice', '2022-01-25 02:35:01', '2022-01-25 02:35:37'),
+(1129, 'B.10.a', NULL, NULL, 0.28, 'labor', 'L.02.c', 'App\\Models\\ItemPrice', '2022-01-25 02:35:37', '2022-01-25 02:36:14'),
+(1130, 'B.10.a', NULL, NULL, 0.03, 'labor', 'L.03', 'App\\Models\\ItemPrice', '2022-01-25 02:36:16', '2022-01-25 02:37:05'),
+(1131, 'B.10.a', NULL, NULL, 0.16, 'labor', 'L.04', 'App\\Models\\ItemPrice', '2022-01-25 02:37:05', '2022-01-25 02:37:38'),
+(1132, 'B.10.a', NULL, NULL, 413.00, 'ingredients', 'M.15.a', 'App\\Models\\ItemPrice', '2022-01-25 02:37:38', '2022-01-25 02:38:11'),
+(1133, 'B.10.a', NULL, NULL, 681.00, 'ingredients', 'M.14.a', 'App\\Models\\ItemPrice', '2022-01-25 02:38:11', '2022-01-25 02:38:43'),
+(1134, 'B.10.a', NULL, NULL, 1021.00, 'ingredients', 'M.12', 'App\\Models\\ItemPrice', '2022-01-25 02:38:43', '2022-01-25 02:39:30'),
+(1135, 'B.10.a', NULL, NULL, 215.00, 'ingredients', 'M.02', 'App\\Models\\ItemPrice', '2022-01-25 02:39:30', '2022-01-25 02:40:24'),
+(1137, 'B.10.b', NULL, NULL, 1.32, 'labor', 'L.01', 'App\\Models\\ItemPrice', '2022-01-25 02:45:51', '2022-01-25 02:48:34'),
+(1138, 'B.10.b', NULL, NULL, 0.19, 'labor', 'L.02.c', 'App\\Models\\ItemPrice', '2022-01-25 02:48:34', '2022-01-25 02:49:12'),
+(1139, 'B.10.b', NULL, NULL, 0.02, 'labor', 'L.03', 'App\\Models\\ItemPrice', '2022-01-25 02:49:12', '2022-01-25 02:49:49'),
+(1140, 'B.10.b', NULL, NULL, 0.13, 'labor', 'L.04', 'App\\Models\\ItemPrice', '2022-01-25 02:49:49', '2022-01-25 02:50:28'),
+(1141, 'B.10.b', NULL, NULL, 413.00, 'ingredients', 'M.15.a', 'App\\Models\\ItemPrice', '2022-01-25 02:50:28', '2022-01-25 02:54:48'),
+(1142, 'B.10.b', NULL, NULL, 681.00, 'ingredients', 'M.14.a', 'App\\Models\\ItemPrice', '2022-01-25 02:54:48', '2022-01-25 02:55:25'),
+(1143, 'B.10.b', NULL, NULL, 1021.00, 'ingredients', 'M.12', 'App\\Models\\ItemPrice', '2022-01-25 02:55:25', '2022-01-25 02:56:18'),
+(1144, 'B.10.b', NULL, NULL, 215.00, 'ingredients', 'M.02', 'App\\Models\\ItemPrice', '2022-01-25 02:56:18', '2022-01-25 02:59:51'),
+(1145, 'B.10.b', NULL, NULL, 0.25, 'tools', 'E.29', 'App\\Models\\ItemPrice', '2022-01-25 02:59:51', '2022-01-25 03:00:18'),
+(1146, 'B.11.a', NULL, NULL, 2.10, 'labor', 'L.01', 'App\\Models\\ItemPrice', '2022-01-25 03:03:01', '2022-01-25 03:03:32'),
+(1147, 'B.11.a', NULL, NULL, 0.35, 'labor', 'L.02.c', 'App\\Models\\ItemPrice', '2022-01-25 03:03:32', '2022-01-25 03:04:05'),
+(1148, 'B.11.a', NULL, NULL, 0.04, 'labor', 'L.03', 'App\\Models\\ItemPrice', '2022-01-25 03:04:05', '2022-01-25 03:04:43'),
+(1149, 'B.11.a', NULL, NULL, 0.21, 'labor', 'L.04', 'App\\Models\\ItemPrice', '2022-01-25 03:04:43', '2022-01-25 03:05:16'),
+(1150, 'B.11.a', NULL, NULL, 439.00, 'ingredients', 'M.15.a', 'App\\Models\\ItemPrice', '2022-01-25 03:05:16', '2022-01-25 03:06:00'),
+(1151, 'B.11.a', NULL, NULL, 670.00, 'ingredients', 'M.14.a', 'App\\Models\\ItemPrice', '2022-01-25 03:06:00', '2022-01-25 03:06:44'),
+(1152, 'B.11.a', NULL, NULL, 1006.00, 'ingredients', 'M.12', 'App\\Models\\ItemPrice', '2022-01-25 03:06:44', '2022-01-25 03:07:46'),
+(1153, 'B.11.a', NULL, NULL, 215.00, 'ingredients', 'M.02', 'App\\Models\\ItemPrice', '2022-01-25 03:07:46', '2022-01-25 03:08:24');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.7
+-- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jan 24, 2022 at 12:10 AM
--- Server version: 10.3.32-MariaDB-cll-lve
--- PHP Version: 7.3.33
+-- Host: localhost
+-- Generation Time: Jan 28, 2022 at 02:42 PM
+-- Server version: 10.6.5-MariaDB
+-- PHP Version: 7.4.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -19,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `u6592316_rencanakan_preview`
+-- Database: `rencanakan_cloud_2`
 --
 
 --
