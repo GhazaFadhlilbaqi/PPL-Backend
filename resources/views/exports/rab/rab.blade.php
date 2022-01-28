@@ -61,7 +61,8 @@
                 <td><b>{{ $rab->name }}</b></td>
                 <td></td>
                 <td></td>
-                <td><b>TOTAL I</b></td>
+                <td><b>TOTAL {{ numToAlphabet($loop->index) }}</b></td>
+                <td></td>
                 <td>{{ $rab->subtotal }}</td>
             </tr>
             @foreach ($rab->rabItem ?? [] as $rabItem)
