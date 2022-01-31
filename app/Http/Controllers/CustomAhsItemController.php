@@ -23,6 +23,7 @@ class CustomAhsItemController extends Controller
 
     public function store(Project $project, Request $request)
     {
+
         $customAhsItem = CustomAhsItem::create([
             'unit_id' => $this->getFirstUnit()->id,
             'coefficient' => 0.0,
@@ -61,6 +62,22 @@ class CustomAhsItemController extends Controller
 
     public function update(Project $project, CustomAhsItem $customAhsItem, Request $request)
     {
+
+        # Validate AHS recursion
+        if ($request->has('custom_ahs_itemable_type') && $request->custom_ahs_itemable_type === 'CustomAhs') {
+
+            $simmilarCustomAhsItem = CustomAhsItem::where('custom_ahs_id', $request->custom_ahs_itemable_id)
+                ->where('custom_ahs_itemable_id', $customAhsItem->custom_ahs_id)
+                ->where('custom_ahs_itemable_type', CustomAhs::class)
+                ->first();
+
+            if ($simmilarCustomAhsItem) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Referenced AHS items contains same AHS with parent ! try another AHS !'
+                ], 422);
+            }
+        }
 
         if ($request->has('custom_ahs_itemable_type')) {
             $request->merge(['custom_ahs_itemable_type' => 'App\\Models\\' . $request->custom_ahs_itemable_type]);

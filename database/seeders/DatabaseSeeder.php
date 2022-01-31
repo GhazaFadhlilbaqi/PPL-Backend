@@ -18,11 +18,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             UserSeeder::class,
-            // ProvinceSeeder::class,
-            // UnitSeeder::class,
-            // ItemPriceGroupSeeder::class,
-            // ItemPriceSeeder::class,
-            // ItemPriceProvinceSeeder::class,
+            ProvinceSeeder::class,
+            UnitSeeder::class,
+            ItemPriceGroupSeeder::class,
+            ItemPriceSeeder::class,
+            ItemPriceProvinceSeeder::class,
         ]);
     }
 }

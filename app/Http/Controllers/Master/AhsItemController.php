@@ -62,6 +62,23 @@ class AhsItemController extends Controller
         $currentAhsItemItemableType = explode('\\', $ahsItem->ahs_itemable_type)[2];
         $newAhsItemItemableType = $request->ahs_itemable_type;
 
+        # Validate AHS recursion
+        if ($request->has('ahs_itemable_type') && $request->ahs_itemable_type === 'Ahs') {
+
+
+            $simmilarAhsItem = AhsItem::where('ahs_id', $request->ahs_itemable_id)
+                ->where('ahs_itemable_id', $ahsItem->ahs_id)
+                ->where('ahs_itemable_type', Ahs::class)
+                ->first();
+
+            if ($simmilarAhsItem) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => 'Referenced AHS items contains same AHS with parent ! try another AHS !'
+                ], 422);
+            }
+        }
+
         if ($request->has('unit_id')) $dataToMerge['unit_id'] = Hashids::decode($request->unit_id)[0];
         if ($request->has('ahs_itemable_type')) $dataToMerge['ahs_itemable_type'] = 'App\\Models\\' . $request->ahs_itemable_type;
 
