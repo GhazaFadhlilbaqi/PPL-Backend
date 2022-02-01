@@ -21,9 +21,10 @@ class AhsController extends CountableItemController
 
         # Paginate AHS
         if ($isPaginateRequest) {
-            $paginationResult = $this->paginateAhs($ahs, $request->page);
+            $paginationResult = $this->paginateAhs($ahs, $request->page, $request->per_page);
             $ahs = $paginationResult['ahs'];
             $paginationAttribute['total_page'] = $paginationResult['total_page'];
+            $paginationAttribute['total_rows'] = $paginationResult['total_rows'];
         };
 
         $ahs = $ahs->get();
@@ -143,18 +144,19 @@ class AhsController extends CountableItemController
         ]);
     }
 
-    private function paginateAhs($ahs, $currentPage)
+    private function paginateAhs($ahs, $currentPage, $ahsPerPage)
     {
-        $ahsPerPage = 10;
-        $totalPage = ceil($ahs->count() / $ahsPerPage);
-        $currentIndexStart = ($ahsPerPage * (int) $currentPage) - $ahsPerPage;
+        $totalRows = $ahs->count();
+        $totalPage = ceil($totalRows / (int) $ahsPerPage);
+        $currentIndexStart = ((int) $ahsPerPage * (int) $currentPage) - (int) $ahsPerPage;
 
-        $ahs = $ahs->skip($currentIndexStart)->take($ahsPerPage);
+        $ahs = $ahs->skip($currentIndexStart)->take((int) $ahsPerPage);
 
         return [
             'total_page' => $totalPage,
             'current_page' => $currentPage,
-            'current_index_range' => [$currentIndexStart, $currentIndexStart + $ahsPerPage],
+            'current_index_range' => [$currentIndexStart, $currentIndexStart + (int) $ahsPerPage],
+            'total_rows' => $totalRows,
             'ahs' => $ahs
         ];
     }
