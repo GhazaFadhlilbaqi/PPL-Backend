@@ -12,12 +12,22 @@ use Illuminate\Http\Request;
 
 class AhsController extends CountableItemController
 {
-
     public function index(Request $request, $ahsId = null)
     {
-
         $ahs = !is_null($ahsId) ? Ahs::where('id', $ahsId) : Ahs::query();
-        $ahs = $ahs->with(['ahsItem' => function($ahsItem) { $ahsItem->with(['ahsItemable', 'unit']); }])->orderBy('created_at', 'ASC')->get();
+        $ahs = $ahs->with(['ahsItem' => function($ahsItem) { $ahsItem->with(['ahsItemable', 'unit']); }])->orderBy('created_at', 'ASC');
+        $isPaginateRequest = $request->has('page') && (int) $request->page > 0;
+        $paginationAttribute = [];
+
+        # Paginate AHS
+        if ($isPaginateRequest) {
+            $paginationResult = $this->paginateAhs($ahs, $request->page);
+            $ahs = $paginationResult['ahs'];
+            $paginationAttribute['total_page'] = $paginationResult['total_page'];
+        };
+
+        $ahs = $ahs->get();
+
         $provinceId = Hashids::decode($request->province);
 
         # Categorizing by section
@@ -39,7 +49,10 @@ class AhsController extends CountableItemController
 
         return response()->json([
             'status' => 'success',
-            'data' => compact('ahs')
+            'data' => [
+                'ahs' => $ahs,
+                'pagination_attribute' => $paginationAttribute,
+            ]
         ]);
     }
 
@@ -128,5 +141,21 @@ class AhsController extends CountableItemController
             'status' => 'success',
             'data' => compact('ahs')
         ]);
+    }
+
+    private function paginateAhs($ahs, $currentPage)
+    {
+        $ahsPerPage = 10;
+        $totalPage = ceil($ahs->count() / $ahsPerPage);
+        $currentIndexStart = ($ahsPerPage * (int) $currentPage) - $ahsPerPage;
+
+        $ahs = $ahs->skip($currentIndexStart)->take($ahsPerPage);
+
+        return [
+            'total_page' => $totalPage,
+            'current_page' => $currentPage,
+            'current_index_range' => [$currentIndexStart, $currentIndexStart + $ahsPerPage],
+            'ahs' => $ahs
+        ];
     }
 }

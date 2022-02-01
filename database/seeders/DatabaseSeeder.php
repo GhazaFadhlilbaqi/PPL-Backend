@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\ItemPrice;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,11 +19,18 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             UserSeeder::class,
-            ProvinceSeeder::class,
-            UnitSeeder::class,
-            ItemPriceGroupSeeder::class,
-            ItemPriceSeeder::class,
-            ItemPriceProvinceSeeder::class,
         ]);
+
+        if (env('USE_AHS_POPULATE', false)){
+            Artisan::call('populate:ahs');
+        } else {
+            $this->call([
+                ProvinceSeeder::class,
+                UnitSeeder::class,
+                ItemPriceGroupSeeder::class,
+                ItemPriceSeeder::class,
+                ItemPriceProvinceSeeder::class,
+            ]);
+        }
     }
 }
