@@ -92,7 +92,7 @@ class CustomAhsController extends CountableItemController
         ]);
 
         if ($request->has('selected_reference') && $request->selected_reference) {
-            $this->copyCustomAhsFromAhs($project, $request->selected_reference);
+            $this->copyCustomAhsFromAhs($project, $request->selected_reference, $request);
         } else {
             $customAhs = CustomAhs::create($request->only([
                 'name', 'code', 'project_id'
@@ -166,17 +166,18 @@ class CustomAhsController extends CountableItemController
         ]);
     }
 
-    private function copyCustomAhsFromAhs(Project $project, $ahsReferenceId)
+    private function copyCustomAhsFromAhs(Project $project, $ahsReferenceId, Request $request)
     {
 
         $referencedAhs = Ahs::find($ahsReferenceId);
 
         if ($referencedAhs) {
 
-            DB::transaction(function() use ($project, $referencedAhs) {
+            DB::transaction(function() use ($project, $referencedAhs, $request) {
 
                 $customAhsItemRemapped = [];
 
+                # Check if it's referenced from other AHS or not, it it's, then refuse it !
                 foreach ($referencedAhs->ahsItem as $ahsItem) {
                     if ($ahsItem->ahs_itemable_type == Ahs::class) {
                         return false;
@@ -184,14 +185,14 @@ class CustomAhsController extends CountableItemController
                 }
 
                 $customAhs = CustomAhs::create([
-                    'code' => $referencedAhs->id,
-                    'name' => $referencedAhs->name,
+                    'code' => $request->code,
+                    'name' => $request->name,
                     'project_id' => $project->hashidToId($project->hashid),
                 ]);
 
                 foreach ($referencedAhs->ahsItem as $ahsItem2) {
 
-                    $relatedDependency = $this->getRelatedCustomAhsItemDependency($ahsItem2);
+                    $relatedDependency = $this->getRelatedCustomAhsItemDependency($ahsItem2, $project->hashidToId($project->hashid));
 
                     $customAhsItemRemapped[] = [
                         'custom_ahs_id' => $customAhs->id,
@@ -214,17 +215,17 @@ class CustomAhsController extends CountableItemController
         }
     }
 
-    private function getRelatedCustomAhsItemDependency($ahsItem)
+    private function getRelatedCustomAhsItemDependency($ahsItem, $projectId)
     {
         switch ($ahsItem->ahs_itemable_type) {
             case Ahp::class :
                 return [
-                    'model' => CustomAhp::where('code', $ahsItem->ahsItemable->id)->first(),
+                    'model' => CustomAhp::where('code', $ahsItem->ahsItemable->id)->where('project_id', $projectId)->first(),
                     'type' => CustomAhp::class,
                 ];
             case ItemPrice::class :
                 return [
-                    'model' => CustomItemPrice::where('code', $ahsItem->ahsItemable->id)->first(),
+                    'model' => CustomItemPrice::where('code', $ahsItem->ahsItemable->id)->where('project_id', $projectId)->first(),
                     'type' => CustomItemPrice::class,
                 ];
             default :

@@ -44,6 +44,14 @@
 <table border="1">
     <thead>
         <tr>
+            <th>
+                <b>{{ $ahp->code }}</b>
+            </th>
+            <th>
+                <b>{{ $ahp->name }}</b>
+            </th>
+        </tr>
+        <tr>
             <th>NO.</th>
             <th>URAIAN</th>
             <th>KODE</th>
