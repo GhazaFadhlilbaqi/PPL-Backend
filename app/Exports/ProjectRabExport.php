@@ -22,7 +22,7 @@ class ProjectRabExport implements WithMultipleSheets
         $sheets = [
             new RabSummaryExportSheet($this->projectId),
             new AhsExportSheet($this->projectId),
-            new AhsRekapExportSheet($this->projectid),
+            new AhsRekapExportSheet($this->projectId),
             new ItemPriceExportSheet($this->projectId),
             new AhpExportSheet($this->projectId),
         ];

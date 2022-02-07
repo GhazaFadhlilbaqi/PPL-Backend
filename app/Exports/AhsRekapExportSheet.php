@@ -3,12 +3,17 @@
 namespace App\Exports;
 
 use App\Http\Controllers\CountableItemController;
+use App\Models\Rab;
+use App\Models\Project;
+use App\Models\User;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Illuminate\Contracts\View\View;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AhsRekapExportSheet extends CountableItemController implements FromView, WithTitle, WithColumnWidths, WithStyles
 {
@@ -29,7 +34,7 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
 
     public function view(): View
     {
-        return view('exports.rab.rab', [
+        return view('exports.rab.ahs-rekap', [
             'rabs' => $this->generateRab(),
             'project' => $this->project,
             'company' => $this->company
@@ -43,8 +48,11 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
         $pointer = $this->globalStartingIndex;
 
         $rabs = Rab::where('project_id', $this->projectId)
-          ->with(['rabItemHeader.rabItem'])
+          ->with(['rabItemHeader.rabItem' => function($q) {
+              $q->where('custom_ahs_id', '!=', null);
+          }])
           ->with('rabItem', function($q) {
+              $q->where('custom_ahs_id', '!=', null);
               $q->where('rab_item_header_id', NULL);
               $q->with('customAhs');
           })
@@ -147,11 +155,11 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
     public function columnWidths(): array
     {
         return [
-            'A' => 25,
+            'A' => 20,
             'B' => 40,
             'C' => 17,
-            'D' => 17,
-            'E' => 17,
+            'D' => 15,
+            'E' => 25,
             'F' => 45,
             'G' => 35,
         ];
@@ -165,12 +173,12 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
             if ($styleArr['type'] == self::RAB_HEADER || $styleArr['type'] == self::RAB_ITEM_HEADER) {
                 // Styling for rab item header or rab header
                 // Set background color
-                $headerStyle = $sheet->getStyle('A' . $styleArr['pointer'] . ':G' . $styleArr['pointer']);
+                $headerStyle = $sheet->getStyle('A' . $styleArr['pointer'] . ':E' . $styleArr['pointer']);
                 $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB( $styleArr['type'] == self::RAB_HEADER ? '153346' : '465059');
                 $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
             } else {
                 // Styling for rab item
-                $sheet->getStyle('E' . $styleArr['pointer'])->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('D' . $styleArr['pointer'])->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             }
 
 
@@ -180,13 +188,13 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
         }
 
         // Centerize header
-        $sheet->getStyle(('A' . ($this->globalStartingIndex - 1)) . (':G' . ($this->globalStartingIndex - 1)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle(('A' . ($this->globalStartingIndex - 1)) . (':E' . ($this->globalStartingIndex - 1)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
         // Kop Surat
-        $sheet->getStyle('G2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
-        $sheet->getStyle('G2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('G3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-        $sheet->getStyle('A4:G4')->applyFromArray([
+        $sheet->getStyle('E2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');
+        $sheet->getStyle('E2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('E3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('A4:E4')->applyFromArray([
             'borders' => [
                 'bottom' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE
@@ -197,23 +205,21 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
         // Pekerjaan Detail
         $sheet->getStyle('B10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
-        $sheet->getStyle('A' . ($this->globalStartingIndex - 1) . ':G' . $this->finalPointerLocation)->applyFromArray(['borders' => [
+        $sheet->getStyle('A' . ($this->globalStartingIndex - 1) . ':E' . $this->finalPointerLocation)->applyFromArray(['borders' => [
             'allBorders' => [
                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                 'color' => ['rgb' => '000'],
             ],
         ]]);
 
-        $sheet->getStyle('F' . ($this->finalPointerLocation + 2) . ':G' . ($this->finalPointerLocation + 5))->applyFromArray(['borders' => [
-            'allBorders' => [
-                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                'color' => ['rgb' => '000'],
-            ],
-        ]]);
+        // $sheet->getStyle('F' . ($this->finalPointerLocation + 2) . ':G' . ($this->finalPointerLocation + 5))->applyFromArray(['borders' => [
+        //     'allBorders' => [
+        //         'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+        //         'color' => ['rgb' => '000'],
+        //     ],
+        // ]]);
 
-        $sheet->getStyle('G' . (8 + $this->finalPointerLocation) . ':G' . (18 + $this->finalPointerLocation))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
-        // return dd($this->rabStyleArr);
+        $sheet->getStyle('E' . (2 + $this->finalPointerLocation) . ':E' . (18 + $this->finalPointerLocation))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
     }
 
     public function title() : string {
