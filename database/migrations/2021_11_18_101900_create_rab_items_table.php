@@ -25,7 +25,7 @@ class CreateRabItemsTable extends Migration
             $table->timestamps();
             $table->foreign('rab_item_header_id')->references('id')->on('rab_item_headers')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('rab_id')->references('id')->on('rabs')->onDelete('cascade')->onUpdate('cascade');
-            $table->foreign('custom_ahs_id')->references('id')->on('custom_ahs')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreign('custom_ahs_id')->references('id')->on('custom_ahs')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('unit_id')->references('id')->on('units')->onDelete('restrict')->onUpdate('cascade');
         });
     }

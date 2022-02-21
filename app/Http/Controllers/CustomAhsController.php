@@ -86,10 +86,18 @@ class CustomAhsController extends CountableItemController
     public function store(Project $project, Request $request)
     {
 
-        // TODO: Implement validation for same project and ahs id !
         $request->merge([
             'project_id' => $project->hashidToId($project->hashid)
         ]);
+
+        // TODO: Implement validation for same project and ahs id !
+        $sameCodeAhs = $project->customAhs->where('code', $request->code)->first();
+
+        if ($sameCodeAhs) return response()->json([
+            'errors' => [
+                'code' => ['Kode AHS ini sudah digunakan !']
+            ]
+        ], 422);
 
         if ($request->has('selected_reference') && $request->selected_reference) {
             $this->copyCustomAhsFromAhs($project, $request->selected_reference, $request);
