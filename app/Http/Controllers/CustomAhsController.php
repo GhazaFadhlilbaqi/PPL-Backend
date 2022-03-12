@@ -24,10 +24,25 @@ class CustomAhsController extends CountableItemController
 
     public function index(Project $project, Request $request)
     {
+
+        $isPaginatedRequest = $request->has('page') && $request->page > 0;
+        $paginationAttribute = [];
+
         $customAhs = CustomAhs::where('project_id', $project->hashidToId($project->hashid))->with(['customAhsItem' => function($q) {
             $q->with(['unit', 'customAhsItemable']);
-        }])->get();
+        }]);
 
+        # Paginate Custom AHS
+        if ($isPaginatedRequest) {
+            $paginationResult = $this->paginateCustomAhs($customAhs, $request->page, $request->per_page);
+            $customAhs = $paginationResult['customAhs'];
+            $paginationAttribute['total_page'] = $paginationResult['total_page'];
+            $paginationAttribute['total_rows'] = $paginationResult['total_rows'];
+        }
+
+        $customAhs = $customAhs->get();
+
+        # Arrange Custom AHS
         if ($request->has('arrange') && $request->arrange == 'true') {
 
             $arrangedCustomAhs = [];
@@ -42,7 +57,10 @@ class CustomAhsController extends CountableItemController
 
         return response()->json([
             'status' => 'success',
-            'data' => $customAhs,
+            'data' => [
+                'customAhs' => $customAhs,
+                'pagination_attribute' => $paginationAttribute,
+            ],
         ]);
     }
 
@@ -185,7 +203,7 @@ class CustomAhsController extends CountableItemController
 
                 $customAhsItemRemapped = [];
 
-                # Check if it's referenced from other AHS or not, it it's, then refuse it !
+                # Check if it's referenced from other AHS or not, when it is, then refuse it !
                 foreach ($referencedAhs->ahsItem as $ahsItem) {
                     if ($ahsItem->ahs_itemable_type == Ahs::class) {
                         return false;
@@ -254,6 +272,23 @@ class CustomAhsController extends CountableItemController
         return [
             'rab' => $rabDeps,
             'customAhs' => $customAhsDeps
+        ];
+    }
+
+    private function paginateCustomAhs($customAhs, $currentPage, $ahsPerPage)
+    {
+        $totalRows = $customAhs->count();
+        $totalPage = ceil($totalRows / (int) $ahsPerPage);
+        $currentIndexStart = ((int) $ahsPerPage * (int) $currentPage) - (int) $ahsPerPage;
+
+        $customAhs = $customAhs->skip($currentIndexStart)->take((int) $ahsPerPage);
+
+        return [
+            'total_page' => $totalPage,
+            'current_page' => $currentPage,
+            'current_index_range' => [$currentIndexStart, $currentIndexStart + (int) $ahsPerPage],
+            'total_rows' => $totalRows,
+            'customAhs' => $customAhs
         ];
     }
 }
