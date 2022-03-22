@@ -1,108 +1,101 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title')</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <style type="text/css">
-        @media screen {
-            @font-face {
-                font-family: 'Lato';
-                font-style: normal;
-                font-weight: 400;
-                src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v11/qIIYRU-oROkIk8vfvxw6QvesZW2xOQ-xsNqO47m55DA.woff) format('woff');
-            }
-
-            @font-face {
-                font-family: 'Lato';
-                font-style: normal;
-                font-weight: 700;
-                src: local('Lato Bold'), local('Lato-Bold'), url(https://fonts.gstatic.com/s/lato/v11/qdgUG4U09HnJwhYI-uK18wLUuEpTyoUstqEm5AMlJo4.woff) format('woff');
-            }
-
-            @font-face {
-                font-family: 'Lato';
-                font-style: italic;
-                font-weight: 400;
-                src: local('Lato Italic'), local('Lato-Italic'), url(https://fonts.gstatic.com/s/lato/v11/RYyZNoeFgb0l7W3Vu1aSWOvvDin1pK8aKteLpeZ5c0A.woff) format('woff');
-            }
-
-            @font-face {
-                font-family: 'Lato';
-                font-style: italic;
-                font-weight: 700;
-                src: local('Lato Bold Italic'), local('Lato-BoldItalic'), url(https://fonts.gstatic.com/s/lato/v11/HkF_qI1x_noxlxhrhMQYELO3LdcAZYWl9Si6vvxL-qU.woff) format('woff');
-            }
+    <!-- CSS only -->
+    <link rel="stylesheet" href="{{ asset('assets/css/custom-email.css') }}">
+    @include('mails.auth.layouts.style')
+    <style>
+        .custom-container {
+            position: relative;
+            padding-bottom: 200px;
         }
 
-        /* CLIENT-SPECIFIC STYLES */
-        body,
-        table,
-        td,
-        a {
-            -webkit-text-size-adjust: 100%;
-            -ms-text-size-adjust: 100%;
+        .heading1 {
+            background-size: cover;
+            position: relative;
+            height: 180px;
         }
 
-        table,
-        td {
-            mso-table-lspace: 0pt;
-            mso-table-rspace: 0pt;
+        .blue-overlay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background-color: rgba(21, 51, 70, 0.8);
         }
 
-        img {
-            -ms-interpolation-mode: bicubic;
+        .logo-img {
+            /* background-color: red; */
+            /* width: 50%; */
+            margin: auto;
+            z-index: 99;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            position: absolute;
         }
 
-        /* RESET STYLES */
-        img {
+        .custom-container {
+            width: 100%;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .footers {
+            height: 200px;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            max-width: 700px;
+            margin: auto;
+            right: 0;
+            background-color: rgba(21, 51, 70, 1);
+            color: white;
+            text-align: center;
+            vertical-align: middle;
+            padding: 87px 0;
+        }
+
+        .footer p {
+            height: 100%;
+        }
+
+        .content-container {
+            padding: 50px;
+        }
+
+        .custom-btn {
+            height: 50px;
+            background-color: rgba(246, 144, 34, 1);
+            border-radius: 10px;
             border: 0;
-            height: auto;
-            line-height: 100%;
-            outline: none;
-            text-decoration: none;
+            padding-top: 13px;
         }
 
-        table {
-            border-collapse: collapse !important;
+        .custom-btn:hover {
+            background-color: rgb(182, 106, 24) !important;
         }
 
-        body {
-            height: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-        }
-
-        /* iOS BLUE LINKS */
-        a[x-apple-data-detectors] {
-            color: inherit !important;
-            text-decoration: none !important;
-            font-size: inherit !important;
-            font-family: inherit !important;
-            font-weight: inherit !important;
-            line-height: inherit !important;
-        }
-
-        /* MOBILE STYLES */
-        @media screen and (max-width:600px) {
-            h1 {
-                font-size: 32px !important;
-                line-height: 32px !important;
-            }
-        }
-
-        /* ANDROID CENTER FIX */
-        div[style*="margin: 16px 0;"] {
-            margin: 0 !important;
-        }
     </style>
 </head>
-
-<body style="background-color: #f4f4f4; margin: 0 !important; padding: 0 !important;">
-    @yield('content')
+<body>
+    <div class="custom-container">
+        <div class="heading1 text-center py-5">
+            <img src="{{ asset('assets/images/logo_white.png') }}" class="logo-img" alt="">
+            <div class="blue-overlay"></div>
+        </div>
+        <div class="content-container" style="height: 85vh; overflow: auto;">
+            @yield('content')
+        </div>
+        <div class="footers" style="position: absolute; bottom: 0;">
+            <p>&copy; Rencanakan {{ date('Y') }}</p>
+        </div>
+    </div>
 </body>
-
 </html>

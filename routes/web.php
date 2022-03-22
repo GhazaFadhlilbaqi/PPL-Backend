@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Models\PasswordReset;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +17,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return config('app.disable_homepage') ? abort(404) : view('welcome');
+});
+
+// NOTE: Debug only route !
+Route::get('/forgot-password', function() {
+    return view('mails.auth.forgot-password', [
+        'passwordReset' => PasswordReset::first(),
+    ]);
 });
 
 Route::get('/auth/email-verification/confirm/{token}', [RegisterController::class, 'confirmEmail'])->name('register.confirm_email');
