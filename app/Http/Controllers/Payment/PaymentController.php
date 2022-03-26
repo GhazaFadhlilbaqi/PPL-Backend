@@ -55,8 +55,8 @@ class PaymentController extends Controller
             $midtransStatusCode = $midtransStatus['status_code'];
 
             // If it's expired or it's completed (but marked as pending or expired)
-            if ($midtransStatusCode == '407' || $midtransStatusCode == '200') {
-                $order->status = $midtransStatusCode == '407' ? 'expired' : 'completed';
+            if ($midtransStatusCode == '407' || $midtransStatusCode == '200' || $midtransStatusCode == '404') {
+                $order->status = $midtransStatusCode == '407' ? 'expired' : ($midtransStatusCode == '404' ? 'canceled' : 'completed');
                 $order->save();
                 $order = $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0], self::productPrice);
             }
