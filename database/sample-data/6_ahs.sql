@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.1
+-- version 4.9.7
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Jan 28, 2022 at 02:43 PM
--- Server version: 10.6.5-MariaDB
--- PHP Version: 7.4.27
+-- Host: localhost:3306
+-- Generation Time: Feb 23, 2022 at 02:17 PM
+-- Server version: 10.3.32-MariaDB-cll-lve
+-- PHP Version: 7.3.33
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -18,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `rencanakan_cloud_2`
+-- Database: `u6592316_beta_rencanakan`
 --
 
 --
@@ -49,6 +50,102 @@ INSERT INTO `ahs` (`id`, `name`, `created_at`, `updated_at`) VALUES
 ('B.10.b', 'Beton mutu 1 m3, fc = 26,4 MPa (K300) kedap air, slump (12±2) cm, w/c = 0,52 (kedap air) dengan menggunakan molen', '2022-01-25 02:41:25', '2022-01-25 02:41:25'),
 ('B.11.a', 'Beton mutu 1 m3, fc = 28,8 MPa (K325) kedap air, slump (12±2) cm, w/c = 0,49 (kedap air) dengan cara manual', '2022-01-25 03:01:57', '2022-01-25 03:01:57'),
 ('B.11.b', 'Beton mutu 1 m3, fc = 28,8 MPa (K325) kedap air, slump (12±2) cm, w/c = 0,49 (kedap air) dengan menggunakan molen', '2022-01-25 03:14:16', '2022-01-25 03:14:16'),
+('B.12.a', 'Beton mutu 1 m3, fc = 31,2 MPa, (K350) kedap air, slump (12±2) cm, w/c = 0,48 (kedap air) dengan cara manual', '2022-02-02 01:04:47', '2022-02-02 01:04:47'),
+('B.12.b', 'Beton mutu 1 m3, fc = 31,2 MPa, (K350) kedap air, slump (12±2) cm, w/c = 0,48 (kedap air) menggunakan molen', '2022-02-02 01:12:06', '2022-02-02 01:12:06'),
+('B.13.a', '1 m3 Beton menggunakan ready mixed dan pompa beton', '2022-02-02 01:19:54', '2022-02-02 01:19:54'),
+('B.13.b', '1 m3 Beton menggunakan bahan aditif', '2022-02-02 01:29:32', '2022-02-02 01:29:32'),
+('B.14.a.1', 'Mengangkut/ menaikan campuran beton dengan jarak ≥ 5 m beton 1 m3 dicorkan pada tapak berjarak < 25 m dengan beda tinggi  < 1 m dengan cara manual', '2022-02-02 02:15:04', '2022-02-02 02:15:04'),
+('B.14.b.1', 'Mengangkut/ menaikan campuran beton dengan jarak ≥ 5 m beton 1 m3 dicorkan pada tapak berjarak setiap tambahan jarak 25 m  dengan cara manual', '2022-02-02 02:48:21', '2022-02-02 02:48:21'),
+('B.14.b.2', 'Mengangkut/ menaikan campuran beton dengan jarak ≥ 5 m beton 1 m3 dicorkan pada tapak berjarak setiap tambahan jarak 25 m menggunakan pompa beton', '2022-02-02 03:08:22', '2022-02-02 03:08:22'),
+('B.15.a', 'Mengangkut/ menaikan campuran beton dengan jarak ≥ 5 m pemadatan beton 1 m3 pada saat mengecor menggunakan vibrator', '2022-02-02 03:15:21', '2022-02-02 03:15:21'),
+('B.15.b', 'Mengangkut/ menaikan campuran beton dengan jarak ≥ 5 m pemadatan beton 1 m3 pada saat mengecor dengan cara manual (menggunakan penusuk besi beton)', '2022-02-02 03:22:51', '2022-02-02 03:22:51'),
+('B.16.a', 'Mengangkut/ menaikan campuran beton dengan jarak ≥ 5 m beton 1 m3 dicorkan pada tapak setiap kenaikan 4 m (vertikal)  dengan cara manual', '2022-02-02 03:28:36', '2022-02-02 03:28:36'),
+('B.16.b', 'Mengangkut/ menaikan campuran beton dengan jarak ≥ 5 m beton 1 m3 dicorkan pada tapak setiap kenaikan 4 m (vertikal) menggunakan pompa beton', '2022-02-02 03:32:09', '2022-02-02 03:32:09'),
+('B.17.a', 'Pembesian 100 kg dengan besi polos atau ulir untuk pembesian pelat', '2022-02-02 03:43:30', '2022-02-02 03:43:30'),
+('B.17.b', 'Pembesian 100 kg dengan besi polos atau ulir untuk pembesia kolom, balok, ring ba1k dan sloof', '2022-02-02 03:58:53', '2022-02-02 03:58:53'),
+('B.18', 'Pembesian 100 kg jaring kawat (wiremesh) untuk pelat atau dinding', '2022-02-02 04:05:13', '2022-02-02 04:05:13'),
+('B.19', 'Pembesian 100 kg kabel prestressed polos/ stand', '2022-02-02 04:15:43', '2022-02-02 04:15:43'),
+('B.20.a', 'Mengangkut/ menaikkan 100 kg tulangan setiap kenaikan verttikal 4 m atau jarak horizontal setiap 25 m ke tapak pemasangan dengan cara manual (kenaikan 4 m)', '2022-02-02 05:02:04', '2022-02-02 05:02:04'),
+('B.20.b', 'Mengangkut/ menaikkan 100 kg tulangan setiap kenaikan verttikal 4 m atau jarak horizontal setiap 25 m ke tapak pemasangan  menggunakan mekanis (penambahan  jarak horizontal 10 m s.d 25 m)', '2022-02-02 05:59:52', '2022-02-02 05:59:52'),
+('B.20.c', 'Mengangkut/ menaikkan 100 kg tulangan setiap kenaikan verttikal 4 m atau jarak horizontal setiap 25 m ke tapak pemasangan dengan mekanis  (setiap penambahan jarak horizontal 25 m)', '2022-02-02 06:08:44', '2022-02-02 06:08:44'),
+('B.20.d', 'Mengangkut/ menaikkan 100 kg tulangan setiap kenaikan verttikal 4 m atau jarak horizontal setiap 25 m ke tapak pemasangan dengan mekanis (setiap kenaikan 4 m)', '2022-02-02 06:16:27', '2022-02-02 06:16:27'),
+('B.21.a', '1 m2 Bekisting lantai beton expose dengan multiflex 18 mm (TP)', '2022-02-02 06:28:24', '2022-02-02 06:28:24'),
+('B.21.b', '1 m2 bekisting lantai beton biasa dengan multiflex 12 mm atau 18 mm (TP)', '2022-02-02 07:35:41', '2022-02-02 07:35:41'),
+('B.21.c', '1 m2 bekisting lantai beton biasa menggunakan papan kayu 3/20 cm (TP)', '2022-02-02 07:57:51', '2022-02-02 07:57:51'),
+('B.21.d', '1 m2 Perancah bekisting lantai menggunakan kaso 5/7 cm, tinggi 4 m**, JAT ≤ 60 cm', '2022-02-02 08:14:51', '2022-02-02 08:14:51'),
+('B.21.e', '1 m2 Perancah bekisting lantai menggunakan dolken Ø 8-10 cm, tinggi 4 m, JAT ≤ 80 cm', '2022-02-03 00:59:15', '2022-02-03 00:59:15'),
+('B.21.f', '1 m2 Perancah bekisting lantai menggunakan bambu ∅ 8-10 cm, tinggi 4 m, JAT ≤ 80 cm', '2022-02-03 01:20:23', '2022-02-03 01:20:23'),
+('B.22.a', '1 m2 Bekisting lantai floordeck tipe pelat (JAP ≤ 0,6 m)', '2022-02-03 01:44:36', '2022-02-03 01:44:36'),
+('B.22.b', '1 m2 Bekisting lantai floordeck tipe pelat (JAP ≤ 0,8 m)', '2022-02-03 02:35:05', '2022-02-03 02:35:05'),
+('B.22.c', '1 m2 Bekisting lantai floordeck tipe balok T (JAP ≤ 1,2 m)', '2022-02-03 04:03:35', '2022-02-03 04:03:35'),
+('B.22.d', '1 m2 Bekisting lantai dengan floordeck tipe balok T (JAP ≤ 2,0 m)', '2022-02-03 06:31:57', '2022-02-03 06:31:57'),
+('B.23.a', '1 m2 Bekisting balok beton expose menggunakan multiflex 18 mm, JAT ≤ 1,0 m', '2022-02-03 06:51:39', '2022-02-03 06:51:39'),
+('B.23.b', '1 m2 Bekisting balok beton biasa menggunakan multiflex 12 mm atau 18 mm, JAT≤ 1,0 m', '2022-02-03 07:18:55', '2022-02-03 07:18:55'),
+('B.23.c', '1 m2 Bekisting balok beton biasa menggunakan kayu papan 3/20 cm (TP)', '2022-02-03 07:36:38', '2022-02-03 07:36:38'),
+('B.23.d', '1 m2 Perancah bekisting balok menggunakan kaso 5/7, tinggi 4 m dan JAT ≤ 1,0 m', '2022-02-03 08:09:40', '2022-02-03 08:09:40'),
+('B.23.e', '1 m2 Perancah bekisting balok menggunakan dolken ∅ 8-10 cm, tinggi 4 m**, JAT ≤  1,2 m', '2022-02-07 03:33:20', '2022-02-07 03:33:20'),
+('B.23.f', '1 m2 Perancah bekisting balok beton menggunakan bamboo ∅ 8-10 cm, tinggi 4 m**, JAT < 1,0 m', '2022-02-07 03:37:56', '2022-02-07 03:37:56'),
+('B.24.a', '1 m2 Bekisting kolom beton expose menggunakan multiflex 18 mm (TP)', '2022-02-07 03:44:17', '2022-02-07 03:44:17'),
+('B.24.b', '1 m2 Bekisting kolom beton biasa menggunakan multiflex 12 mm atau 18 mm (TP)', '2022-02-07 03:48:51', '2022-02-07 03:48:51'),
+('B.24.c', '1 m2 Bekisting kolom beton biasa menggunakan kayu papan 3/20 cm (TP)', '2022-02-07 03:53:28', '2022-02-07 03:53:28'),
+('B.24.d', '1 m2 Perancah bekisting kolom beton menggunakan kayu 5/7 cm, tinggi 4 m,  JAT  ≤ 1,0 m', '2022-02-07 04:06:52', '2022-02-07 04:06:52'),
+('B.24.e', '1 m2 Perancah bekisting kolom beton dengan kayu dolken ∅ 8-10 cm, tinggi 4 m, JAT ≤ 1,2 m', '2022-02-07 04:11:35', '2022-02-07 04:11:35'),
+('B.24.f', '1 m2 Perancah bekisting kolom beton dengan bambu ∅ 8-10 cm, tinggi 4 m, JAT ≤ 1,0 m', '2022-02-07 04:19:25', '2022-02-07 04:19:25'),
+('B.25.a', '1 m2 Bekisting dinding beton expose dengan multiflex 18 mm', '2022-02-07 04:24:32', '2022-02-07 04:24:32'),
+('B.25.b', '1 m2 Bekisting dinding beton biasa dengan multiflex 12 mm atau 18 mm (TP)', '2022-02-07 04:30:21', '2022-02-07 04:30:21'),
+('B.25.c', '1 m2 Bekisting dinding beton biasa menggunakan kayu papan 3/20 cm', '2022-02-07 04:38:39', '2022-02-07 04:38:39'),
+('B.25.d', '1 m2 Perancah/ penyokong bekisting dinding beton menggunakan kayu 5/7, tinggi maksimum 2,5 m', '2022-02-07 06:30:12', '2022-02-07 06:30:12'),
+('B.25.e', '1 m2 Perancah/ penyokong bekisting dinding beton menggunakan balok 8/12, tinggi maksimum 4,5 m', '2022-02-07 06:33:15', '2022-02-07 06:33:15'),
+('B.26.a', '1 m2 Bekisting fondasi dan sloof beton biasa menggunakan multiflex 12 mm atau 18 mm (TP)', '2022-02-07 06:38:52', '2022-02-07 06:38:52'),
+('B.26.b', '1 m2 Bekisting fondasi dan sloof beton biasa menggunakan papan 3/20 cm', '2022-02-07 06:50:06', '2022-02-07 06:50:06'),
+('B.26.c', '1 m2 Perancah/ penyokong bekisting sloof dan fondasi beton menggunakan kaso 5/7, tinggi maksimum 2,0 m', '2022-02-07 06:56:46', '2022-02-07 06:56:46'),
+('B.27.a', 'Bongkar 1 m2 bekisting secara biasa (membersihkan dan membereskan puing-puing )', '2022-02-07 07:06:34', '2022-02-07 07:06:34'),
+('B.27.b', 'Bongkar 1 m2 bekisting secara hati-hati (dan membereskan puing)', '2022-02-07 07:08:13', '2022-02-07 07:08:13'),
+('B.28.a', 'Pelaksanaan curring beton menggenangi 100 m2 permukaan beton dengan air', '2022-02-07 07:11:48', '2022-02-07 07:11:48'),
+('B.28.b', 'Pelaksanaan curring beton menyirami 100 m2 permukaan beton menggunakan media terpal selama 4 hari', '2022-02-07 07:15:15', '2022-02-07 07:15:15'),
+('B.28.c', 'Pelaksanaan curring beton menyirami 100 m2 permukaan beton menggunakan media karung goni selama 4 hari', '2022-02-07 07:17:19', '2022-02-07 07:17:19'),
+('B.29.a', 'Bongkar 1 m3 beton secara konvensional', '2022-02-07 07:19:17', '2022-02-07 07:19:17'),
+('B.29.b', 'Bongkar 1 m3 beton dengan jack hammer', '2022-02-07 07:24:01', '2022-02-07 07:24:01'),
+('B.30.a', 'Pemasangan waterstop 1 m\' pasangan water stop PVC lebar 150 mm', '2022-02-07 07:28:39', '2022-02-07 07:28:39'),
+('B.30.b', 'Pemasangan waterstop 1 m\' pasangan water stop PVC lebar 200 mm', '2022-02-07 07:37:58', '2022-02-07 07:37:58'),
+('B.30.c', 'Pemasangan waterstop 1 m\' pasangan water stop PVC lebar 230 mm - 320 mm', '2022-02-07 07:41:02', '2022-02-07 07:41:02'),
+('B.30.d', 'Pemasangan waterstop 1 m\' pasangan water stop rubber lebar 150 mm - 200 mm', '2022-02-07 07:46:18', '2022-02-07 07:46:18'),
+('D.01.a', '1 buah kistdam pasir/ tanah dibungkus karung plastik bagor 43 cm x 65 cm', '2022-02-08 02:41:44', '2022-02-08 02:41:44'),
+('D.01.b', '1 buah kistdam pasir/ tanah dibungkus karung plastik/ bagor/ goni atau terpal ukuran 45 x 120 cm', '2022-02-08 02:48:33', '2022-02-08 02:48:33'),
+('D.01.c', '1 Buah geobang pasir/ tanah ukuran 145 x 240 cm', '2022-02-08 03:03:03', '2022-02-08 03:03:03'),
+('D.02', 'Kerangka kayu untuk 1 m3 kistdam pasir/ tanah ukuran 43 cm x 65 cm', '2022-02-08 03:10:07', '2022-02-08 03:10:07'),
+('D.03', 'Kerangka baja profil L.50.50.5 atau L.60.60.6 atau profil besi berlubang untuk 1 m3 kistdam pasir/ tanah dengan karung ukuran 43 cm x 65 cm', '2022-02-08 03:18:58', '2022-02-08 03:18:58'),
+('D.04', 'Pengoperasian per-jam pompa air diesel daya 5 kW dengan suction head maks. 3 m dan discharge head maks. 20 m (kapasitas 0,5 m3/s pada suction head 1 m dan discharge head 10 m)', '2022-02-08 03:25:32', '2022-02-08 03:25:32'),
+('D.05', 'Pengoperasian per-jam pompa air diesel daya 10 kW dengan suction head maksimal 3 m dan discharge head maksimal 20 m (kapasitas 1,0 m3/s pada suction head 1 m dan  discharge head 10 m)', '2022-02-08 07:17:11', '2022-02-08 07:17:11'),
+('D.06', 'Pengoperasian per-jam pompa air diesel daya 20 kW dengan suction head maksimal 3 m dan discharge head maksimal 20 m (kapasitas 2,0 m3/s pada suction head 1 m dan discharge head 10 m)', '2022-02-08 07:52:08', '2022-02-08 07:52:08'),
+('F.01', 'Per - m\' penetrasi tiang pancang kayu gelondongan ∅ 15 - 20 cm', '2022-02-07 08:22:08', '2022-02-07 08:22:08'),
+('F.02', 'Per - m\' penetrasi tiang pancang kayu atau dolken ∅ 8 - 10 cm', '2022-02-07 08:30:02', '2022-02-07 08:30:02'),
+('F.03', 'Per - m\' penetrasi tiang pancang baja pipa ∅ 30 cm atau kotak 30 x 30 cm', '2022-02-07 08:33:41', '2022-02-07 08:33:41'),
+('F.04.a', 'Tiang pancang beton bertulang per m\' penetrasi tiang pancang beton kotak 20 cm x 20 cm', '2022-02-07 08:43:34', '2022-02-07 08:43:34'),
+('F.04.b', 'Tiang pancang beton bertulang per m\' penetrasi tiang pancang beton kotak 25 cm x 25 cm', '2022-02-07 08:46:03', '2022-02-07 08:46:03'),
+('F.04.c', 'Tiang pancang beton bertulang per m\' penetrasi tiang pancang beton kotak 30 cm x 30 cm', '2022-02-07 08:48:23', '2022-02-07 08:48:23'),
+('F.04.d', 'Tiang pancang beton bertulang per m\' penetrasi tiang pancang beton ∅ 40 atau  kotak 40 cm x 40 cm', '2022-02-07 08:51:02', '2022-02-07 08:51:02'),
+('F.04.e', 'Tiang pancang beton bertulang per m\' penetrasi tiang pancang (hollow) baton ∅ 40 cm', '2022-02-07 08:54:32', '2022-02-07 08:54:32'),
+('F.05.a', 'Turap Kayu per m\' penetrasi untuk 1 m\' lebar turap (10 - 12,5 buah) dolken  ∅ 8 - 10 cm', '2022-02-07 08:57:03', '2022-02-07 08:57:03'),
+('F.05.b', 'Turap Kayu per m\' penetrasi untuk 1 m\' lebar turap  kayu (10 buah) papan (2 - 3) / 10 cm', '2022-02-07 09:00:01', '2022-02-07 09:00:01'),
+('F.05.c', 'Turap Kayu per m\' penetrasi untuk 1 m\' lebar turap (5 buah) kayu papan (2 - 3)/ 20 cm', '2022-02-07 09:02:26', '2022-02-07 09:02:26'),
+('F.05.d', 'Turap Kayu per m\' penetrasi untuk 1 m\' lebar turap (4 buah) kayu papan (2 - 3)/ 25 cm', '2022-02-08 01:18:04', '2022-02-08 01:18:04'),
+('F.05.e', 'Turap Kayu per m\' penetrasi untuk 1 m\' lebar turap (3,33 buah) kayu papan (2 - 3)/ 30 cm', '2022-02-08 01:20:43', '2022-02-08 01:20:43'),
+('F.05.f', 'Turap Kayu per m\' penetrasi untuk 1 m\' lebar turap (14 buah) kayu kaso 5/7 tebal 5 cm', '2022-02-08 01:23:39', '2022-02-08 01:23:39'),
+('F.05.g', 'Turap Kayu per m\' penetrasi untuk 1 m\' lebar turap (20 buah) kayu kaso 5/7 tebal 7 cm', '2022-02-08 01:26:57', '2022-02-08 01:26:57'),
+('F.05.h', 'Turap Kayu per m\' penetrasi untuk 1 m\' lebar turap (8 buah) kayu balok 8/12  tebal 8 cm', '2022-02-08 01:29:29', '2022-02-08 01:29:29'),
+('F.05.i', 'Turap Kayu per m\' penetrasi untuk 1 m\' lebar (12,5 buah) turap kayu balok 8/12 tebal 12 cm', '2022-02-08 01:58:06', '2022-02-08 01:58:06'),
+('F.06.a', 'Turap Baja Per-m\' penetrasi (1 buah) turap baja profil larsen lebar 350 mm', '2022-02-08 02:06:34', '2022-02-08 02:06:34'),
+('F.06.b', 'Turap Baja per-m\' penetrasi untuk 1 m\' lebar turap (7 buah) baja profil INP-8 + UNP-8', '2022-02-08 02:14:23', '2022-02-08 02:14:23'),
+('F.06.c', 'Turap Baja per-m\' penetrasi untuk 1 m\' lebar turap (5,56 buah) baja profil INP-10 + UNP-10', '2022-02-08 02:23:23', '2022-02-08 02:23:23'),
+('F.07.a', 'Turap beton pre-cast per-m\' penetrasi 1 buah turap beton pre-cast 12 x 30 cm', '2022-02-08 02:30:19', '2022-02-08 02:30:19'),
+('F.07.b', 'Turap beton pre-cast per-m\' penetrasi 1 buah turap beton pre-cast 15 x 40 cm', '2022-02-08 02:34:43', '2022-02-08 02:34:43'),
+('F.07.c', 'Turap beton pre-cast per-m\' penetrasi 1 buah turap beton pre-cast 22 x 50 cm', '2022-02-08 02:37:21', '2022-02-08 02:37:21'),
+('H.01', 'Pintu angkat (lebar B=200 mm; H=250 mm; H1=500 mm dan TR=1050 mm)', '2022-02-08 07:59:26', '2022-02-08 07:59:26'),
+('H.02', 'Pintu sorong kayu (lebar B=150 mm; H=1500 mm; H1=3000 mm dan TR=3800 mm)', '2022-02-09 03:48:50', '2022-02-09 03:48:50'),
+('H.03', 'Pintu sorong baja (lebar B=500 mm; H=500 mm; H1=1000 mm dan TR=1900 mm)', '2022-02-09 03:57:44', '2022-02-09 03:57:44'),
+('H.04.a', 'AHSP Pelumasan pintu air (pelaksanaan pelumasan dilakukan setiap 2 minggu sekali atau 26 kali/tahun) dengan pintu angkat', '2022-02-09 05:14:52', '2022-02-09 05:14:52'),
+('H.04.b.1', 'AHSP Pelumasan pintu air (pelaksanaan pelumasan dilakukan setiap 2 minggu sekali atau 26 kali/tahun) dengan pintu sorong kayu dengan roda gigi stang tunggal  < 1 m', '2022-02-09 05:22:20', '2022-02-09 05:22:20'),
 ('P.01.a.1', 'Pasangan 1 m3  batu dengan mortar tipe M (1 PC: 2 PP) dengan cara manual', '2021-12-24 09:08:29', '2021-12-24 09:08:29'),
 ('P.01.a.2', 'Pasangan 1 m3 batu mortar tipe M  (1 PC : 2 PP) dengan menggunakan molen', '2021-12-24 09:10:52', '2021-12-24 09:10:52'),
 ('P.01.b.1', 'Pasangan 1 m3 batu dengan mortar tipe S (1 PC:3PP) dengan cara manual', '2021-12-29 02:40:14', '2021-12-29 02:40:14'),

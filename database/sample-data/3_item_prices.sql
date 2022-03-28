@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jan 28, 2022 at 09:41 PM
+-- Generation Time: Feb 23, 2022 at 02:14 PM
 -- Server version: 10.3.32-MariaDB-cll-lve
 -- PHP Version: 7.3.33
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `u6592316_rencanakan_app_db`
+-- Database: `u6592316_beta_rencanakan`
 --
 
 --
@@ -71,6 +71,7 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('E.18.c', 9, 11, 'ahs', 'Kapal Keruk (besar)', '2021-11-01 16:07:16', '2021-11-01 16:07:16'),
 ('E.22', 9, 11, 'ahs', 'Las listrik 250 A diesel', '2021-11-01 16:07:40', '2021-11-01 16:07:40'),
 ('E.23', 9, 14, 'ahs', 'Lift (proyek) sampai dengan tinggi maksimum 12m', '2021-11-01 16:08:01', '2021-11-01 16:08:01'),
+('E.23.a', 9, 11, 'ahs', 'Lift', '2022-02-02 06:23:15', '2022-02-02 06:23:15'),
 ('E.24a', 9, 11, 'ahs', 'Loader, Wheel', '2021-11-01 16:08:18', '2021-11-01 16:08:18'),
 ('E.24b', 9, 11, 'ahs', 'Loader, Track', '2021-11-01 16:09:10', '2021-11-01 16:09:10'),
 ('E.24c', 9, 15, 'ahs', 'Wheel Loader/ Excavator', '2022-01-04 07:19:23', '2022-01-04 07:19:23'),
@@ -156,6 +157,7 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('L.02.i', 1, 1, 'ahs', 'Tukang Tebas', '2021-11-16 14:03:55', '2021-11-16 14:03:55'),
 ('L.02.j', 1, 1, 'ahs', 'Tukang Las', '2021-11-16 14:04:16', '2021-11-16 14:04:16'),
 ('L.02.k', 1, 1, 'ahs', 'Tukang Penganyam', '2022-01-05 02:47:43', '2022-01-05 02:47:43'),
+('L.02.l', 1, 1, 'ahs', 'Tukang Jahit', '2022-02-08 02:50:48', '2022-02-08 02:50:48'),
 ('L.03', 1, 1, 'ahs', 'Kepala Tukang', '2021-11-16 14:04:35', '2021-11-16 14:04:35'),
 ('L.04', 1, 1, 'ahs', 'Mandor', '2021-10-18 23:49:57', '2021-10-18 23:49:57'),
 ('L.05', 1, 1, 'ahs', 'Juru Ukur', '2021-11-16 14:05:29', '2021-11-16 14:05:29'),
@@ -170,6 +172,7 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('L.14.a', 1, 1, 'ahs', 'Tenaga Ahli Utama', '2021-11-16 14:09:34', '2021-11-16 14:09:34'),
 ('L.14.b', 1, 1, 'ahs', 'Tenaga Ahli Madya', '2021-11-16 14:09:54', '2021-11-16 14:09:54'),
 ('L.15', 1, 1, 'ahs', 'Operator Tripod/ Crane', '2022-01-03 05:52:20', '2022-01-03 05:52:20'),
+('L.16', 1, 1, 'ahs', 'Operator Pompa', '2022-02-08 03:28:09', '2022-02-08 03:28:09'),
 ('M.01', 2, 2, 'ahs', 'Abu Batu', '2021-10-18 23:50:53', '2021-10-18 23:50:53'),
 ('M.02', 2, 2, 'ahs', 'Air', '2021-10-18 23:51:14', '2021-10-18 23:51:14'),
 ('M.03.a', 2, 7, 'ahs', 'Ampelas Halus', '2021-10-18 23:53:04', '2021-10-18 23:53:04'),
@@ -214,6 +217,7 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.09.k', 2, 2, 'ahs', 'Beton Ready Mixed K-425', '2021-10-27 10:13:50', '2021-10-27 10:13:50'),
 ('M.09.l', 2, 2, 'ahs', 'Beton Ready Mixed K-450', '2021-10-27 10:14:12', '2021-10-27 10:14:12'),
 ('M.09.m', 2, 2, 'ahs', 'Beton Ready Mixed K-500', '2021-10-27 10:14:49', '2021-10-27 10:14:49'),
+('M.09.n', 2, 2, 'ahs', 'Campuran Beton Ready Mixed', '2022-02-02 01:26:09', '2022-02-02 01:26:09'),
 ('M.10.a', 2, 8, 'ahs', 'Buis Beton Dia. 30 cm tanpa tulang, panjang 0,5 m', '2021-10-27 10:17:18', '2021-10-30 08:15:55'),
 ('M.10.b', 2, 8, 'ahs', 'Buis Beton Dia. 40 cm tanpa tulang, panjang 0,5 m', '2021-10-27 10:17:50', '2021-10-30 08:16:03'),
 ('M.10.c', 2, 8, 'ahs', 'Buis Beton Dia. 50 cm tanpa tulang, panjang 0,5 m', '2021-10-27 10:20:43', '2021-10-30 08:16:11'),
@@ -335,6 +339,8 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.131.a', 11, 8, 'ahs', 'Motor 2 KW 1350 rpm + pengkabelan', '2021-11-02 13:54:09', '2021-11-02 13:54:09'),
 ('M.131.b', 11, 8, 'ahs', 'Motor 5 KW 1350 rpm + pengkabelan', '2021-11-02 13:54:31', '2021-11-02 13:54:31'),
 ('M.131.c', 11, 8, 'ahs', 'Motor 10 KW 1350 rpm + pengkabelan', '2021-11-02 13:54:46', '2021-11-02 13:54:46'),
+('M.132.d', 11, 3, 'ahs', 'Olie mesin (Mesran 20 SAE)', '2022-02-09 05:25:32', '2022-02-09 05:25:32'),
+('M.132.e', 11, 3, 'ahs', 'Olie mesin (Mesran 90 SAE)', '2022-02-09 05:26:02', '2022-02-09 05:26:02'),
 ('M.132a', 11, 3, 'ahs', 'Olie mesin (Mesran 40 SAE)', '2021-11-02 13:56:00', '2021-11-02 13:56:00'),
 ('M.132b', 11, 3, 'ahs', 'Oli hidraulic', '2021-11-02 13:56:16', '2021-11-02 13:56:16'),
 ('M.132c', 11, 3, 'ahs', 'Oli transmisi', '2021-11-02 13:56:39', '2021-11-02 13:56:39'),
@@ -349,6 +355,7 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.14.b', 2, 2, 'ahs', 'Pasir pasang kali/gunung', '2021-10-30 08:25:38', '2021-10-30 08:25:38'),
 ('M.14.c', 2, 2, 'ahs', 'Pasir teras', '2021-10-30 08:26:00', '2021-10-30 08:26:00'),
 ('M.14.d', 2, 2, 'ahs', 'Pasir urug', '2021-10-30 08:26:20', '2021-10-30 08:26:20'),
+('M.14.e', 2, 2, 'ahs', 'Sewa Pasir', '2022-02-08 03:00:11', '2022-02-08 03:00:11'),
 ('M.140', 11, 7, 'ahs', 'Tali pengikat/Tambang Nylon/plastik', '2021-11-02 14:00:41', '2021-11-02 14:00:41'),
 ('M.141', 11, 7, 'ahs', 'Tali pengikat/Tambang Ijuk', '2021-11-02 14:01:02', '2021-11-02 14:01:02'),
 ('M.142', 11, 22, 'ahs', 'Terpal (kain)', '2021-11-02 14:01:46', '2021-11-02 14:01:46'),
@@ -358,8 +365,10 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.144.b', 11, 7, 'ahs', 'Waterstop PVC.200', '2021-11-02 14:03:18', '2021-11-02 14:03:18'),
 ('M.144.c', 11, 7, 'ahs', 'Waterstop PVC.270', '2021-11-02 14:03:44', '2021-11-02 14:03:44'),
 ('M.144.d', 11, 7, 'ahs', 'Waterstop rubber lebar 150mm - 200mm', '2021-11-02 14:04:00', '2021-11-02 14:04:00'),
+('M.144.e', 11, 7, 'ahs', 'Water stop PVC lebar 230 - 320 mm', '2022-02-07 07:44:13', '2022-02-07 07:44:13'),
 ('M.145', 11, 2, 'ahs', 'Campuran beton, fc\" ≥ 20 Mpa', '2022-01-04 05:52:41', '2022-01-04 05:52:41'),
 ('M.146', 11, 5, 'ahs', 'Tulangan praktir 120 kg/m3', '2022-01-04 05:53:39', '2022-01-04 05:53:39'),
+('M.147', 9, 8, 'ahs', 'Pintu Air', '2022-02-09 03:53:15', '2022-02-09 03:53:15'),
 ('M.15', 2, 4, 'ahs', 'Portland Cement (PC 50 kg / zak)', '2021-10-30 08:26:41', '2021-10-30 08:26:41'),
 ('M.15.a', 2, 5, 'ahs', 'Portland Cement (1 Kg)', '2021-12-24 09:22:16', '2021-12-24 09:22:16'),
 ('M.16', 2, 2, 'ahs', 'Sirtu', '2021-10-30 08:27:05', '2021-10-30 08:27:05'),
@@ -382,10 +391,12 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.28.b', 3, 10, 'ahs', 'Bambu diameter 3 - 4\", panjang 4 - 6 m', '2021-10-30 08:39:37', '2021-10-30 08:39:37'),
 ('M.28.c', 3, 7, 'ahs', 'Bambu 8\" - panjang 10 cm', '2022-01-03 05:57:00', '2022-01-03 05:57:00'),
 ('M.28.d', 3, 10, 'ahs', 'Bambu', '2022-01-04 03:33:36', '2022-01-04 03:33:36'),
+('M.28.e', 3, 10, 'ahs', 'Bambu ∅ 8 cm - 10 cm, panjang 4 m', '2022-02-03 01:35:17', '2022-02-03 01:35:17'),
 ('M.29.a', 3, 10, 'ahs', 'Dolken kayu galam diameter 10 cm, panjang 4m (Tiang pancang)', '2021-10-30 08:40:03', '2021-10-30 08:40:03'),
 ('M.29.b', 3, 10, 'ahs', 'Dolken kayu galam diameter 8 cm, panjang 4m (Tiang pancang)', '2021-10-30 08:40:42', '2021-10-30 08:40:42'),
 ('M.29.c', 3, 10, 'ahs', 'Dolken kayu klas III diameter 5 – 7 cm, panjang 3 m (stoot)', '2021-10-30 08:41:11', '2021-10-30 08:41:11'),
 ('M.29.d', 3, 10, 'ahs', 'Dolken kayu klas III diameter 7 –10 cm, panjang 4 m (stoot)', '2021-10-30 08:41:55', '2021-10-30 08:41:55'),
+('M.29.e', 3, 10, 'ahs', 'Dolken kayu klas III diameter 8 –10 cm, panjang 4 m', '2022-02-03 01:10:47', '2022-02-03 01:10:47'),
 ('M.30', 3, 5, 'ahs', 'Ijuk tebal 5 cm', '2021-10-30 08:42:25', '2021-10-30 08:42:25'),
 ('M.30.a', 3, 5, 'ahs', 'Ijuk', '2022-01-11 02:47:21', '2022-01-11 02:47:21'),
 ('M.31.a', 3, 2, 'ahs', 'Kayu umum balok kelas 1', '2021-10-30 08:42:45', '2021-10-30 08:42:45'),
@@ -404,6 +415,7 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.35.c', 3, 2, 'ahs', 'Kayu papan kelas 2 (Kamper Medan/Borneo Super', '2021-10-30 08:49:05', '2021-10-30 08:49:05'),
 ('M.35.d', 3, 2, 'ahs', 'Kayu papan kelas 2 (Kamper Samarinda)', '2021-10-30 08:49:27', '2021-10-30 08:49:27'),
 ('M.35.e', 3, 2, 'ahs', 'Kayu papan klas 3 (Albasia)', '2021-10-30 08:49:56', '2021-10-30 08:49:56'),
+('M.35.f', 3, 2, 'ahs', 'Papan Kayu 3/20 cm kayu kelas II', '2022-02-02 08:10:02', '2022-02-02 08:10:02'),
 ('M.36.a', 3, 10, 'ahs', 'Kayu kelas 2 untuk cerucuk ø 2\", panjang 2,5 m', '2021-10-30 08:50:32', '2021-10-30 08:50:32'),
 ('M.36.b', 3, 10, 'ahs', 'Kayu kelas 2 untuk cerucuk ø 3\", panjang 2,5 m', '2021-10-30 08:50:52', '2021-10-30 08:50:52'),
 ('M.36.c', 3, 10, 'ahs', 'Kayu kelas 2 untuk cerucuk diamater 4\", panjang 2,5 m', '2021-10-31 02:38:04', '2021-10-31 02:38:04'),
@@ -411,6 +423,7 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.36.e', 3, 7, 'ahs', 'Kayu kelas 2 untuk cerucuk diameter 10\", panjang 15 cm', '2022-01-03 06:17:20', '2022-01-03 06:17:20'),
 ('M.37.a', 3, 2, 'ahs', 'Kayu usuk/kaso klas 2 (Kamper Medan/B. Super)', '2021-10-31 02:39:02', '2021-10-31 02:39:02'),
 ('M.37.b', 3, 2, 'ahs', 'Kayu usuk/kaso klas 3 (Albasia)', '2021-10-31 02:39:20', '2021-10-31 02:39:20'),
+('M.37.c', 3, 2, 'ahs', 'Kayu Kaso ukuran 5/7 kelas II', '2022-02-08 03:14:35', '2022-02-08 03:14:35'),
 ('M.38', 3, 10, 'ahs', 'Kayu batang pohon kelapa, panjang 4 m\'', '2021-10-31 02:39:45', '2021-10-31 02:39:45'),
 ('M.39.a', 3, 12, 'ahs', 'Multiplek tebal 6 mm', '2021-10-31 02:41:33', '2021-10-31 02:41:33'),
 ('M.39.b', 3, 12, 'ahs', 'Multiplek tebal 9 mm', '2021-10-31 02:41:55', '2021-10-31 02:41:55'),
@@ -424,6 +437,9 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.42.a', 3, 7, 'ahs', 'Tiang pancang kayu kelas II diameter8-10 cm atau kotak', '2021-10-31 02:44:50', '2021-10-31 02:44:50'),
 ('M.42.b', 3, 7, 'ahs', 'Tiang pancang kayu kelas II diameter 15 cm atau kotak', '2021-10-31 02:45:14', '2021-10-31 02:45:14'),
 ('M.42.c', 3, 7, 'ahs', 'Tiang pancang kayu kelas II diameter 20 cm atau kotak', '2021-10-31 02:45:41', '2021-10-31 02:45:41'),
+('M.43', 3, 5, 'ahs', 'Balok 8/12 cm', '2022-02-03 02:16:30', '2022-02-03 02:16:30'),
+('M.43.a', 3, 2, 'ahs', 'Balok Kayu 8/12 cm', '2022-02-07 06:36:46', '2022-02-07 06:36:46'),
+('M.46.c', 9, 8, 'ahs', 'Tackle/ Tripod tinggi 4-5m', '2022-02-09 03:55:47', '2022-02-09 03:55:47'),
 ('M.51.a', 4, 8, 'ahs', 'Alat penyambung tiang pancang kayu gelondongan', '2021-10-31 03:14:22', '2021-10-31 03:14:22'),
 ('M.51.b', 4, 8, 'ahs', 'Alat penyambung turap papan kayu 3/10 cm', '2021-10-31 03:14:43', '2021-10-31 03:14:43'),
 ('M.51.c', 4, 8, 'ahs', 'Alat penyambung turap papan kayu 3/20 cm', '2021-10-31 03:15:17', '2021-10-31 03:15:17'),
@@ -461,12 +477,14 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.54.g', 4, 5, 'ahs', 'Baja Profil siku', '2021-10-31 03:28:11', '2021-10-31 03:28:11'),
 ('M.54.h', 4, 5, 'ahs', 'Baja Profil UNP', '2021-10-31 03:28:30', '2021-10-31 03:28:30'),
 ('M.54.i', 4, 7, 'ahs', 'Baja Profil L.40.40.4', '2022-01-03 07:43:27', '2022-01-03 07:43:27'),
+('M.54.j', 4, 5, 'ahs', 'Baja Profil L.50.50.5', '2022-02-08 03:22:57', '2022-02-08 03:22:57'),
 ('M.55.a', 4, 5, 'ahs', 'Baja Tulangan U 32 Ulir', '2021-10-31 03:28:50', '2021-10-31 03:28:50'),
 ('M.55.b', 4, 5, 'ahs', 'Baja Tulangan U 39 Ulir', '2021-10-31 03:29:14', '2021-10-31 03:29:14'),
 ('M.55.c', 4, 5, 'ahs', 'Baja Tulangan U 42 Ulir', '2021-10-31 03:29:29', '2021-10-31 03:29:29'),
 ('M.55.d', 4, 5, 'ahs', 'Baja Tulangan U 24 (besi beton biasa) Polos', '2021-10-31 03:29:55', '2021-10-31 03:29:55'),
 ('M.55.e', 4, 5, 'ahs', 'Baja Tulangan U 32 Polos', '2021-10-31 03:30:17', '2021-10-31 03:30:17'),
 ('M.55.f', 4, 7, 'ahs', 'Baja Tulangan U 12 (Besi Beton)', '2022-01-03 07:44:13', '2022-01-03 07:44:13'),
+('M.55.g', 4, 5, 'ahs', 'Baja Tulangan/ Besi Beton (polos/ulir)', '2022-02-02 03:53:05', '2022-02-02 03:53:05'),
 ('M.56.a', 4, 12, 'ahs', 'Baja Wiremesh M4 ukuran 2,1 m x 5,4 m', '2021-10-31 03:30:42', '2021-10-31 03:30:42'),
 ('M.56.b', 4, 12, 'ahs', 'Baja Wiremesh M5 ukuran 2,1 m x 5,4 m', '2021-10-31 03:31:04', '2021-10-31 03:31:04'),
 ('M.56.c', 4, 12, 'ahs', 'Baja Wiremesh M6 ukuran 2,1 m x 5,4 m', '2021-10-31 03:31:26', '2021-10-31 03:31:26'),
@@ -487,6 +505,7 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.59.a', 4, 8, 'ahs', 'Engsel besi (untuk di las)', '2021-11-01 01:33:47', '2021-11-01 01:33:47'),
 ('M.59.b', 4, 8, 'ahs', 'Engsel tanam kecil (dibuat)', '2021-11-01 01:34:22', '2021-11-01 01:34:22'),
 ('M.59.c', 4, 8, 'ahs', 'Engsel tanam besar (dibuat)', '2021-11-01 01:34:41', '2021-11-01 01:34:41'),
+('M.60.a', 4, 9, 'ahs', 'Floordeck', '2022-02-03 02:14:43', '2022-02-03 02:14:43'),
 ('M.60.b', 4, 9, 'ahs', 'Floordeck galvanized t=0,65 mm tipe balok T tinggi', '2021-11-01 01:35:29', '2021-11-01 01:35:29'),
 ('M.60.c', 4, 9, 'ahs', 'Floordeck galvanized t=0,75 mm tipe pelat berprofil', '2021-11-01 01:35:47', '2021-11-01 01:35:47'),
 ('M.60.d', 4, 9, 'ahs', 'Floordeck galvanized t=0,75 mm tipe balok T', '2021-11-01 01:36:07', '2021-11-01 01:36:07'),
@@ -500,8 +519,10 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.65', 4, 5, 'ahs', 'Kabel baja/sling', '2021-11-01 01:39:09', '2021-11-01 01:39:09'),
 ('M.66', 4, 5, 'ahs', 'Kabel prestress', '2021-11-01 01:39:35', '2021-11-01 01:39:35'),
 ('M.67', 4, 5, 'ahs', 'Kawat beton / Bendrat', '2021-11-01 01:39:52', '2021-11-01 01:39:52'),
+('M.67.a', 4, 5, 'ahs', 'Kawat Ikat', '2022-02-02 03:54:51', '2022-02-02 03:54:51'),
 ('M.68', 4, 5, 'ahs', 'Kawat bronjong diameter  2 - 4 mm', '2021-11-01 01:40:16', '2021-11-01 01:40:16'),
-('M.68.a', 4, 8, 'ahs', 'Kawat bronjong', '2022-01-03 05:44:26', '2022-01-03 05:44:26'),
+('M.68.a', 4, 8, 'ahs', 'Kawat bronjong', '2022-01-03 05:44:26', '2022-01-03 05:44:26');
+INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name`, `created_at`, `updated_at`) VALUES
 ('M.68.b', 4, 5, 'ahs', 'Kawat Bronjong diameter 2.7 mm', '2022-01-05 02:50:27', '2022-01-05 02:50:27'),
 ('M.69', 4, 5, 'ahs', 'Kawat las listrik', '2021-11-01 01:40:32', '2021-11-01 01:40:32'),
 ('M.70', 4, 5, 'ahs', 'Kawat seng 3mm', '2021-11-01 01:40:47', '2021-11-01 01:40:47'),
@@ -512,6 +533,8 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.71.e', 4, 13, 'ahs', 'Paku beton 3 cm - 6 cm', '2021-11-01 01:42:52', '2021-11-01 01:42:52'),
 ('M.71.f', 4, 13, 'ahs', 'Paku paying', '2021-11-01 01:43:13', '2021-11-01 01:43:13'),
 ('M.71.g', 4, 5, 'ahs', 'Paku seng gelombang', '2021-11-01 01:43:42', '2021-11-01 01:43:42'),
+('M.71.h', 4, 5, 'ahs', 'Paku Biasa 5 cm dan 7 cm', '2022-02-02 07:23:50', '2022-02-02 07:23:50'),
+('M.71.i', 4, 5, 'ahs', 'Paku campuran 5 cm & 7 cm', '2022-02-08 03:16:33', '2022-02-08 03:16:33'),
 ('M.72', 4, 8, 'ahs', 'Pen kuningan untuk titik acu pengukuran', '2021-11-01 01:44:06', '2021-11-01 01:44:06'),
 ('M.74.a', 4, 8, 'ahs', 'Pintu Sorong Baja (satu draad) stang b = 0,80, h = 0,30', '2021-11-01 10:05:21', '2021-11-01 10:05:21'),
 ('M.74.b', 4, 8, 'ahs', 'Pintu Sorong Baja (satu draad) stang b = 0,80, h = 0,50', '2021-11-01 10:05:53', '2021-11-01 10:05:53'),
@@ -519,8 +542,7 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.75.a', 4, 8, 'ahs', 'Pintu Sorong Baja (satu draad) stang b = 0,90 , h = 0,30', '2021-11-01 10:06:43', '2021-11-01 10:06:43'),
 ('M.75.b', 4, 8, 'ahs', 'Pintu Sorong Baja (satu draad) stang b = 0,90 , h = 0,50', '2021-11-01 10:07:07', '2021-11-01 10:07:07'),
 ('M.75.c', 4, 8, 'ahs', 'Pintu Sorong Baja (satu draad) stang b = 0,90, h = 1,00', '2021-11-01 10:07:32', '2021-11-01 10:07:32'),
-('M.76.a', 4, 8, 'ahs', 'Pintu Sorong Baja (satu draad) stang b =1,00 , h = 0,30', '2021-11-01 10:07:54', '2021-11-01 10:07:54');
-INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name`, `created_at`, `updated_at`) VALUES
+('M.76.a', 4, 8, 'ahs', 'Pintu Sorong Baja (satu draad) stang b =1,00 , h = 0,30', '2021-11-01 10:07:54', '2021-11-01 10:07:54'),
 ('M.76.b', 4, 8, 'ahs', 'Pintu Sorong Baja (satu draad) stang b =1,00 , h = 0,50', '2021-11-01 11:39:04', '2021-11-01 11:39:04'),
 ('M.76.c', 4, 8, 'ahs', 'Pintu Sorong Baja (satu draad) stang b =1,00 , h = 1,00', '2021-11-01 11:39:25', '2021-11-01 11:39:25'),
 ('M.77.a   1', 4, 8, 'ahs', 'Pintu Sorong Baja (satu draad) stang b = 1,50, h = 0,30', '2021-11-01 11:39:46', '2021-11-01 11:39:46'),
@@ -582,7 +604,9 @@ INSERT INTO `item_prices` (`id`, `item_price_group_id`, `unit_id`, `type`, `name
 ('M.95.c', 4, 5, 'ahs', 'Wiremesh untuk bronjong diameter 8 mm (buatan pabrik)', '2021-11-01 12:04:05', '2021-11-01 12:04:26'),
 ('M.95.d', 4, 5, 'ahs', 'Wiremesh untuk bronjong diameter 10 mm (buatan pabrik)', '2021-11-01 12:04:59', '2021-11-01 12:04:59'),
 ('M.95.e', 4, 5, 'ahs', 'Wiremesh 5 mm ulir, kotak 10 cm', '2022-01-05 03:52:23', '2022-01-05 03:52:23'),
+('M.95.f', 4, 5, 'ahs', 'Wiremesh', '2022-02-02 04:13:40', '2022-02-02 04:13:40'),
 ('M.96', 4, 5, 'ahs', 'Batang skoor L.40.40.4', '2022-01-11 07:12:13', '2022-01-11 07:12:13'),
+('M.97', 2, 2, 'ahs', 'Kaso 5/7 cm', '2022-02-02 07:25:29', '2022-02-02 07:25:29'),
 ('To.01', 10, 11, 'ahs', 'Amplas Listrik', '2021-11-01 16:36:39', '2021-11-01 16:36:39'),
 ('To.02', 10, 8, 'ahs', 'Bodem', '2021-11-01 16:36:56', '2021-11-01 16:36:56'),
 ('To.03', 10, 11, 'ahs', 'Bor listrik', '2021-11-01 16:37:29', '2021-11-01 16:37:29'),
