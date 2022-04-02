@@ -25,7 +25,7 @@ Route::get('/forgot-password', function() {
 
     $passwordReset = PasswordReset::first();
 
-    return view('mails.auth.forgot-password', [
+    return view('mails.auth.email-verification', [
         'user' => User::where('email', $passwordReset->email)->first(),
         'token' => 'sdas',
         'passwordReset' => $passwordReset,
