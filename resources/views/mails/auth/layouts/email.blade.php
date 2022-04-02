@@ -98,8 +98,8 @@
 </head>
 <body>
     <div class="custom-container" style="position: relative; padding-bottom: 200px; width: 100%; max-width: 700px; margin: auto;">
-        <div class="heading1 text-center py-5" style="background-size: cover; position: relative; height: 180px; background-image: url('{{ asset('assets/images/header-bg.jpg') }}')">
-            <img src="{{ asset('assets/images/logo_white.png') }}" class="logo-img" alt="" style="margin: auto; z-index: 99; right: 0; top: 0; bottom: 0; left: 0; position: absolute;">
+        <div class="heading1 text-center py-5" style="background-size: cover; position: relative; padding-top: 60px; text-align: center; height: 138px; background-image: url('{{ asset('assets/images/header-bg.jpg') }}')">
+            <img src="{{ asset('assets/images/logo_white.png') }}" class="logo-img" alt="" style="margin: auto;">
             <div class="blue-overlay" style="position: absolute; top: 0; right: 0; left: 0; bottom: 0; background-color: rgba(21, 51, 70, 0.8);"></div>
         </div>
         <div class="content-container" style="height: 49vh; overflow: auto; padding: 50px;">
