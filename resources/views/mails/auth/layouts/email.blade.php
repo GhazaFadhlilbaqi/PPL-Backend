@@ -7,7 +7,21 @@
     <title>@yield('title')</title>
     <!-- CSS only -->
     <link rel="stylesheet" href="{{ asset('assets/css/custom-email.css') }}">
-    @include('mails.auth.layouts.style')
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+        body {
+            margin: 0;
+        }
+
+        * {
+            font-family: 'Roboto'
+        }
+
+        .font-weight-bold {
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
     <div class="custom-container" style="position: relative; padding-bottom: 200px; width: 100%; max-width: 700px; margin: auto;">
@@ -15,10 +29,10 @@
             <img src="{{ asset('assets/images/logo_white.png') }}" class="logo-img" alt="" style="margin: auto; z-index: 99; right: 0; top: 0; bottom: 0; left: 0; position: absolute;">
             <div class="blue-overlay" style="position: absolute; top: 0; right: 0; left: 0; bottom: 0; background-color: rgba(21, 51, 70, 0.8);"></div>
         </div>
-        <div class="content-container" style="height: 85vh; overflow: auto; padding: 50px;">
+        <div class="content-container" style="height: 49vh; overflow: auto; padding: 50px;">
             @yield('content')
         </div>
-        <div class="footers" style="position: absolute; bottom: 0; height: 200px; bottom: 0; left: 0; width: 100%; max-width: 700px; margin: auto; right: 0; background-color: rgba(21, 51, 70, 1); color: white; text-align: center; vertical-align: middle; padding: 87px 0;">
+        <div class="footers" style="position: absolute; bottom: 0; height: 40px; bottom: 0; left: 0; width: 100%; max-width: 700px; margin: auto; right: 0; background-color: rgba(21, 51, 70, 1); color: white; text-align: center; vertical-align: middle; padding: 87px 0;">
             <p style="height: 100%;">&copy; Rencanakan {{ date('Y') }}</p>
         </div>
     </div>

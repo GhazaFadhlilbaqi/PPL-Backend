@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\RegisterController;
 use App\Models\PasswordReset;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,8 +22,13 @@ Route::get('/', function () {
 
 // NOTE: Debug only route !
 Route::get('/forgot-password', function() {
+
+    $passwordReset = PasswordReset::first();
+
     return view('mails.auth.forgot-password', [
-        'passwordReset' => PasswordReset::first(),
+        'user' => User::where('email', $passwordReset->email)->first(),
+        'token' => 'sdas',
+        'passwordReset' => $passwordReset,
     ]);
 });
 
