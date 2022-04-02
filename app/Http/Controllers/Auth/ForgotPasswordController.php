@@ -8,6 +8,7 @@ use App\Http\Requests\VerifyTokenRequest;
 use App\Mail\ForgotPasswordMail;
 use App\Models\PasswordReset;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -17,25 +18,30 @@ class ForgotPasswordController extends Controller
 {
     public function sendConfirmationMail(Request $request)
     {
+        try {
+            $user = User::where('email', $request->email)->first();
 
-        $user = User::where('email', $request->email)->first();
+            if ($user) {
 
-        if ($user) {
+                $passwordResetToken = PasswordReset::where('email', $request->email);
+                if ($passwordResetToken->count() > 0) $passwordResetToken->delete();
 
-            $passwordResetToken = PasswordReset::where('email', $request->email);
-            if ($passwordResetToken->count() > 0) $passwordResetToken->delete();
+                $token = PasswordReset::create([
+                    'email' => $request->email,
+                    'token' => Str::random(32),
+                ]);
 
-            $token = PasswordReset::create([
-                'email' => $request->email,
-                'token' => Str::random(32),
+                Mail::to($request->email)->send(new ForgotPasswordMail($user, $token));
+            }
+
+            return response()->json([
+                'status' => 'success',
             ]);
-
-            Mail::to($request->email)->send(new ForgotPasswordMail($user, $token));
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'status' => 'success',
-        ]);
     }
 
     public function verifyResetToken(VerifyTokenRequest $request)
