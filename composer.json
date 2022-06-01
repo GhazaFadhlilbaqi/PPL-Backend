@@ -1,11 +1,8 @@
 {
-    "name": "laravel/laravel",
+    "name": "rencanakan.id/rencanakan-app-backend",
+    "version": "1.2.2",
     "type": "project",
-    "description": "The Laravel Framework.",
-    "keywords": [
-        "framework",
-        "laravel"
-    ],
+    "description": "Backend for Rencanakan ID Apps",
     "license": "MIT",
     "require": {
         "php": "^7.3|^8.0",
