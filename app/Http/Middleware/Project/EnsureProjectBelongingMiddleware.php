@@ -18,7 +18,7 @@ class EnsureProjectBelongingMiddleware
     public function handle(Request $request, Closure $next)
     {
         if ($request->project) {
-            if ($request->project->user_id !== Auth::user()->id) {
+            if ($request->project->user_id != Auth::user()->id) {
                 return response()->json([
                     'status' => 'fail',
                     'message' => 'This project is not belongs to this user'
