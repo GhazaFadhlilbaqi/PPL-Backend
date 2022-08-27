@@ -45,6 +45,7 @@ Route::prefix('order')->group(function() {
     Route::post('notify', [OrderController::class, 'notify']);
 
     Route::middleware('auth:sanctum')->group(function() {
+        Route::get('', [OrderController::class, 'index']);
         Route::post('by-project/{project}', [OrderController::class, 'orderStatusByProject']);
     });
 });
@@ -73,6 +74,7 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function() {
 
 Route::prefix('payment')->middleware('auth:sanctum')->group(function() {
     Route::post('fetch-snap-token', [PaymentController::class, 'fetchSnapToken']);
+    Route::post('set-pending', [PaymentController::class, 'setPending']);
     # NOTE: For demo purpose only
     Route::post('demo-add-token', [PaymentController::class, 'addToken']);
 });

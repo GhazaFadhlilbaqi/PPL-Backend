@@ -34,103 +34,136 @@ class PaymentController extends Controller
         $buyedItems = [];
         $cartsSubtotal = self::productPrice;
 
-        $customer = Auth::user();
-        $orderId = $this->generateOrderId();
-        $projectId = Hashids::decode($request->project_id)[0];
+        if ($request->has('project_id') && $request->project_id) {
+            $customer = Auth::user();
+            $orderId = $this->generateOrderId();
+            $projectId = Hashids::decode($request->project_id)[0];
 
-        /**
-         * Payment verification step
-         *
-         * 1. Check if there's any pending or waiting_for_payment order
-         * 2. Check for midtrans status
-         * 3. Re use order if it's not expired (status from midtrans)
-         */
+            /**
+             * Payment verification step
+             *
+             * 1. Check if there's any pending or waiting_for_payment order
+             * 2. Check for midtrans status
+             * 3. Re use order if it's not expired (status from midtrans)
+             */
 
-        $order = Auth::user()->order()->where('project_id', $projectId)->orderBy('created_at', 'DESC')->take(1)->first();
+            $order = Auth::user()->order()->where('project_id', $projectId)->orderBy('created_at', 'DESC')->take(1)->first();
 
-        if ($order && in_array($order->status, ['pending', 'waiting_for_payment']) && $order->used_at == null) {
+            if ($order && in_array($order->status, ['pending', 'waiting_for_payment']) && $order->used_at == null) {
 
-            // Check midtrans status
-            $midtransStatus = $this->checkStatusOrder($order->order_id);
-            $midtransStatusCode = $midtransStatus['status_code'];
+                // Check midtrans status
+                $midtransStatus = $this->checkStatusOrder($order->order_id);
+                $midtransStatusCode = $midtransStatus['status_code'];
 
-            // If it's expired or it's completed (but marked as pending or expired)
-            if ($midtransStatusCode == '407' || $midtransStatusCode == '200' || $midtransStatusCode == '404') {
-                $order->status = $midtransStatusCode == '407' ? 'expired' : ($midtransStatusCode == '404' ? 'canceled' : 'completed');
-                $order->save();
+                // If it's expired or it's completed (but marked as pending or expired)
+                if ($midtransStatusCode == '407' || $midtransStatusCode == '200' || $midtransStatusCode == '404') {
+                    $order->status = $midtransStatusCode == '407' ? 'expired' : ($midtransStatusCode == '404' ? 'canceled' : 'completed');
+                    $order->save();
+                    $order = $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0], self::productPrice);
+                }
+
+            } else {
                 $order = $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0], self::productPrice);
             }
 
-        } else {
-            $order = $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0], self::productPrice);
-        }
+            // Check if there's a pending order
+            // $pendingOrder = Auth::user()->order()->where('project_id', $projectId)->where('status', 'pending')->first();
 
-        // Check if there's a pending order
-        // $pendingOrder = Auth::user()->order()->where('project_id', $projectId)->where('status', 'pending')->first();
+            // if ($pendingOrder) {
+            //     return response()->json([
+            //         'status' => 'fail',
+            //         'message' => 'Masih terdapat pembayaran yang pending ! mohon tunggu hingga anda mendapatkan email konfirmasi pembayaran'
+            //     ], 400);
+            // }
 
-        // if ($pendingOrder) {
-        //     return response()->json([
-        //         'status' => 'fail',
-        //         'message' => 'Masih terdapat pembayaran yang pending ! mohon tunggu hingga anda mendapatkan email konfirmasi pembayaran'
-        //     ], 400);
-        // }
+            // Check if the order already created or not
+            // $order = Auth::user()->order()->where('project_id', $projectId)->where('status', 'waiting_for_payment')->first();
 
-        // Check if the order already created or not
-        // $order = Auth::user()->order()->where('project_id', $projectId)->where('status', 'waiting_for_payment')->first();
+            $buyedItems[] = [
+                'id' => uniqid(),
+                'price' => self::productPrice,
+                'quantity' => 1,
+                'name' => 'Export RAB user ' . $customer->first_name . ' ' . ($customer->last_name ?? ''),
+            ];
 
-        $buyedItems[] = [
-            'id' => uniqid(),
-            'price' => self::productPrice,
-            'quantity' => 1,
-            'name' => 'Export RAB user ' . $customer->first_name . ' ' . ($customer->last_name ?? ''),
-        ];
+            $transactionDetails = [
+                'order_id' => $orderId,
+                'gross_amount' => $cartsSubtotal
+            ];
 
-       $transactionDetails = [
-            'order_id' => $orderId,
-            'gross_amount' => $cartsSubtotal
-        ];
+            $customerDetails = [
+                'first_name' => $customer->first_name,
+                'last_name' => $customer->last_name,
+                'email' => $customer->email,
+                'phone' => $customer->phone_number,
+            ];
 
-        $customerDetails = [
-            'first_name' => $customer->first_name,
-            'last_name' => $customer->last_name,
-            'email' => $customer->email,
-            'phone' => $customer->phone_number,
-        ];
+            // NOTE: Metode yg lain butuh handle yang lain jg
+            // $enabledPayments = [
+            //     "credit_card", "cimb_clicks", "bca_klikbca", "bca_klikpay", "bri_epay", "echannel", "permata_va", "bca_va", "bni_va", "bri_va", "other_va", "gopay", "indomaret", "danamon_online", "shopeepay"
+            // ];
 
-        // NOTE: Metode yg lain butuh handle yang lain jg
-        // $enabledPayments = [
-        //     "credit_card", "cimb_clicks", "bca_klikbca", "bca_klikpay", "bri_epay", "echannel", "permata_va", "bca_va", "bni_va", "bri_va", "other_va", "gopay", "indomaret", "danamon_online", "shopeepay"
-        // ];
+            $enabledPayments = [
+                "credit_card"
+            ];
 
-        $enabledPayments = [
-            "credit_card"
-        ];
+            $transaction = [
+                'enabled_payments' => $enabledPayments,
+                'transaction_details' => $transactionDetails,
+                'customer_detail' => $customerDetails,
+                'item_details' => $buyedItems,
+            ];
 
-        $transaction = [
-            'enabled_payments' => $enabledPayments,
-            'transaction_details' => $transactionDetails,
-            'customer_detail' => $customerDetails,
-            'item_details' => $buyedItems,
-        ];
+            try {
+                $snapToken = $order->midtrans_snap_token ?? Snap::getSnapToken($transaction);
 
-        try {
-            $snapToken = $order->midtrans_snap_token ?? Snap::getSnapToken($transaction);
+                $order->midtrans_snap_token = $snapToken;
+                $order->save();
 
-            $order->midtrans_snap_token = $snapToken;
-            $order->save();
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [
+                        'token' => $snapToken,
+                    ]
+                ]);
+            } catch (Exception $e) {
+                return response()->json([
+                    'status' => 'fail',
+                    'message' => $e->getMessage()
+                ], 500);
+            }   
+        } else if ($request->has('order_id') && $request->order_id) {
+
+            $order = Order::where('order_id', $request->order_id)->first();
 
             return response()->json([
                 'status' => 'success',
                 'data' => [
-                    'token' => $snapToken,
+                    'token' => $order->midtrans_snap_token,
                 ]
             ]);
-        } catch (Exception $e) {
+        } else {
             return response()->json([
-                'status' => 'fail',
-                'message' => $e->getMessage()
-            ], 500);
+                'status' => 'failed',
+                'message' => 'Please provide a project_id or order_id !',
+            ], 400);
         }
+    }
+
+    public function setPending(Request $request)
+    {
+        
+        $order = Order::where('midtrans_snap_token', $request->snapToken)->first();
+
+        if ($order->status == 'waiting_for_payment') {
+            $order->status = 'pending';
+            $order->save();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Set pending successfully !',
+        ]);
     }
 
     public function addToken(Request $request)

@@ -6,6 +6,7 @@ use App\Http\Controllers\CountableItemController;
 use App\Models\Rab;
 use App\Models\Project;
 use App\Models\User;
+use Exception;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
@@ -43,72 +44,33 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
 
     private function generateRab()
     {
+        try {
+            $rabSubtotal = 0;
+            $pointer = $this->globalStartingIndex;
 
-        $rabSubtotal = 0;
-        $pointer = $this->globalStartingIndex;
+            $rabs = Rab::where('project_id', $this->projectId)
+            ->with(['rabItemHeader.rabItem' => function($q) {
+                $q->where('custom_ahs_id', '!=', null);
+            }])
+            ->with('rabItem', function($q) {
+                $q->where('custom_ahs_id', '!=', null);
+                $q->where('rab_item_header_id', NULL);
+                $q->with('customAhs');
+            })
+            ->get();
 
-        $rabs = Rab::where('project_id', $this->projectId)
-          ->with(['rabItemHeader.rabItem' => function($q) {
-              $q->where('custom_ahs_id', '!=', null);
-          }])
-          ->with('rabItem', function($q) {
-              $q->where('custom_ahs_id', '!=', null);
-              $q->where('rab_item_header_id', NULL);
-              $q->with('customAhs');
-          })
-          ->get();
+            foreach ($rabs as $key => $rab) {
 
-        foreach ($rabs as $key => $rab) {
+                $this->rabStyleArr[] = [
+                    'pointer' => $pointer,
+                    'type' => self::RAB_HEADER
+                ];
 
-            $this->rabStyleArr[] = [
-                'pointer' => $pointer,
-                'type' => self::RAB_HEADER
-            ];
+                $rabPerSectionCount = 0;
 
-            $rabPerSectionCount = 0;
+                if ($rab->rabItem || ($rab->rabItemHeader && $rab->rabItemHeader->rabItem)) {
 
-            if ($rab->rabItem || ($rab->rabItemHeader && $rab->rabItemHeader->rabItem)) {
-
-                foreach ($rab->rabItem as $key2 => $rabItem) {
-
-                    if ($rabItem->customAhs) {
-
-                        $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
-                        $countedAhs->price = $countedAhs->subtotal;
-                        $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
-                        $rabItem->subtotal = $countedAhs->subtotal;
-                        $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
-                        $rabSubtotal += $countedAhs->subtotal;
-                        $rabPerSectionCount += $countedAhs->subtotal;
-
-                    } else {
-
-                        $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
-                        $rabs[$key]->rabItem[$key2] = $rabItem;
-                        $rabSubtotal += $rabItem->subtotal;
-                        $rabPerSectionCount += $rabSubtotal;
-
-                    }
-
-                    $pointer++;
-
-                    $this->rabStyleArr[] = [
-                        'pointer' => $pointer,
-                        'type' => self::RAB_ITEM_CONTENT
-                    ];
-
-                }
-
-                foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
-
-                    $pointer++;
-
-                    $this->rabStyleArr[] = [
-                        'pointer' => $pointer,
-                        'type' => self::RAB_ITEM_HEADER
-                    ];
-
-                    foreach ($rabItemHeader->rabItem as $rabItem) {
+                    foreach ($rab->rabItem as $key2 => $rabItem) {
 
                         if ($rabItem->customAhs) {
 
@@ -123,6 +85,7 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
                         } else {
 
                             $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
+                            $rabs[$key]->rabItem[$key2] = $rabItem;
                             $rabSubtotal += $rabItem->subtotal;
                             $rabPerSectionCount += $rabSubtotal;
 
@@ -136,20 +99,63 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
                         ];
 
                     }
+
+                    foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
+
+                        $pointer++;
+
+                        $this->rabStyleArr[] = [
+                            'pointer' => $pointer,
+                            'type' => self::RAB_ITEM_HEADER
+                        ];
+
+                        foreach ($rabItemHeader->rabItem as $rabItem) {
+
+                            if ($rabItem->customAhs) {
+
+                                $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
+                                $countedAhs->price = $countedAhs->subtotal;
+                                $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
+                                $rabItem->subtotal = $countedAhs->subtotal;
+                                $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
+                                $rabSubtotal += $countedAhs->subtotal;
+                                $rabPerSectionCount += $countedAhs->subtotal;
+
+                            } else {
+
+                                $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
+                                $rabSubtotal += $rabItem->subtotal;
+                                $rabPerSectionCount += $rabSubtotal;
+
+                            }
+
+                            $pointer++;
+
+                            $this->rabStyleArr[] = [
+                                'pointer' => $pointer,
+                                'type' => self::RAB_ITEM_CONTENT
+                            ];
+
+                        }
+                    }
+
+                } else {
+                    $rabSubtotal += 0;
                 }
 
-            } else {
-                $rabSubtotal += 0;
+                $rab->subtotal = $rabPerSectionCount;
+
+                $pointer++;
             }
 
-            $rab->subtotal = $rabPerSectionCount;
+            $this->finalPointerLocation = $pointer - 1;
 
-            $pointer++;
+            return $rabs;
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $this->finalPointerLocation = $pointer - 1;
-
-        return $rabs;
     }
 
     public function columnWidths(): array

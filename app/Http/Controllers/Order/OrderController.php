@@ -7,9 +7,21 @@ use App\Models\Order;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Vinkla\Hashids\Facades\Hashids;
 
 class OrderController extends Controller
 {
+
+    public function index(Request $request)
+    {
+        $orders = Auth::user()->order()->select(['created_at', 'gross_amount', 'used_at', 'order_id', 'status', 'project_id'])->with('project')->orderBy('created_at', 'DESC')->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('orders'),
+        ]);
+    }
+
     public function notify(Request $request)
     {
         if ($request->has('order_id')) {
