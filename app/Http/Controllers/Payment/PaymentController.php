@@ -36,7 +36,7 @@ class PaymentController extends Controller
 
         if ($request->has('project_id') && $request->project_id) {
             $customer = Auth::user();
-            $orderId = $this->generateOrderId();
+            $orderId = generateRandomOrderId();
             $projectId = Hashids::decode($request->project_id)[0];
 
             /**
@@ -131,7 +131,7 @@ class PaymentController extends Controller
                     'status' => 'fail',
                     'message' => $e->getMessage()
                 ], 500);
-            }   
+            }
         } else if ($request->has('order_id') && $request->order_id) {
 
             $order = Order::where('order_id', $request->order_id)->first();
@@ -152,7 +152,7 @@ class PaymentController extends Controller
 
     public function setPending(Request $request)
     {
-        
+
         $order = Order::where('midtrans_snap_token', $request->snapToken)->first();
 
         if ($order->status == 'waiting_for_payment') {

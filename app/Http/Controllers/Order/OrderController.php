@@ -69,7 +69,7 @@ class OrderController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => [
-                'quotasLeft' => $orders->count()
+                'quotasLeft' => env('APP_USER_TRIAL_MODE') ? 1 : $orders->count()
             ]
         ]);
     }

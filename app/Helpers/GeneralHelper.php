@@ -56,3 +56,10 @@ if (!function_exists('numToAlphabet')){
         return $lettersRange[$num];
     }
 }
+
+if (!function_exists('generateRandomOrderId')) {
+    function generateRandomOrderId()
+    {
+        return strtoupper(Str::random(16));
+    }
+}
