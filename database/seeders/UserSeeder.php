@@ -20,12 +20,12 @@ class UserSeeder extends Seeder
         // User::truncate();
 
         $rootUsers = User::factory()->create([
-            'first_name' => 'Mizuhara',
-            'last_name' => 'Chizuru',
+            'first_name' => 'Root',
+            'last_name' => 'Account',
             'password' => Hash::make(1234),
-            'email' => 'chizuru@gmail.com',
+            'email' => 'root@gmail.com',
             'email_verified_at' => Carbon::now(),
-            'address' => 'Jln. Pahlawan No. 7 Gambiran, Banyuwangi'
+            'address' => 'Jln. Pahlawan No. 7, Jakarta'
         ]);
 
         $rootUsers->each(function($user) {
