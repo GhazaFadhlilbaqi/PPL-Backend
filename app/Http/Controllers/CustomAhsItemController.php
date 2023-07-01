@@ -104,7 +104,8 @@ class CustomAhsItemController extends Controller
                 'custom_ahs_itemable_type' => "App\\Models\\CustomItemPrice",
                 'custom_ahs_itemable_id' => $customItemPrice->id,
                 'hashed_ahs_itemable_id' => Hashids::encode($customItemPrice->id),
-                'display_id' => $customItemPrice->code
+                'display_id' => $customItemPrice->code,
+                'display_name' => $customItemPrice->code . ' - ' . $customItemPrice->name,
             ];
         });
 
@@ -115,6 +116,7 @@ class CustomAhsItemController extends Controller
                 'custom_ahs_itemable_id' => $customAhs->id,
                 'hashed_ahs_itemable_id' => Hashids::encode($customAhs->id),
                 'display_id' => $customAhs->code,
+                'display_name' => $customAhs->name,
             ];
         });
 
@@ -125,6 +127,7 @@ class CustomAhsItemController extends Controller
                 'custom_ahs_itemable_id' => $customAhp->id,
                 'hashed_ahs_itemable_id' => Hashids::encode($customAhp->id),
                 'display_id' => $customAhp->code,
+                'display_name' => $customAhp->name,
             ];
         });
 
