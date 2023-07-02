@@ -69,5 +69,6 @@ class Kernel extends HttpKernel
         'custom-item-price.protect-default-model' => \App\Http\Middleware\CustomItemPrice\ProtectDefaultModelMiddleware::class,
         'request.strip-empty-char-on-request' => \App\Http\Middleware\Request\StripEmptyCharOnRequestMiddleware::class,
         'project.ensure-project-eligible-to-export' => \App\Http\Middleware\Project\EnsureProjectEligibleToExportMiddleware::class,
+        'protect-debug' => \App\Http\Middleware\ProtectDebugMiddleware::class,
     ];
 }

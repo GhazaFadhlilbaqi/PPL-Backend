@@ -9,6 +9,7 @@ use App\Http\Controllers\CustomAhsController;
 use App\Http\Controllers\CustomAhsItemController;
 use App\Http\Controllers\CustomItemPriceController;
 use App\Http\Controllers\CustomItemPriceGroupController;
+use App\Http\Controllers\DebugController;
 use App\Http\Controllers\Master\AhpController;
 use App\Http\Controllers\Master\AhsController;
 use App\Http\Controllers\Master\AhsItemController;
@@ -231,3 +232,6 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
 
 });
 
+Route::prefix('debug')->middleware('protect-debug')->group(function() {
+    Route::post('send-dummy-mail', [DebugController::class, 'sendDummyMail']);
+});
