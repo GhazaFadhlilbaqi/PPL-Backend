@@ -24,6 +24,7 @@ use App\Http\Controllers\RabController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\RabItemController;
 use App\Http\Controllers\RabItemHeaderController;
+use App\Http\Controllers\TutorialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -232,6 +233,12 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
 
 });
 
+Route::prefix('tutorials')->middleware('auth:sanctum')->group(function() {
+    Route::get('', [TutorialController::class, 'index'])->name('tutorials');
+    Route::post('update', [TutorialController::class, 'update'])->name('tutorials.update');
+});
+
 Route::prefix('debug')->middleware('protect-debug')->group(function() {
     Route::post('send-dummy-mail', [DebugController::class, 'sendDummyMail']);
+    Route::post('clear', [DebugController::class, 'clear']);
 });
