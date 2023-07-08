@@ -17,7 +17,7 @@ class CreateTutorialsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->boolean('create_project')->default(true);
-            $table->boolean('show_project')->default(true);
+            $table->boolean('manage_project')->default(true);
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
