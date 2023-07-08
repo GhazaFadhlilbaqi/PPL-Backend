@@ -40,6 +40,16 @@ class CustomItemPriceController extends CustomItemPriceBaseController
             'project_id' => Hashids::decode($request->project_id)[0]
         ]);
 
+        if ($request->has('unique_check') && $request->unique_check == 'true') {
+            $customItemPrice = CustomItemPrice::where('project_id', $request->project_id)->where('code', $request->code)->first();
+            if ($customItemPrice) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Kode ' . $request->code . ' telah terpakai'
+                ], 422);
+            }
+        }
+
         # TODO: Implement unique validation check for code field unique to item price and custom item price table table
         $customItemPrice = CustomItemPrice::create($request->only([
             'code', 'custom_item_price_group_id', 'unit_id', 'project_id', 'name', 'price'
