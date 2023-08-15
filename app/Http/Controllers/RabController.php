@@ -57,13 +57,28 @@ class RabController extends CountableItemController
                     }
                 }
 
+                // foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
+                //     foreach ($rabItemHeader->rabItem as $rabItem) {
+                //         if ($rabItem->customAhs) {
+                //             $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
+                //             $countedAhs->price = $countedAhs->subtotal;
+                //             $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
+                //             $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
+                //             $rabSubtotal += $countedAhs->subtotal;
+                //         } else {
+                //             $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
+                //             $rabSubtotal += $rabItem->subtotal;
+                //         }
+                //     }
+                // }
+
                 foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
                     foreach ($rabItemHeader->rabItem as $rabItem) {
                         if ($rabItem->customAhs) {
                             $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
                             $countedAhs->price = $countedAhs->subtotal;
                             $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
-                            $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
+                            $rabs[$key]->rabItemHeader[$key3]['custom_ahs'] = $countedAhs;
                             $rabSubtotal += $countedAhs->subtotal;
                         } else {
                             $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
