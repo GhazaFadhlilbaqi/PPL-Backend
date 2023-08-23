@@ -114,7 +114,7 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
                             $countedAhs->price = $countedAhs->subtotal;
                             $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
                             $rabItem->subtotal = $countedAhs->subtotal;
-                            $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
+                            $rabs[$key]->rabItem[$key3]['custom_ahs'] = $countedAhs;
                             $rabSubtotal += $countedAhs->subtotal;
                             $rabPerSectionCount += $countedAhs->subtotal;
 
