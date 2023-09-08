@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class LoginController extends Controller
 {
@@ -32,11 +34,12 @@ class LoginController extends Controller
 
             } else {
 
+                $this->sendVerificationMail(Auth::user());
                 Auth::logout();
 
                 return response()->json([
                     'status' => 'fail',
-                    'message' => 'Please verify your email first'
+                    'message' => 'Email anda belum diverifikasi. Instruksi verifikasi telah dikirim ke alamat email Anda. Silakan cek dan ikuti petunjuknya untuk menyelesaikan verifikasi.'
                 ], 401);
             }
 
@@ -78,5 +81,15 @@ class LoginController extends Controller
                 'message' => 'Unauthenticated User',
             ], 401);
         }
+    }
+
+    protected function sendVerificationMail(User $user)
+    {
+        $token = Str::random(32);
+
+        $user->verification_token = $token;
+        $user->save();
+
+        Mail::to($user->email)->send(new EmailVerificationMail($user, $token));
     }
 }
