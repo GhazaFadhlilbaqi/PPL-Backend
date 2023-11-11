@@ -43,11 +43,12 @@ class RegisterController extends Controller
 
     public function confirmEmail($token)
     {
-        $user = User::where('verification_token', $token)->where('email_verified_at', null)->first();
+        $user = User::where('verification_token', $token)->first();
 
-        if (!$user) return redirect(config('app.email_verification.callback_domain') . '/auth/verification/callback?status=fail&msg=invalid');
+        if (!$user) {
+            return redirect(config('app.email_verification.callback_domain') . '/auth/verification/callback?status=fail&msg=invalid');
+        }
 
-        $user->verification_token = null;
         $user->email_verified_at = Carbon::now();
         $user->save();
 

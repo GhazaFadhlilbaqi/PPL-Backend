@@ -24,6 +24,7 @@ use App\Http\Controllers\RabController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\RabItemController;
 use App\Http\Controllers\RabItemHeaderController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TutorialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -75,7 +76,9 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function() {
 });
 
 Route::prefix('payment')->middleware('auth:sanctum')->group(function() {
+    # NOTE: Clean fetch-snap-token route
     Route::post('fetch-snap-token', [PaymentController::class, 'fetchSnapToken']);
+    Route::post('fetch-subscription-snap-token', [PaymentController::class, 'fetchSubscriptionSnapToken']);
     Route::post('set-pending', [PaymentController::class, 'setPending']);
     # NOTE: For demo purpose only
     Route::post('demo-add-token', [PaymentController::class, 'addToken']);
@@ -236,6 +239,10 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
 Route::prefix('tutorials')->middleware('auth:sanctum')->group(function() {
     Route::get('', [TutorialController::class, 'index'])->name('tutorials');
     Route::post('update', [TutorialController::class, 'update'])->name('tutorials.update');
+});
+
+Route::prefix('subscriptions')->middleware('auth:sanctum')->group(function() {
+    Route::get('', [SubscriptionController::class, 'index']);
 });
 
 Route::prefix('debug')->middleware('protect-debug')->group(function() {

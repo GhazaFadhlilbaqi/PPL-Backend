@@ -26,7 +26,8 @@ class Project extends Model
         'fiscal_year',
         'profit_margin',
         'last_opened_at',
-        'ppn'
+        'ppn',
+        'subscription_id',
     ];
 
     public function user()
@@ -62,6 +63,11 @@ class Project extends Model
     public function customAhs()
     {
         return $this->hasMany(CustomAhs::class);
+    }
+
+    public function subscription()
+    {
+        return $this->belongsTo(Subscription::class);
     }
 
     public function getHashedProvinceIdAttribute()

@@ -17,7 +17,7 @@ class CreateOrdersTable extends Migration
             $table->id();
             $table->string('order_id');
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('project_id');
+            $table->unsignedBigInteger('project_id')->nullable();
             $table->enum('status', ['waiting_for_payment', 'pending', 'completed', 'canceled', 'expired'])->default('waiting_for_payment');
             $table->string('midtrans_snap_token', 64)->nullable();
             $table->timestamp('used_at')->nullable()->default(null);

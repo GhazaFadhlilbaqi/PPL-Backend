@@ -8,10 +8,14 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Midtrans\Config;
 use App\Http\Controllers\Midtrans\Snap;
 use App\Models\Order;
+use App\Models\Subscription;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Vinkla\Hashids\Facades\Hashids;
+use Midtrans\Config as MidtransConfig;
+use Midtrans\Snap as MidtransSnap;
 
 class PaymentController extends Controller
 {
@@ -148,6 +152,76 @@ class PaymentController extends Controller
                 'message' => 'Please provide a project_id or order_id !',
             ], 400);
         }
+    }
+
+    public function fetchSubscriptionSnapToken(Request $request)
+    {
+
+        DB::beginTransaction();
+
+        $subscription = Subscription::find($request->subscription_id);
+
+        MidtransConfig::$serverKey = env('MIDTRANS_SERVER_KEY');
+        MidtransConfig::$isProduction = env('MIDTRANS_MODE') == 'production';
+        MidtransConfig::$is3ds = true;
+
+        $user = Auth::user();
+
+        // Generate order data
+        $order = Order::create([
+            'order_id' => $this->generateOrderId(),
+            'user_id' => $user->id,
+            'project_id' => null,
+            'status' => 'waiting_for_payment',
+            'gross_amount' => $subscription->price,
+        ]);
+
+        // return response()->json([
+        //     's' => $order-
+        // ]);
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order->order_id,
+                'gross_amount' => $order->gross_amount,
+            ],
+            'item_details' => [
+                [
+                    'id' => $subscription->hashid,
+                    'price' => $subscription->price,
+                    'quantity' => 1,
+                    'name' => 'Project Plan : ' . $subscription->name,
+                ]
+            ],
+            'customer_details' => [
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'address' => $user->address,
+                'phone' => $user->phone,
+                'email' => $user->email,
+            ],
+        ];
+
+        $snapToken = null;
+
+        try {
+            $snapToken = MidtransSnap::getSnapToken($params);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'snap_token' => $snapToken,
+            ]
+        ]);
     }
 
     public function setPending(Request $request)
