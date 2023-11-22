@@ -70,6 +70,11 @@ class Project extends Model
         return $this->belongsTo(Subscription::class);
     }
 
+    public function order()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function getHashedProvinceIdAttribute()
     {
         return Hashids::encode($this->province_id);

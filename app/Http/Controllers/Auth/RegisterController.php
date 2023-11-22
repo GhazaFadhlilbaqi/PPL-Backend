@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -45,9 +46,15 @@ class RegisterController extends Controller
     {
         $user = User::where('verification_token', $token)->first();
 
+        Log::info('[INFO] Confirming email at ' . Carbon::now()->format('Y'));
+        Log::info('[INFO] Email token : ' . $token);
+
         if (!$user) {
+            Log::error('[INFO] Email verification failed, no user assigned for token : ' . $token);
             return redirect(config('app.email_verification.callback_domain') . '/auth/verification/callback?status=fail&msg=invalid');
         }
+
+        Log::info('[INFO] Email verified successfully for uid : ' . $user->hashid);
 
         $user->email_verified_at = Carbon::now();
         $user->save();

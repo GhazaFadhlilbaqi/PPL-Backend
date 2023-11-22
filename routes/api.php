@@ -78,7 +78,8 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function() {
 Route::prefix('payment')->middleware('auth:sanctum')->group(function() {
     # NOTE: Clean fetch-snap-token route
     Route::post('fetch-snap-token', [PaymentController::class, 'fetchSnapToken']);
-    Route::post('fetch-subscription-snap-token', [PaymentController::class, 'fetchSubscriptionSnapToken']);
+    Route::post('fetch-subscription-snap-token', [PaymentController::class, 'fetchSubscriptionSnapToken'])->middleware('ensure.demo.eligibility');
+    Route::post('set-canceled', [PaymentController::class, 'setCanceled']);
     Route::post('set-pending', [PaymentController::class, 'setPending']);
     # NOTE: For demo purpose only
     Route::post('demo-add-token', [PaymentController::class, 'addToken']);
@@ -157,7 +158,7 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
  */
 Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page'])->group(function() {
     Route::get('', [ProjectController::class, 'index']);
-    Route::post('', [ProjectController::class, 'store']);
+    Route::post('', [ProjectController::class, 'store'])->middleware('ensure.demo.eligibility');
     Route::post('{project}', [ProjectController::class, 'update']);
     Route::get('{project}', [ProjectController::class, 'show']);
     Route::get('{project}/delete', [ProjectController::class, 'destroy']);
@@ -171,6 +172,7 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
     Route::prefix('{project}')->middleware(['auth:sanctum', 'project.ensure-project-belonging'])->group(function() {
 
         Route::get('export', [ProjectController::class, 'export'])->middleware('project.ensure-project-eligible-to-export');
+        Route::post('renew', [ProjectController::class, 'renew']);
 
         Route::prefix('rab')->group(function() {
             Route::get('', [RabController::class, 'index']);

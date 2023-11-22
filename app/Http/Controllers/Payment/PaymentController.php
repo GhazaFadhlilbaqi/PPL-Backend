@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Midtrans\Config;
 use App\Http\Controllers\Midtrans\Snap;
 use App\Models\Order;
+use App\Models\ProjectTemporary;
 use App\Models\Subscription;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -159,6 +161,10 @@ class PaymentController extends Controller
 
         DB::beginTransaction();
 
+        if ($request->type != 'create' && $request->type != 'renew') {
+            throw new Exception('Invalid type');
+        }
+
         $subscription = Subscription::find($request->subscription_id);
 
         MidtransConfig::$serverKey = env('MIDTRANS_SERVER_KEY');
@@ -171,14 +177,30 @@ class PaymentController extends Controller
         $order = Order::create([
             'order_id' => $this->generateOrderId(),
             'user_id' => $user->id,
-            'project_id' => null,
+            'project_id' => $request->type == 'create' ? null : Hashids::decode($request->project_hashid)[0],
+            'subscription_id' => $subscription->id,
             'status' => 'waiting_for_payment',
             'gross_amount' => $subscription->price,
+            'type' => $request->type == 'create' ? 'create' : 'renew'
         ]);
 
-        // return response()->json([
-        //     's' => $order-
-        // ]);
+        // Check if the action is creating project or renewing project
+        if ($request->type == 'create') {
+            // This temporary project will become the "temporary" storage for project creation. It also
+            // act as order identifier towards project data.
+            ProjectTemporary::create([
+                'user_id' => Auth::user()->id,
+                'order_id' => $order->id,
+                'name' => $request->name,
+                'activity' => $request->activity,
+                'job' => $request->job,
+                'address' => $request->address,
+                'province_id' => Hashids::decode($request->province_id)[0],
+                'fiscal_year' => $request->fiscal_year,
+                'profit_margin' => $request->margin_profit,
+                'ppn' => $request->ppn,
+            ]);
+        }
 
         $params = [
             'transaction_details' => [
@@ -214,6 +236,9 @@ class PaymentController extends Controller
             ], 500);
         }
 
+        $order->midtrans_snap_token = $snapToken;
+        $order->save();
+
         DB::commit();
 
         return response()->json([
@@ -224,11 +249,28 @@ class PaymentController extends Controller
         ]);
     }
 
+    public function setCanceled(Request $request)
+    {
+        $order = Order::where('midtrans_snap_token', $request->snapToken)->first();
+
+        if ($order->status == 'waiting_for_payment') {
+            $order->status = 'canceled';
+            $order->save();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Order canceled',
+        ]);
+    }
+
     public function setPending(Request $request)
     {
 
         $order = Order::where('midtrans_snap_token', $request->snapToken)->first();
 
+        // Make sure the current order is still on waiting_for_payment status. Otherwise, it could be
+        // reversed status (e.g from completed to pending)
         if ($order->status == 'waiting_for_payment') {
             $order->status = 'pending';
             $order->save();
