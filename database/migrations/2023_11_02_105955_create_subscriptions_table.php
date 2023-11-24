@@ -17,10 +17,11 @@ class CreateSubscriptionsTable extends Migration
             $table->string('id')->primary();
             $table->string('name');
             $table->double('price');
-            $table->enum('subscription_type', ['DAILY', 'MONTHLY', 'ANNUALLY']);
+            $table->enum('subscription_type', ['DAILY', 'MONTHLY', 'ANNUALLY', 'QUARTERLY']);
             $table->text('description')->nullable();
             $table->boolean('is_show')->default(1);
             $table->integer('order')->nullable();
+            $table->integer('promotion_price')->nullable();
             $table->timestamps();
         });
     }

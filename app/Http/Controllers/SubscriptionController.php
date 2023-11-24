@@ -10,7 +10,7 @@ class SubscriptionController extends Controller
     public function index()
     {
 
-        $subscriptions = Subscription::orderBy('order', 'ASC')->get(['id', 'name', 'price', 'subscription_type', 'description', 'is_show']);
+        $subscriptions = Subscription::orderBy('order', 'ASC')->get(['id', 'name', 'price', 'subscription_type', 'description', 'is_show', 'promotion_price']);
 
         return response()->json([
             'status' => 'success',
