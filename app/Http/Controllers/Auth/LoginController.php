@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailVerificationMail;
+use Illuminate\Support\Facades\Crypt;
 
 class LoginController extends Controller
 {
@@ -87,11 +88,12 @@ class LoginController extends Controller
 
     protected function sendVerificationMail(User $user)
     {
-        $token = Str::random(32);
+        // FIXME: 🤯 Make verification token fix (no changes after re-sending the verification mail)
+        // $token = Crypt::encryptString($user->email);
 
-        $user->verification_token = $token;
-        $user->save();
+        // $user->verification_token = $token;
+        // $user->save();
 
-        Mail::to($user->email)->send(new EmailVerificationMail($user, $token));
+        Mail::to($user->email)->send(new EmailVerificationMail($user, $user->verification_token));
     }
 }

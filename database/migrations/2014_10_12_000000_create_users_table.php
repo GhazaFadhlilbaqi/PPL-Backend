@@ -23,7 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('address', 255)->nullable();
             $table->string('job', 64);
             $table->string('photo', 32)->nullable()->default(null);
-            $table->string('verification_token', 32)->nullable()->unique();
+            $table->text('verification_token')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->integer('token_amount')->default(0);
             $table->rememberToken();

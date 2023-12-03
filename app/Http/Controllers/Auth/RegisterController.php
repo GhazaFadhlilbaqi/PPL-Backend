@@ -9,6 +9,7 @@ use App\Mail\EmailVerificationMail;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -44,7 +45,7 @@ class RegisterController extends Controller
 
     public function confirmEmail($token)
     {
-        $user = User::where('verification_token', $token)->first();
+        $user = User::where('email', Crypt::decryptString($token))->first();
 
         Log::info('[INFO] Confirming email at ' . Carbon::now()->format('Y'));
         Log::info('[INFO] Email token : ' . $token);
@@ -64,7 +65,7 @@ class RegisterController extends Controller
 
     protected function sendVerificationMail(User $user)
     {
-        $token = Str::random(32);
+        $token = Crypt::encryptString($user->email);
 
         $user->verification_token = $token;
         $user->save();

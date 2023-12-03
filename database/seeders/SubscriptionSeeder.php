@@ -20,7 +20,15 @@ class SubscriptionSeeder extends Seeder
                 'id' => 'student',
                 'name' => 'Student',
                 'price' => 50000,
-                'description' => '<li>Kustomisasi RAB</li><li>Akses full ke AHS permen PUPR 2016/2023 </li><li>Buat baru AHS / Custom AHS</li><li>Buat baru AHS / Custom AHS</li><li>Akses full ke AHP permen PUPR 2016/2023</li><li>Buat baru AHP/ Custom AHS</li><li>Kustomisasi Harga Satuan</li><li>Export RAB </li>',
+                'description' => '
+                    <ul class="pl-0">
+                    <li>Kustomisasi RAB</li>
+                    <li>Buat baru AHS / Custom AHS</li>
+                    <li>Akses full ke AHS permen PUPR 2016/2023</li>
+                    <li>Akses full ke AHP permen PUPR 2016/2023 </li>
+                    <li>Kustomisasi Harga Satuan</li>
+                    <li>Export RAB (Excel) </li>
+                    </ul>',
                 'subscription_type' => 'MONTHLY',
                 'is_show' => true,
                 'order' => 1,
@@ -31,7 +39,12 @@ class SubscriptionSeeder extends Seeder
                 'id' => 'starter',
                 'name' => 'Starter',
                 'price' => 100000,
-                'description' => '<li>Kustomisasi RAB</li><li>Akses full ke AHS permen PUPR 2016/2023 </li><li>Buat baru AHS / Custom AHS</li><li>Buat baru AHS / Custom AHS</li><li>Akses full ke AHP permen PUPR 2016/2023</li><li>Buat baru AHP/ Custom AHS</li><li>Kustomisasi Harga Satuan</li><li>Export RAB </li>',
+                'description' => '<ul class="pl-0"><li>Kustomisasi RAB</li>
+                <li>Buat baru AHS / Custom AHS</li>
+                <li>Akses full ke AHS permen PUPR 2016/2023</li>
+                <li>Akses full ke AHP permen PUPR 2016/2023 </li>
+                <li>Kustomisasi Harga Satuan</li>
+                <li>Export RAB (Excel) </li></ul>',
                 'subscription_type' => 'QUARTERLY',
                 'is_show' => true,
                 'order' => 2,
