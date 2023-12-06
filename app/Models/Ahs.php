@@ -11,7 +11,7 @@ class Ahs extends Model
 
     public $incrementing = false;
 
-    protected $fillable = ['id', 'name'];
+    protected $fillable = ['id', 'name', 'groups'];
     protected $with = ['ahsItem'];
 
     public function ahsItem()

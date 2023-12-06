@@ -16,6 +16,7 @@ class CreateAhsTable extends Migration
         Schema::create('ahs', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('name', 255);
+            $table->string('groups')->nullable('');
             $table->timestamps();
         });
     }

@@ -19,6 +19,10 @@ class AhsController extends CountableItemController
         $isPaginateRequest = $request->has('page') && (int) $request->page > 0;
         $paginationAttribute = [];
 
+        if ($request->selected_ahs_group && $request->selected_ahs_group != '' && $request->selected_ahs_group != 'all') {
+            $ahs->where('groups', $request->selected_ahs_group);
+        }
+
         # Paginate AHS
         if ($isPaginateRequest) {
             $paginationResult = $this->paginateAhs($ahs, $request->page, $request->per_page);
@@ -75,6 +79,7 @@ class AhsController extends CountableItemController
             return [
                 'name' => $ahs->name,
                 'code' => $ahs->code,
+                'groups' => $ahs->groups,
                 'id' => $ahs->id,
             ];
         });
@@ -93,7 +98,7 @@ class AhsController extends CountableItemController
 
     public function store(AhsRequest $request)
     {
-        Ahs::create($request->only(['id', 'name']));
+        Ahs::create($request->only(['id', 'name', 'groups']));
 
         return response()->json([
             'status' => 'success',
