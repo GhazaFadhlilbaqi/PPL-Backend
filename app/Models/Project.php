@@ -12,7 +12,7 @@ class Project extends Model
 {
     use HasFactory, HasHashid, HashidRouting;
 
-    protected $appends = ['hashid', 'hashed_province_id'];
+    protected $appends = ['hashid', 'hashed_province_id', 'activeOrder'];
     protected $hidden = ['id', 'province_id'];
 
     protected $fillable = [
@@ -28,6 +28,7 @@ class Project extends Model
         'last_opened_at',
         'ppn',
         'subscription_id',
+        'activeOrder'
     ];
 
     public function user()
@@ -78,5 +79,10 @@ class Project extends Model
     public function getHashedProvinceIdAttribute()
     {
         return Hashids::encode($this->province_id);
+    }
+
+    public function getActiveOrderAttribute()
+    {
+        return $this->order->where('is_active', true)->first() ?? null;
     }
 }

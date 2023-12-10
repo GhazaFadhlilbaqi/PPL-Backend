@@ -31,7 +31,7 @@ class Order extends Model
 
     public function getIsExpiredAttribute()
     {
-        return Carbon::parse($this->expired_at)->lt(Carbon::now());
+        return Carbon::parse($this->expired_at)->startOfDay()->lt(Carbon::now()->startOfDay());
     }
 
     public function projectTemporary()

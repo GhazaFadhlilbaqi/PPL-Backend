@@ -169,7 +169,7 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
      * PROJECT BASED ROUTE  |
      * ----------------------
      */
-    Route::prefix('{project}')->middleware(['auth:sanctum', 'project.ensure-project-belonging'])->group(function() {
+    Route::prefix('{project}')->middleware(['auth:sanctum', 'project.ensure-project-belonging', 'project.subscription.limitation.guard'])->group(function() {
 
         Route::get('export', [ProjectController::class, 'export'])->middleware('project.ensure-project-eligible-to-export');
         Route::post('renew', [ProjectController::class, 'renew']);
