@@ -5,11 +5,9 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ReverificationMail;
-use App\Models\Rab;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class BlastReverificationMail extends Command
 {
@@ -25,7 +23,7 @@ class BlastReverificationMail extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Blast email for user re-verification';
 
     /**
      * Create a new command instance.

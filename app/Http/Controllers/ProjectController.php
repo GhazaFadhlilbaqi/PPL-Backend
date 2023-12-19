@@ -179,27 +179,27 @@ class ProjectController extends Controller
     {
         $projectId = $project->hashidToId($project->hashid);
 
+        return (new ProjectRabExport($projectId))->download('exports.xlsx');
         // In trial mode, create order when user export RAB
-        if (env('APP_USER_TRIAL_MODE')) {
-            $order = Order::create([
-                'order_id' => generateRandomOrderId(),
-                'user_id' => Auth::user()->id,
-                'project_id' => $projectId,
-                'gross_amount' => 0,
-                'status' => 'completed'
-            ]);
-        }
+        // if (env('APP_USER_TRIAL_MODE')) {
+        //     $order = Order::create([
+        //         'order_id' => generateRandomOrderId(),
+        //         'user_id' => Auth::user()->id,
+        //         'project_id' => $projectId,
+        //         'gross_amount' => 0,
+        //         'status' => 'completed'
+        //     ]);
+        // }
 
         // FIXME: SECURITY HOLE ! if somemone unauthorized access this route with knowing project id, then the user might lost his order to export
-        $order = Order::where('project_id', $projectId)->where('status', 'completed')->where('used_at', null)->first();
+        // $order = Order::where('project_id', $projectId)->where('status', 'completed')->where('used_at', null)->first();
 
-        if ($order) {
-            $order->used_at = Carbon::now();
-            $order->save();
-            return (new ProjectRabExport($projectId))->download('exports.xlsx');
-        } else {
-            return abort(403);
-        }
+        // if ($order) {
+        //     $order->used_at = Carbon::now();
+        //     $order->save();
+        // } else {
+        //     return abort(403);
+        // }
 
     }
 
