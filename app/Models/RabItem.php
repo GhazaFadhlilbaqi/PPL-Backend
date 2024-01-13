@@ -58,4 +58,9 @@ class RabItem extends Model
     {
         return Hashids::encode($this->unit_id);
     }
+
+    public function implementationSchedule()
+    {
+        return $this->hasMany(ImplementationSchedule::class);
+    }
 }

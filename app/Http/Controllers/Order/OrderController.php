@@ -107,7 +107,7 @@ class OrderController extends Controller
 
     private function generateSignature($order)
     {
-        $input = $order->order_id . '200' . ($order->gross_amount .'.00') . env('MIDTRANS_SERVER_KEY');
+        $input = $order->order_id . '200' . ($order->gross_amount .'.00') . (env('MIDTRANS_MODE') == 'sandbox' ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT') : env('MIDTRANS_SERVER_KEY_PRODUCTION'));
         return openssl_digest($input, 'sha512');
     }
 

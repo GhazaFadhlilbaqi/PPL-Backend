@@ -28,7 +28,8 @@ class Project extends Model
         'last_opened_at',
         'ppn',
         'subscription_id',
-        'activeOrder'
+        'activeOrder',
+        'implementation_duration'
     ];
 
     public function user()
@@ -84,5 +85,10 @@ class Project extends Model
     public function getActiveOrderAttribute()
     {
         return $this->order->where('is_active', true)->first() ?? null;
+    }
+
+    public function implementationSchedule()
+    {
+        return $this->hasMany(ImplementationSchedule::class);
     }
 }

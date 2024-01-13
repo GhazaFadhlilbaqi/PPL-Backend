@@ -10,6 +10,7 @@ use App\Http\Controllers\CustomAhsItemController;
 use App\Http\Controllers\CustomItemPriceController;
 use App\Http\Controllers\CustomItemPriceGroupController;
 use App\Http\Controllers\DebugController;
+use App\Http\Controllers\ImplementationScheduleController;
 use App\Http\Controllers\Master\AhpController;
 use App\Http\Controllers\Master\AhsController;
 use App\Http\Controllers\Master\AhsItemController;
@@ -193,6 +194,15 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
                 Route::post('{rabItemHeader}', [RabItemHeaderController::class, 'update']);
                 Route::get('{rabItemHeader}/delete', [RabItemHeaderController::class, 'destroy']);
             });
+        });
+
+        Route::prefix('implementation-schedules')->group(function() {
+            Route::get('implementation-schedule-duration', [ImplementationScheduleController::class, 'getProjectDuration']);
+            Route::get('', [ImplementationScheduleController::class, 'index']);
+            Route::post('', [ImplementationScheduleController::class, 'update']);
+            Route::get('{implementationSchedule}/delete', [ImplementationScheduleController::class, 'destroy']);
+            Route::post('update-project-duration', [ImplementationScheduleController::class, 'updateProjectDuration']);
+            // Route::post('', [ImplementationScheduleController::class, '']);
         });
 
         Route::prefix('custom-item-price-group')->group(function() {

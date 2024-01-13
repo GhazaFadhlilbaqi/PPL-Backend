@@ -34,7 +34,7 @@ class RabController extends CountableItemController
                 ->with(['rabItemHeader.rabItem'])
                 ->with('rabItem', function($q) {
                     $q->where('rab_item_header_id', NULL);
-                    $q->with('customAhs');
+                    $q->with(['customAhs', 'implementationSchedule']);
                 })
                 ->get();
         }

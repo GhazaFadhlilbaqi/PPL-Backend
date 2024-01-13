@@ -26,7 +26,7 @@ class PaymentController extends Controller
 
     public function fetchSnapToken(Request $request)
     {
-        Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        Config::$serverKey = env('MIDTRANS_MODE') == 'sandbox' ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT') : env('MIDTRANS_SERVER_KEY_PRODUCTION');
 
         if (!isset(Config::$serverKey)) return response()->json([
             'status' => 'fail',
@@ -167,7 +167,7 @@ class PaymentController extends Controller
 
         $subscription = Subscription::find($request->subscription_id);
 
-        MidtransConfig::$serverKey = env('MIDTRANS_SERVER_KEY');
+        MidtransConfig::$serverKey = env('MIDTRANS_MODE') == 'sandbox' ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT') : env('MIDTRANS_SERVER_KEY_PRODUCTION');
         MidtransConfig::$isProduction = env('MIDTRANS_MODE') == 'production';
         MidtransConfig::$is3ds = true;
 
@@ -319,7 +319,7 @@ class PaymentController extends Controller
         $midtransApiUrl = env('MIDTRANS_MODE') == 'production' ? 'https://api.midtrans.com' : 'https://api.sandbox.midtrans.com';
 
         $statusRequest = Http::withHeaders([
-            'Authorization' => 'Basic ' . base64_encode(env('MIDTRANS_SERVER_KEY') . ':'),
+            'Authorization' => 'Basic ' . base64_encode((env('MIDTRANS_MODE') ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT') : env('MIDTRANS_SERVER_KEY_PRODUCTION')) . ':'),
         ])->get($midtransApiUrl . '/v2' . '/' . $orderId . '/status');
 
         return $statusRequest->json();
