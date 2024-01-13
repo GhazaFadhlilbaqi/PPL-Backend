@@ -20,6 +20,8 @@ class RabItem extends Model
         'id', 'rab_id', 'rab_item_header_id', 'unit_id'
     ];
 
+    protected $with = ['implementationSchedule'];
+
     protected $appends = [
         'hashid', 'hashed_rab_item_header_id', 'hashed_rab_id', 'hashed_unit_id'
     ];
