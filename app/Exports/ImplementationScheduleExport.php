@@ -56,7 +56,7 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
 
         $dataSeriesValueStartAt = $this->finalPointerLocation + 3;
 
-        $dataSeriesLabels = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, '\'Jadwal Pelaksanaan\'!$E$17', null, 1)];
+        $dataSeriesLabels = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, '\'Jadwal Pelaksanaan\'!$E$' . $dataSeriesValueStartAt, null, 1)];
         $xAxisTickValues = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, '\'Jadwal Pelaksanaan\'!$G$12:$' . $this->getNameFromNumber(6 + $this->project->implementation_duration) . '$12', null, $this->project->implementation_duration ?? 0)];
         $dataSeriesValues = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, '\'Jadwal Pelaksanaan\'!$G$' . $dataSeriesValueStartAt . ':$' . $this->getNameFromNumber(6 + $this->project->implementation_duration) .'$' . $dataSeriesValueStartAt, null, 4)];
 
@@ -64,7 +64,7 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
             DataSeries::TYPE_LINECHART, // plotType
             null, // plotGrouping, was DataSeries::GROUPING_STACKED, not a usual choice for line chart
             range(0, count($dataSeriesValues) - 1), // plotOrder
-            [], // plotLabel
+            $dataSeriesLabels, // plotLabel
             $xAxisTickValues, // plotCategory
             $dataSeriesValues        // plotValues
         );
@@ -78,6 +78,7 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
         $chart = new Chart(
             'Kurva S Chart',
             $title,
+            // $legend,
             null,
             $plotArea,
             true,
