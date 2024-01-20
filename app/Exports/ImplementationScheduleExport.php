@@ -8,17 +8,27 @@ use App\Models\Project;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\WithCharts;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Chart\Chart;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
+use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
+use PhpOffice\PhpSpreadsheet\Chart\Legend as ChartLegend;
+use PhpOffice\PhpSpreadsheet\Chart\Title;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
-class ImplementationScheduleExport extends CountableItemController implements FromView, WithTitle, WithColumnWidths, WithStyles
+class ImplementationScheduleExport extends CountableItemController implements FromView, WithTitle, WithColumnWidths, WithStyles, WithCharts
 {
     
     private $projectId, $project, $company = null;
     private $rabStyleArr = [];
     private $globalStartingIndex = 13, $finalPointerLocation = 0;
+    private $rabs = null;
 
     const RAB_HEADER = 'rabHeader';
     const RAB_ITEM_HEADER = 'rabItemHeader';
@@ -29,15 +39,57 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
         $this->projectId = $projectId;
         $this->project = Project::find($projectId);
         $this->company = Auth::user()->company;
+        $this->rabs = $this->generateRab();
     }
 
     public function view(): View
     {
         return view('exports.rab.implementation-schedule', [
-            'rabs' => $this->generateRab(),
+            'rabs' => $this->rabs,
             'project' => $this->project,
             'company' => $this->company
         ]);
+    }
+
+    public function charts()
+    {
+
+        $dataSeriesValueStartAt = $this->finalPointerLocation + 3;
+
+        $dataSeriesLabels = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, '\'Jadwal Pelaksanaan\'!$E$17', null, 1)];
+        $xAxisTickValues = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, '\'Jadwal Pelaksanaan\'!$G$12:$' . $this->getNameFromNumber(6 + $this->project->implementation_duration) . '$12', null, $this->project->implementation_duration ?? 0)];
+        $dataSeriesValues = [new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, '\'Jadwal Pelaksanaan\'!$G$' . $dataSeriesValueStartAt . ':$' . $this->getNameFromNumber(6 + $this->project->implementation_duration) .'$' . $dataSeriesValueStartAt, null, 4)];
+
+        $series = new DataSeries(
+            DataSeries::TYPE_LINECHART, // plotType
+            null, // plotGrouping, was DataSeries::GROUPING_STACKED, not a usual choice for line chart
+            range(0, count($dataSeriesValues) - 1), // plotOrder
+            [], // plotLabel
+            $xAxisTickValues, // plotCategory
+            $dataSeriesValues        // plotValues
+        );
+
+        $plotArea = new PlotArea(null, [$series]);
+        $legend = new ChartLegend(ChartLegend::POSITION_TOPRIGHT, null, false);
+
+        $title = new Title('Kurva S');
+        $yAxisLabel = new Title('Bobot Kumulatif');
+
+        $chart = new Chart(
+            'Kurva S Chart',
+            $title,
+            null,
+            $plotArea,
+            true,
+            DataSeries::EMPTY_AS_GAP, // displayBlanksAs
+            null, // xAxisLabel
+            null,  // yAxisLabel
+        );
+
+        $chart->setTopLeftPosition($this->getNameFromNumber(8 + ($this->project->implementation_duration ?? 0)) . '12');
+        $chart->setBottomRightPosition($this->getNameFromNumber(8 + ($this->project->implementation_duration ?? 0) + ($this->project->implementation_duration ?? 0)) . '25');
+
+        return $chart;
     }
 
     private function generateRab()
@@ -228,7 +280,7 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
         $letter = chr(65 + $numeric);
         $num2 = intval(($num - 1) / 26);
         if ($num2 > 0) {
-            return getNameFromNumber($num2) . $letter;
+            return $this->getNameFromNumber($num2) . $letter;
         } else {
             return $letter;
         }
