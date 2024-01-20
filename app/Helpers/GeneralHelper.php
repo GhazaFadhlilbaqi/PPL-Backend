@@ -10,13 +10,15 @@ use App\Models\RabItem;
 if (!function_exists('determineCustomAhsItemName')) {
     function determineCustomAhsItemName(CustomAhsItem $customAhsItem)
     {
+        if (!$customAhsItem) return 'Item AHS Dihapus';
         switch ($customAhsItem->custom_ahs_itemable_type) {
             case CustomAhp::class :
             case CustomAhs::class :
                 return $customAhsItem->name;
             break;
             case CustomItemPrice::class :
-                return $customAhsItem->customAhsItemable->name;
+                // return dd($customAhsItem);
+                return $customAhsItem->customAhsItemable ? 'Item AHS Dihapus' : $customAhsItem->customAhsItemable->name;
             break;
         }
     }

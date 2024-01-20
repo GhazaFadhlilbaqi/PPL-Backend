@@ -186,6 +186,14 @@
       @endforeach
       <tr>
         <td></td>
+        <td>TOTAL HARGA PENAWARAN SEBELUM PPN</td>
+        <td></td>
+        <td></td>
+        <td>{{ $rabSum }}</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>

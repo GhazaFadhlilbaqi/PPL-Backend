@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ImplementationSchedule;
 use App\Models\Project;
+use App\Models\RabItem;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -81,13 +82,12 @@ class ImplementationScheduleController extends Controller
         }
     }
 
-    public function destroy(Project $project, ImplementationSchedule $implementationSchedule)
+    public function destroy(Project $project, RabItem $rabItem)
     {
         try {
-            $implementationSchedule->delete();
+            ImplementationSchedule::where('rab_item_id', $rabItem->hashidToId($rabItem->hashid))->where('project_id', $project->hashidToId($project->hashid))->delete();
             return response()->json([
-                'status' => 'success',
-                'message' => 'Berhasil menghapus jadwal pelaksanaan'
+                'message' => 'Berhasil menghapus jadwal pelaksanaan',
             ]);
         } catch (Exception $e) {
             return response()->json([
@@ -96,6 +96,22 @@ class ImplementationScheduleController extends Controller
             ]);
         }
     }
+
+    // public function destroy(Project $project, ImplementationSchedule $implementationSchedule)
+    // {
+    //     try {
+    //         $implementationSchedule->delete();
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'message' => 'Berhasil menghapus jadwal pelaksanaan'
+    //         ]);
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'message' => $e->getMessage(),
+    //         ]);
+    //     }
+    // }
 
     public function getProjectDuration(Project $project)
     {

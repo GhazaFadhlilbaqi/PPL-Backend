@@ -163,9 +163,9 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
     public function styles(Worksheet $sheet)
     {
 
-        foreach ($this->rabStyleArr as $styleArr) {
+        $endColumn = $this->getNameFromNumber($this->project->implementation_duration + 6);
 
-            $endColumn = $this->getNameFromNumber($this->project->implementation_duration + 6);
+        foreach ($this->rabStyleArr as $styleArr) {
 
             if ($styleArr['type'] == self::RAB_HEADER || $styleArr['type'] == self::RAB_ITEM_HEADER) {
                 // Styling for rab item header or rab header
@@ -202,14 +202,14 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
         // Pekerjaan Detail
         $sheet->getStyle('B10')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
-        $sheet->getStyle('A' . ($this->globalStartingIndex - 1) . ':' . $endColumn . $this->finalPointerLocation)->applyFromArray(['borders' => [
+        $sheet->getStyle('A' . ($this->globalStartingIndex - 1) . ':' . $endColumn . $this->finalPointerLocation + 1)->applyFromArray(['borders' => [
             'allBorders' => [
                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                 'color' => ['rgb' => '000'],
             ],
         ]]);
 
-        $sheet->getStyle('E' . $this->finalPointerLocation + 1 . ':' . $endColumn . $this->finalPointerLocation + 2)->applyFromArray(['borders' => [
+        $sheet->getStyle('E' . $this->finalPointerLocation + 1 . ':' . $endColumn . $this->finalPointerLocation + 3)->applyFromArray(['borders' => [
             'allBorders' => [
                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                 'color' => ['rgb' => '000'],

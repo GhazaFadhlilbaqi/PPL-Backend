@@ -202,6 +202,7 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
             Route::post('', [ImplementationScheduleController::class, 'update']);
             Route::get('{implementationSchedule}/delete', [ImplementationScheduleController::class, 'destroy']);
             Route::post('update-project-duration', [ImplementationScheduleController::class, 'updateProjectDuration']);
+            Route::delete('{rabItem}', [ImplementationScheduleController::class, 'destroy']);
             // Route::post('', [ImplementationScheduleController::class, '']);
         });
 

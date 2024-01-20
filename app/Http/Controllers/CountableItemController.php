@@ -160,7 +160,7 @@ class CountableItemController extends Controller
         if ($customAhsItem->custom_ahs_itemable_type === CustomItemPrice::class) {
 
             $fixedPrice = $customAhsItem->customAhsItemable->price ?? 0;
-            $customAhsItem->customAhsItemable->subtotal = $fixedPrice;
+            // $customAhsItem->customAhsItemable->subtotal = $fixedPrice;
 
             return $fixedPrice * $customAhsItem->coefficient;
 
