@@ -52,6 +52,26 @@ class SubscriptionSeeder extends Seeder
                 'created_at' => Carbon::now(),
             ],
             [
+                'id' => 'professional',
+                'name' => 'Professional',
+                'price' => 500000,
+                'description' => '<ul class="pl-0"><li>Kustomisasi RAB</li>
+                    <li>Buat baru AHS / Custom AHS</li>
+                    <li>Akses full ke AHS permen PUPR 2016/2023</li>
+                    <li>Akses full ke AHP permen PUPR 2016/2023 </li>
+                    <li>Kustomisasi Harga Satuan</li>
+                    <li>Export RAB (Excel) </li>
+                    <li>Kustomisasi Jadwal Pelaksanaan</li>
+                    <li>Export Kurva S</li>
+                </ul>
+                ',
+                'subscription_type' => 'MONTHLY',
+                'is_show' => true,
+                'order' => 3,
+                'promotion_price' => 1000000,
+                'created_at' => Carbon::now(),
+            ],
+            [
                 'id' => 'demo',
                 'name' => 'Demo',
                 'price' => 0,

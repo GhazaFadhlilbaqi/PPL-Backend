@@ -22,7 +22,7 @@ class ProjectRabExport implements WithMultipleSheets
 
         $project = Project::find($this->projectId);
 
-        if ($project->implementation_duration) {
+        if ($project->implementation_duration && $project->subscription_id == 'professional') {
             return [
                 new RabSummaryExportSheet($this->projectId),
                 new ImplementationScheduleExport($this->projectId),
