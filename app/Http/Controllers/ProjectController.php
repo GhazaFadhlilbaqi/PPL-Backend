@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\ProjectRabExport;
 use App\Http\Requests\ProjectRequest;
+use App\Http\Requests\ProjectUpdateRequest;
 use App\Models\Order;
 use App\Models\Project;
 use App\Models\Province;
@@ -129,7 +130,7 @@ class ProjectController extends Controller
         }
     }
 
-    public function update(Project $project, ProjectRequest $request)
+    public function update(Project $project, ProjectUpdateRequest $request)
     {
 
         if ($project->user_id != Auth::user()->id) return $this->giveUnbelongedAccessResponse();
