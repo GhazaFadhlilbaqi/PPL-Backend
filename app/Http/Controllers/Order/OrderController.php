@@ -175,7 +175,7 @@ class OrderController extends Controller
 
         $order->project_id = $project->id;
         $order->status = 'completed';
-        $order->expired_at = $order->subscription->subscription_type == 'MONTHLY' ? Carbon::now()->subMonth(-1) : ($order->subscription->subscription_type == 'ANNUALLY' ? Carbon::now()->subYear(-1) : ($order->subscription->subscription_type == 'QUARTERLY' ? Carbon::now()->subMonth(-3) : Carbon::now()->subDay(-1)));
+        $order->expired_at = $order->subscription->subscription_type == 'MONTHLY' ? Carbon::now()->subMonth(-1) : ($order->subscription->subscription_type == 'ANNUALLY' ? Carbon::now()->subYear(-1) : ($order->subscription->subscription_type == 'QUARTERLY' ? Carbon::now()->subMonth(-3) : ($order->subscription->subscription_type == 'THREEDAYS' ? Carbon::now()->subDay(-3) : Carbon::now()->subDay(-1))));
         $order->is_active = true;
 
         $order->save();

@@ -18,7 +18,7 @@ class CreateAhsItemsTable extends Migration
             $table->string('ahs_id');
             $table->string('name')->nullable();
             $table->unsignedBigInteger('unit_id')->nullable();
-            $table->float('coefficient')->default(0.0);
+            $table->double('coefficient')->default(0.0);
             $table->enum('section', ['labor', 'ingredients', 'tools', 'others']);
             $table->string('ahs_itemable_id');
             $table->string('ahs_itemable_type');

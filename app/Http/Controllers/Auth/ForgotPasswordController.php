@@ -8,6 +8,7 @@ use App\Http\Requests\VerifyTokenRequest;
 use App\Mail\ForgotPasswordMail;
 use App\Models\PasswordReset;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -66,6 +67,11 @@ class ForgotPasswordController extends Controller
         $user = User::where('email', $passwordReset->email)->first();
 
         $user->password = Hash::make($request->password);
+
+        if (!$user->email_verified_at) {
+            $user->email_verified_at = Carbon::now();
+        }
+
         $user->save();
 
         $passwordReset->delete();

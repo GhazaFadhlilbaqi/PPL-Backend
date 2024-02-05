@@ -34,7 +34,7 @@ class EmailVerificationMail extends Mailable
     {
         return $this->view('mails.auth.email-verification', [
             'token' => $this->token,
-            'user' => $this->user->verification_token,
+            'user' => $this->user,
         ]);
     }
 }
