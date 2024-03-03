@@ -122,7 +122,8 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ determineCustomAhsItemName($toolsAhs) }}</td>
                 <td>{{ $toolsAhs->customAhsItemable->code }}</td>
-                <td>{{ $toolsAhs->customAhsItemable->unit->name }}</td>
+                <td>{{ $toolsAhs->custom_ahs_itemable_type == 'App\\Models\\CustomAhp' ? $toolsAhs->unit->name : ($toolsAhs->customAhsItemable->unit ? $toolsAhs->customAhsItemable->unit->name : 'Tidak ada satuan') }}</td>
+                <td>{{ $toolsAhs->customAhsItemable->unit ? $toolsAhs->customAhsItemable->unit->name : 'Tidak ada satuan' }}</td>
                 <td>{{ $toolsAhs->coefficient }}</td>
                 {{-- <td>{{ $toolsAhs->customAhsItemable->subtotal }}</td> --}}
                 <td>{{ $toolsAhs->customAhsItemable->price }}</td>

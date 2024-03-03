@@ -30,6 +30,7 @@ class ProjectRabExport implements WithMultipleSheets
                 new AhsRekapExportSheet($this->projectId),
                 new ItemPriceExportSheet($this->projectId),
                 new AhpExportSheet($this->projectId),
+                new MaterialEstimatorExportSheet($this->projectId),
             ];
         } else {
             return [
