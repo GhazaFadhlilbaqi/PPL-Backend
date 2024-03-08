@@ -4,6 +4,10 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Models\PasswordReset;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use App\Models\Order;
+use App\Models\Project;
+use Carbon\Carbon;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,3 +37,40 @@ Route::get('/forgot-password', function() {
 });
 
 Route::get('/auth/email-verification/confirm/{token}', [RegisterController::class, 'confirmEmail'])->name('register.confirm_email');
+
+Route::get('/clear-order', function() {
+    $projects = Project::all();
+
+    foreach ($projects as $project) {
+        if ($project->order()->count() > 1) {
+            $project->order[1]->delete();
+        }
+    }
+
+    return dd('OK');
+
+});
+
+Route::get('/populate-demo-projects', function() {
+
+    DB::beginTransaction();
+
+    $projects = Project::all();
+    $datas = [];
+
+    foreach ($projects as $project) {
+            $datas[] = [
+                    'order_id' => strtoupper(uniqid()),
+                    'user_id' => $project->user_id,
+                    'type' => 'demo',
+                    'project_id' => $project->id,
+                    'is_active' => true,
+                    'expired_at' => Carbon::now()->subMonth(-1),
+                    'subscription_id' => 'demo',
+            ];
+    }
+
+    Order::insert($datas);
+
+    DB::commit();
+});

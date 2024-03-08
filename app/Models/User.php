@@ -31,6 +31,7 @@ class User extends Authenticatable
         'photo',
         'verification_token',
         'email_verified_at',
+        'demo_quota'
     ];
 
     /**

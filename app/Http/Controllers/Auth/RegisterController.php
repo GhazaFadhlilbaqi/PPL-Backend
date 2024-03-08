@@ -21,10 +21,11 @@ class RegisterController extends Controller
     {
         try {
             $request->merge([
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
+                'demo_quota' => 1
             ]);
 
-            $user = User::create($request->only(['first_name', 'last_name', 'email', 'password', 'job', 'phone']));
+            $user = User::create($request->only(['first_name', 'last_name', 'email', 'password', 'job', 'phone', 'demo_quota']));
             $user->assignRole('owner');
 
             // Send verification mail

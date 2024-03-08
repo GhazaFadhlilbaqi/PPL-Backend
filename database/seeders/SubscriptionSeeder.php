@@ -56,7 +56,7 @@ class SubscriptionSeeder extends Seeder
                 'name' => 'Demo',
                 'price' => 0,
                 'description' => '',
-                'subscription_type' => 'DAILY',
+                'subscription_type' => 'THREEWEEKLY',
                 'is_show' => false,
                 'order' => null,
                 'promotion_price' => null,
