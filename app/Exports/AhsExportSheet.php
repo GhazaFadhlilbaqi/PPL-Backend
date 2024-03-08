@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
@@ -31,6 +32,8 @@ class AhsExportSheet extends CountableItemController implements FromView, WithTi
 
         $arrangedCustomAhs = $this->getArrangedCustomAhs();
         $this->customAhsCount = $arrangedCustomAhs['customAhsCount'];
+
+        Log::info($arrangedCustomAhs['customAhs']);
 
         return view('exports.rab.ahs', [
             'ahs' => $arrangedCustomAhs['customAhs'],

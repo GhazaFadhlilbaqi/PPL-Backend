@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Project;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
@@ -19,14 +20,26 @@ class ProjectRabExport implements WithMultipleSheets
 
     public function sheets(): array {
 
-        $sheets = [
-            new RabSummaryExportSheet($this->projectId),
-            new AhsExportSheet($this->projectId),
-            new AhsRekapExportSheet($this->projectId),
-            new ItemPriceExportSheet($this->projectId),
-            new AhpExportSheet($this->projectId),
-        ];
+        $project = Project::find($this->projectId);
 
-        return $sheets;
+        if ($project->implementation_duration && $project->subscription_id == 'professional') {
+            return [
+                new RabSummaryExportSheet($this->projectId),
+                new ImplementationScheduleExport($this->projectId),
+                new AhsExportSheet($this->projectId),
+                new AhsRekapExportSheet($this->projectId),
+                new ItemPriceExportSheet($this->projectId),
+                new AhpExportSheet($this->projectId),
+                new MaterialEstimatorExportSheet($this->projectId),
+            ];
+        } else {
+            return [
+                new RabSummaryExportSheet($this->projectId),
+                new AhsExportSheet($this->projectId),
+                new AhsRekapExportSheet($this->projectId),
+                new ItemPriceExportSheet($this->projectId),
+                new AhpExportSheet($this->projectId),
+            ];
+        }
     }
 }

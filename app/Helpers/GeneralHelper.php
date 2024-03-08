@@ -6,17 +6,22 @@ use App\Models\CustomAhsItem;
 use App\Models\CustomItemPrice;
 use Riskihajar\Terbilang\Facades\Terbilang;
 use App\Models\RabItem;
+use App\Models\Unit;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Vinkla\Hashids\Facades\Hashids;
 
 if (!function_exists('determineCustomAhsItemName')) {
     function determineCustomAhsItemName(CustomAhsItem $customAhsItem)
     {
+        if (!$customAhsItem) return 'Item AHS Dihapus';
         switch ($customAhsItem->custom_ahs_itemable_type) {
             case CustomAhp::class :
             case CustomAhs::class :
                 return $customAhsItem->name;
             break;
             case CustomItemPrice::class :
-                return $customAhsItem->customAhsItemable->name;
+                return $customAhsItem->customAhsItemable ? $customAhsItem->customAhsItemable->name : 'Item AHS Dihapus';
             break;
         }
     }
@@ -61,5 +66,13 @@ if (!function_exists('generateRandomOrderId')) {
     function generateRandomOrderId()
     {
         return strtoupper(Str::random(16));
+    }
+}
+
+if (!function_exists('getUnitNameByHashedId')) {
+    function getUnitNameByHashedId($hashedUnitId)
+    {
+        $unit = Unit::find(Hashids::decode($hashedUnitId)[0]);
+        return $unit ? $unit->name : 'Tidak ada unit';
     }
 }

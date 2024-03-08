@@ -9,6 +9,7 @@ use App\Models\AhsItem;
 use App\Models\Province;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class AhsController extends CountableItemController
 {

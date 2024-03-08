@@ -107,7 +107,7 @@ class OrderController extends Controller
 
     private function generateSignature($order)
     {
-        $input = $order->order_id . '200' . ($order->gross_amount .'.00') . env('MIDTRANS_SERVER_KEY');
+        $input = $order->order_id . '200' . ($order->gross_amount .'.00') . (env('MIDTRANS_MODE') == 'sandbox' ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT') : env('MIDTRANS_SERVER_KEY_PRODUCTION'));
         return openssl_digest($input, 'sha512');
     }
 
@@ -175,7 +175,7 @@ class OrderController extends Controller
 
         $order->project_id = $project->id;
         $order->status = 'completed';
-        $order->expired_at = $order->subscription->subscription_type == 'MONTHLY' ? Carbon::now()->subMonth(-1) : ($order->subscription->subscription_type == 'ANNUALLY' ? Carbon::now()->subYear(-1) : ($order->subscription->subscription_type == 'QUARTERLY' ? Carbon::now()->subMonth(-3) : Carbon::now()->subDay(-1)));
+        $order->expired_at = $order->subscription->subscription_type == 'MONTHLY' ? Carbon::now()->subMonth(-1) : ($order->subscription->subscription_type == 'ANNUALLY' ? Carbon::now()->subYear(-1) : ($order->subscription->subscription_type == 'QUARTERLY' ? Carbon::now()->subMonth(-3) : ($order->subscription->subscription_type == 'THREEDAYS' ? Carbon::now()->subDay(-3) : Carbon::now()->subDay(-1))));
         $order->is_active = true;
 
         $order->save();

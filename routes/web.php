@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\Project;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,36 @@ Route::get('/forgot-password', function() {
         'token' => 'sdas',
         'passwordReset' => $passwordReset,
     ]);
+});
+
+Route::get('populate-user', function() {
+    $user1 = User::create([
+        'first_name' => 'Helper 1',
+        'last_name' => 'User',
+        'email' => 'helper1@gmail.com',
+        'password' => Hash::make('Helper12024'),
+        'phone' => '00001',
+        'address' => '-',
+        'job' => 'Helper',
+        'email_verified_at' => Carbon::now(),
+        'demo_quota' => 1,
+    ]);
+    $user2 = User::create([
+        'first_name' => 'Helper 2',
+        'last_name' => 'User',
+        'email' => 'helper2@gmail.com',
+        'password' => Hash::make('Helper22024'),
+        'phone' => '00002',
+        'address' => '-',
+        'job' => 'Helper',
+        'email_verified_at' => Carbon::now(),
+        'demo_quota' => 1,
+    ]);
+
+    $user1->assignRole('root');
+    $user2->assignRole('root');
+
+    return dd('OK');
 });
 
 Route::get('/auth/email-verification/confirm/{token}', [RegisterController::class, 'confirmEmail'])->name('register.confirm_email');
