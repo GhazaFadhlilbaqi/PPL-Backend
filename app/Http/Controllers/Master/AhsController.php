@@ -9,7 +9,9 @@ use App\Models\AhsItem;
 use App\Models\Province;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class AhsController extends CountableItemController
 {
@@ -131,23 +133,34 @@ class AhsController extends CountableItemController
 
     public function update(AhsRequest $request, Ahs $ahs)
     {
+        try {
+            DB::beginTransaction();
+            if ($request->has('id') && ($ahs->id != $request->id)) {
 
-        if ($request->has('id') && ($ahs->id != $request->id)) {
-            $oldId = $ahs->id;
+                $oldId = $ahs->id;
+
+                AhsItem::where('ahs_itemable_id', $oldId)->update([
+                    'ahs_itemable_id' => $request->id,
+                ]);
+            }
+
+            $ahs->update($request->only([
+                'id', 'name'
+            ]));
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => compact('ahs')
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengubah data'
+            ]);
         }
-
-        $ahs->update($request->only([
-            'id', 'name'
-        ]));
-
-        AhsItem::where('ahs_itemable_id', $oldId)->update([
-            'ahs_itemable_id' => $request->id,
-        ]);
-
-        return response()->json([
-            'status' => 'success',
-            'data' => compact('ahs')
-        ]);
     }
 
     private function paginateAhs($ahs, $currentPage, $ahsPerPage)
