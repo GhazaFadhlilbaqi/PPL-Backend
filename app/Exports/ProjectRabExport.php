@@ -22,16 +22,27 @@ class ProjectRabExport implements WithMultipleSheets
 
         $project = Project::find($this->projectId);
 
-        if ($project->implementation_duration && $project->subscription_id == 'professional') {
-            return [
-                new RabSummaryExportSheet($this->projectId),
-                new ImplementationScheduleExport($this->projectId),
-                new AhsExportSheet($this->projectId),
-                new AhsRekapExportSheet($this->projectId),
-                new ItemPriceExportSheet($this->projectId),
-                new AhpExportSheet($this->projectId),
-                new MaterialEstimatorExportSheet($this->projectId),
-            ];
+        if ($project->subscription_id == 'professional') {
+            if ($project->implementation_duration) {
+                return [
+                    new RabSummaryExportSheet($this->projectId),
+                    new ImplementationScheduleExport($this->projectId),
+                    new AhsExportSheet($this->projectId),
+                    new AhsRekapExportSheet($this->projectId),
+                    new ItemPriceExportSheet($this->projectId),
+                    new AhpExportSheet($this->projectId),
+                    new MaterialEstimatorExportSheet($this->projectId),
+                ];
+            } else {
+                return [
+                    new RabSummaryExportSheet($this->projectId),
+                    new AhsExportSheet($this->projectId),
+                    new AhsRekapExportSheet($this->projectId),
+                    new ItemPriceExportSheet($this->projectId),
+                    new AhpExportSheet($this->projectId),
+                    new MaterialEstimatorExportSheet($this->projectId),
+                ];
+            }
         } else {
             return [
                 new RabSummaryExportSheet($this->projectId),
