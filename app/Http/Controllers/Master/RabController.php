@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\CountableItemController;
 use App\Models\MasterRab;
 use App\Models\Rab;
 use Illuminate\Http\Request;
-use Illuminate\Support\Js;
+use Vinkla\Hashids\Facades\Hashids;
 
-class RabController extends Controller
+class RabController extends CountableItemController
 {
 
     const ALLOWED_SEARCH_CRITERIA = ['header', 'item'];
@@ -41,33 +42,45 @@ class RabController extends Controller
 
         $rabSubtotal = 0;
 
+        // return response()->json([
+        //     'd' => $rabs
+        // ]);
+
         foreach ($rabs as $key => $rab) {
-            if ($rab->rabItem || ($rab->rabItemHeader && $rab->rabItemHeader->rabItem)) {
-                foreach ($rab->rabItem as $key2 => $rabItem) {
-                    if ($rabItem->ahs) {
-                        $countedAhs = $this->countAhsSubtotal($rabItem->ahs, 1);
+            if ($rab->masterRabItem || ($rab->masterRabItemHeader && $rab->masterRabItemHeader->rabItem)) {
+                foreach ($rab->masterRabItem as $key2 => $masterRabItem) {
+                    if ($masterRabItem->ahs) {
+                        $countedAhs = $this->countAhsSubtotal($masterRabItem->ahs, Hashids::decode($request->province)[0]);
+                        // return response()->json([
+                        //     'counted_ahs' => $countedAhs
+                        // ]);
                         $countedAhs->price = $countedAhs->subtotal;
-                        $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
-                        $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
+                        $countedAhs->subtotal = $countedAhs->subtotal * ($masterRabItem->volume ?? 0);
+                        $rabs[$key]->masterRabItem[$key2]['custom_ahs'] = $countedAhs;
                         $rabSubtotal += $countedAhs->subtotal;
                     } else {
-                        $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
-                        $rabs[$key]->rabItem[$key2] = $rabItem;
-                        $rabSubtotal += $rabItem->subtotal;
+                        $masterRabItem->subtotal = $masterRabItem->price * ($masterRabItem->volume ?? 0);
+                        $rabs[$key]->masterRabItem[$key2] = $masterRabItem;
+                        $rabSubtotal += $masterRabItem->subtotal;
                     }
                 }
 
-                foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
-                    foreach ($rabItemHeader->rabItem as $rabItem) {
-                        if ($rabItem->ahs) {
-                            $countedAhs = $this->countCustomAhsSubtotal($rabItem->ahs);
+                foreach ($rab->masterRabItemHeader as $key3 => $masterRabItemHeader) {
+                    foreach ($masterRabItemHeader->masterRabItem as $key4 => $masterRabItem) {
+                        if ($masterRabItem->ahs) {
+                            $countedAhs = $this->countAhsSubtotal($masterRabItem->ahs, Hashids::decode($request->province)[0]);
                             $countedAhs->price = $countedAhs->subtotal;
-                            $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
-                            $rabs[$key]->rabItemHeader[$key3]['custom_ahs'] = $countedAhs;
+                            $countedAhs->subtotal = $countedAhs->subtotal * ($masterRabItem->volume ?? 0);
+                            $masterRabItem['custom_ahs'] = $countedAhs;
+                            // if ($masterRabItem->name == 'Pekerja (Null)') {
+                            //     return response()->json([
+                            //         'd' => $rabs[$key]->masterRabItem[$key3],
+                            //     ]);
+                            // }
                             $rabSubtotal += $countedAhs->subtotal;
                         } else {
-                            $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
-                            $rabSubtotal += $rabItem->subtotal;
+                            $masterRabItem->subtotal = $masterRabItem->price * ($masterRabItem->volume ?? 0);
+                            $rabSubtotal += $masterRabItem->subtotal;
                         }
                     }
                 }

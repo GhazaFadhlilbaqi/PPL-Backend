@@ -24,9 +24,9 @@ class MasterRabItemHeader extends Model
         'hashid', 'hashed_master_rab_id'
     ];
 
-    public function rabItem()
+    public function masterRabItem()
     {
-        return $this->hasMany(RabItem::class);
+        return $this->hasMany(MasterRabItem::class);
     }
 
     public function rab()

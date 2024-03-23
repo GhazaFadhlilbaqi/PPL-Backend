@@ -16,6 +16,7 @@ use App\Http\Controllers\Master\AhsController;
 use App\Http\Controllers\Master\AhsItemController;
 use App\Http\Controllers\Master\ItemPriceController;
 use App\Http\Controllers\Master\ItemPriceGroupController;
+use App\Http\Controllers\Master\MasterRabItemHeaderController;
 use App\Http\Controllers\Master\ProvinceController;
 use App\Http\Controllers\Master\RabController as MasterRabController;
 use App\Http\Controllers\Master\RabItemController as MasterRabItemController;
@@ -159,6 +160,14 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
         Route::prefix('{masterRab}/item')->group(function() {
             Route::post('', [MasterRabItemController::class, 'store']);
             Route::post('{masterRabItem}', [MasterRabItemController::class, 'update']);
+            Route::get('{masterRabItem}/delete', [MasterRabItemController::class, 'destroy']);
+        });
+
+        Route::prefix('{masterRab}/item-header')->group(function() {
+            Route::get('', [MasterRabItemHeaderController::class, 'index']);
+            Route::post('', [MasterRabItemHeaderController::class, 'store']);
+            Route::post('{masterRabItemHeader}', [MasterRabItemHeaderController::class, 'update']);
+            Route::get('{masterRabItemHeader}/delete', [MasterRabItemHeaderController::class, 'destroy']);
         });
     });
 });

@@ -42,11 +42,13 @@ class RabItemController extends Controller
             $dataToMerge['unit_id'] = Hashids::decode($request->unit_id)[0];
         }
 
+
+
         // if ($request->has('ahs_id') && $request->ahs_id) {
         //     $dataToMerge['ahs_id'] = Hashids::decode($request->ahs_id)[0];
         // }
 
-        if ($request->ahs_id) {
+        if ($request->ahs_id && $request->ahs_id != null && $request->ahs_id != '-') {
             if ($request->ahs_id != $masterRabItem->ahs_id) {
                 $ahsItem = Ahs::find($request->ahs_id);
                 $request->merge([
@@ -56,6 +58,10 @@ class RabItemController extends Controller
                 // $request->volume = null;
                 // $request->name = $ahsItem->name;
             }
+        } else {
+            $request->merge([
+                'ahs_id' => null,
+            ]);
         }
 
         if (!$request->has('volume') || $request->volume == '') {
