@@ -156,6 +156,7 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
     Route::prefix('rab')->group(function() {
         Route::get('', [MasterRabController::class, 'index']);
         Route::post('', [MasterRabController::class, 'store']);
+        Route::get('{masterRab}', [MasterRabController::class, 'show']);
 
         Route::prefix('{masterRab}/item')->group(function() {
             Route::post('', [MasterRabItemController::class, 'store']);
