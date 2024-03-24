@@ -103,6 +103,24 @@ class RabController extends CountableItemController
         ]);
     }
 
+    public function update(Request $request, MasterRab $masterRab)
+    {
+        $masterRab->update($request->only(['name']));
+
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('masterRab'),
+        ]);
+    }
+
+    public function destroy(MasterRab $masterRab)
+    {
+        $masterRab->delete();
+        return response()->json([
+            'status' => 'success',
+        ], 204);
+    }
+
     public function show(MasterRab $masterRab, Request $request)
     {
         if ($request->has('q') && $request->q != '' && $request->has('category') && $request->category != '' && in_array($request->category, self::ALLOWED_SEARCH_CRITERIA)) {

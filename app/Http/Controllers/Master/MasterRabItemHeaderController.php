@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MasterRab;
 use App\Models\MasterRabItemHeader;
 use Illuminate\Http\Request;
+use Vinkla\Hashids\Facades\Hashids;
 
 class MasterRabItemHeaderController extends Controller
 {
@@ -46,9 +47,9 @@ class MasterRabItemHeaderController extends Controller
         ]);
     }
 
-    public function destroy(MasterRab $rab, MasterRabItemHeader $masterRabItemHeader)
+    public function destroy(MasterRab $rab, $masterRabItemHeader)
     {
-        $masterRabItemHeader->delete();
+        MasterRabItemHeader::where('id', Hashids::decode($masterRabItemHeader)[0])->delete();
 
         return response()->json([
             'status' => 'success',

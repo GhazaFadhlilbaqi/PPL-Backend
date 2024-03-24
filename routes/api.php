@@ -157,6 +157,8 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
         Route::get('', [MasterRabController::class, 'index']);
         Route::post('', [MasterRabController::class, 'store']);
         Route::get('{masterRab}', [MasterRabController::class, 'show']);
+        Route::post('{masterRab}', [MasterRabController::class, 'update']);
+        Route::get('{masterRab}/delete', [MasterRabController::class, 'destroy']);
 
         Route::prefix('{masterRab}/item')->group(function() {
             Route::post('', [MasterRabItemController::class, 'store']);
