@@ -105,7 +105,7 @@ class MaterialEstimatorExportSheet extends CountableItemController implements Fr
                         'type' => self::RAB_ITEM_HEADER
                     ];
 
-                    foreach ($rabItemHeader->rabItem as $rabItem) {
+                    foreach ($rabItemHeader->rabItem as $key4 => $rabItem) {
 
                         if ($rabItem->customAhs) {
 
@@ -113,7 +113,7 @@ class MaterialEstimatorExportSheet extends CountableItemController implements Fr
                             $countedAhs->price = $countedAhs->subtotal;
                             $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
                             $rabItem->subtotal = $countedAhs->subtotal;
-                            $rabs[$key]->rabItem[$key3]['custom_ahs'] = $countedAhs;
+                            $rabs[$key]->rabItemHeader[$key3]->rabItem[$key4]['custom_ahs'] = $countedAhs;
                             $rabSubtotal += $countedAhs->subtotal;
                             $rabPerSectionCount += $countedAhs->subtotal;
 

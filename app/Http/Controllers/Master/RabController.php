@@ -29,15 +29,26 @@ class RabController extends CountableItemController
                 ->with('masterRabItem', function($q) {
                     $q->where('master_rab_item_header_id', NULL);
                     $q->with(['ahs']);
-                })->get();
+                });
+
+            if ($request->has('master-rab-category-id') && $request->post('master-rab-category-id')) {
+                $rabs = $rabs->where('master_rab_category_id', $request->post('master-rab-category-id'));
+            }
+
+            $rabs = $rabs->get();
 
         } else {
             $rabs = MasterRab::with(['masterRabItemHeader.masterRabItem'])
                 ->with('masterRabItem', function($q) {
                     $q->where('master_rab_item_header_id', NULL);
                     $q->with(['ahs']);
-                })
-                ->get();
+                });
+
+                if ($request->has('master-rab-category-id') && $request->post('master-rab-category-id')) {
+                    $rabs = $rabs->where('master_rab_category_id', $request->post('master-rab-category-id'));
+                }
+
+                $rabs = $rabs->get();
         }
 
         $rabSubtotal = 0;
@@ -96,7 +107,7 @@ class RabController extends CountableItemController
 
     public function store(Request $request)
     {
-        $rab = MasterRab::create($request->only(['name']));
+        $rab = MasterRab::create($request->only(['name', 'master_rab_category_id']));
         return response()->json([
             'status' => 'success',
             'data' => compact('rab')

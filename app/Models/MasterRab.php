@@ -11,7 +11,7 @@ class MasterRab extends Model
 {
     use HasFactory, HasHashid, HashidRouting;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'master_rab_category_id'];
     protected $hidden = ['id'];
     protected $appends = ['hashid'];
 
