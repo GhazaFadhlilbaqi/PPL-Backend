@@ -122,12 +122,16 @@ class RabController extends CountableItemController
             DB::beginTransaction();
             $request->merge(['project_id' => $project->hashidToId($project->hashid)]);
 
-            if ($request->has('selectedMasterRabId') && $request->selectedMasterRabId != '-' && $request->selectedMasterRabId != '') {
-                $masterRab = $this->showMasterRab($request->selectedMasterRabId, $project->province_id);
-                if (count($masterRab) > 0) {
-                    $rab = $this->createCustomRab($request, $project, $masterRab[0]);
-                } else {
-                    throw new Exception('Tidak dapat menemukan referensi RAB yang dipilih!');
+            if ($request->has('selectedMasterRabCategoryId') && $request->selectedMasterRabCategoryId != '-' && $request->selectedMasterRabCategoryId != '') {
+                // Get RAB based on selectedMasterRabCategoryId
+                $masterRabs = MasterRab::where('master_rab_category_id', $request->selectedMasterRabCategoryId)->get();
+                foreach ($masterRabs as $masterRab) {
+                    $masterRab = $this->showMasterRab($masterRab->id, $project->province_id);
+                    if (count($masterRab) > 0) {
+                        $rab = $this->createCustomRab($request, $masterRab[0]->name, $project, $masterRab[0]);
+                    } else {
+                        throw new Exception('Tidak dapat menemukan referensi RAB yang dipilih!');
+                    }
                 }
             } else {
                 $rab = Rab::create($request->only(['name', 'project_id']));
@@ -172,7 +176,7 @@ class RabController extends CountableItemController
     private function showMasterRab($masterRabId, $provinceId)
     {
         $rabs = MasterRab::with(['masterRabItemHeader.masterRabItem'])
-            ->where('id', Hashids::decode($masterRabId)[0])
+            ->where('id', $masterRabId)
             ->with('masterRabItem', function($q) {
                 $q->where('master_rab_item_header_id', NULL);
                 $q->with(['ahs']);
@@ -222,10 +226,10 @@ class RabController extends CountableItemController
         return $rabs;
     }
 
-    private function createCustomRab(Request $request, Project $project, $masterRab)
+    private function createCustomRab(Request $request, $masterRabName, Project $project, $masterRab)
     {
         $customRab = Rab::create([
-            'name' => $request->name,
+            'name' => $masterRabName,
             'project_id' => $project->id,
         ]);
 
