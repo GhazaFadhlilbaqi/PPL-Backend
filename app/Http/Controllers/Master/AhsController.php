@@ -101,11 +101,10 @@ class AhsController extends CountableItemController
 
     public function store(AhsRequest $request)
     {
-        Ahs::create($request->only(['id', 'name', 'groups']));
-
+        $createdAhs = Ahs::create($request->only(['id', 'name', 'groups']));
         return response()->json([
             'status' => 'success',
-            'data' => Ahs::all()
+            'data' => $createdAhs
         ]);
     }
 
