@@ -11,6 +11,7 @@ class Ahs extends Model
 
     public $incrementing = false;
 
+    protected $keyType = 'string';
     protected $fillable = ['id', 'name', 'groups'];
     protected $with = ['ahsItem'];
 
