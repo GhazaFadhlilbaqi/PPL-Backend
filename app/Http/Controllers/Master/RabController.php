@@ -51,7 +51,10 @@ class RabController extends CountableItemController
 
         $decodedProvinceId = Hashids::decode($request->province);
         if (empty($decodedProvinceId)) {
-          return "Error";
+          return response()->json([
+            'status' => 'fail',
+            'message' => 'Data provinsi tidak ditemukan'
+          ], 400);
         }
         $provinceId = $decodedProvinceId[0];
 
