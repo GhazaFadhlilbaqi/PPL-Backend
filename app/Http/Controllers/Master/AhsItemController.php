@@ -27,19 +27,16 @@ class AhsItemController extends Controller
 
     public function store(AhsItemRequest $request, Ahs $ahs)
     {
-
         $request->merge([
             'ahs_id' => $ahs->id,
             'ahs_itemable_type' => "App\\Models\\" . $request->ahs_itemable_type,
         ]);
-
-        AhsItem::create($request->only([
+        $createdAhsItem = AhsItem::create($request->only([
             'ahs_id', 'name', 'unit_id', 'coefficient', 'section', 'ahs_itemable_id', 'ahs_itemable_type',
         ]));
-
         return response()->json([
             'status' => 'success',
-            'data' => AhsItem::all()
+            'data' => $createdAhsItem
         ]);
     }
 
