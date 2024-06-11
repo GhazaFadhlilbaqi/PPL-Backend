@@ -16,11 +16,14 @@ class RabItemController extends Controller
 {
     public function store(MasterRab $masterRab, Request $request)
     {
-
         $request->merge([
             'master_rab_id' => $masterRab->hashidToId($masterRab->hashid),
-            'unit_id' => ($request->has('unit_id') && $request->master_rab_item_header_id) ? Unit::findByHashid($request->unit_id)->id : Unit::first()->id,
-            'master_rab_item_header_id' => ($request->has('master_rab_item_header_id') && $request->master_rab_item_header_id) ? Hashids::decode($request->master_rab_item_header_id)[0] : NULL,
+            'unit_id' => ($request->has('unit_id') && $request->master_rab_item_header_id)
+              ? Unit::findByHashid($request->unit_id)->id
+              : Unit::first()->id,
+            'master_rab_item_header_id' => ($request->has('master_rab_item_header_id') && $request->master_rab_item_header_id)
+              ? Hashids::decode($request->master_rab_item_header_id)[0]
+              : NULL
         ]);
 
         $rabItem = MasterRabItem::create($request->only([
