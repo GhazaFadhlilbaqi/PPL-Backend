@@ -47,10 +47,9 @@ class MasterRabItemHeaderController extends Controller
         ]);
     }
 
-    public function destroy(MasterRab $rab, $masterRabItemHeader)
+    public function destroy(MasterRab $masterRab, MasterRabItemHeader $masterRabItemHeader)
     {
-        MasterRabItemHeader::where('id', Hashids::decode($masterRabItemHeader)[0])->delete();
-
+        $masterRabItemHeader->delete();
         return response()->json([
             'status' => 'success',
         ], 204);
