@@ -4,14 +4,32 @@ namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\CountableItemController;
 use App\Http\Requests\AhsRequest;
+
 use App\Models\Ahs;
 use App\Models\AhsItem;
-use App\Models\Province;
+
 use Vinkla\Hashids\Facades\Hashids;
-use Illuminate\Http\Request;
+
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+
 use Exception;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AhsController extends CountableItemController
 {
@@ -178,4 +196,169 @@ class AhsController extends CountableItemController
             'ahs' => $ahs
         ];
     }
+
+    public function import(Request $request) {}
+
+    public function export() {
+      return Excel::download(new MasterAhsExportController, 'Master Ahs.xlsx');
+    }
+}
+
+class MasterAhsImportController implements ToCollection {
+  function collection(Collection $rows) {}
+}
+
+class MasterAhsParentSheet extends CountableItemController implements FromCollection, WithColumnWidths, WithStyles, WithTitle {
+  private $headerStyle;
+
+  public function __construct($headerStyle) {
+    $this->headerStyle = $headerStyle;
+  }
+
+  public function collection() {
+      $ahsCollection = new Collection([
+        ['Kode', 'Name']
+      ]);
+      $ahsList = Ahs::all();
+      foreach ($ahsList as $ahs) {
+        $ahsCollection->push([
+          $ahs->id,
+          $ahs->name
+        ]);
+      }
+      return $ahsCollection;
+  }
+
+  public function title(): string {
+      return 'AHS';
+  }
+
+  public function columnWidths(): array {
+    return [
+        'A' => 15,
+        'B' => 40,            
+    ];
+  }
+
+  public function styles(Worksheet $sheet) {
+    return [
+      'A1' => $this->headerStyle,
+      'B1' => $this->headerStyle
+    ];
+  }
+}
+
+class MasterAhsItemSheet extends CountableItemController implements FromCollection, WithColumnWidths, WithEvents, WithStrictNullComparison, WithStyles, WithTitle {
+  private $ahsItemTypes;
+  private $totalAhsItemCount = 0;
+  private $headerStyle;
+
+  public function __construct($headerStyle) {
+    $this->headerStyle = $headerStyle;
+    $this->ahsItemTypes = new Collection([
+      ['key' => 'labor', 'title' => 'TENAGA KERJA'],
+      ['key' => 'ingredients', 'title' => 'BAHAN'],
+      ['key' => 'tools', 'title' => 'PERALATAN'],
+      ['key' => 'others', 'title' => 'LAIN-LAIN']
+    ]);
+  }
+
+  public function collection() {
+      $ahsItemCollection = new Collection([
+        ['Kode AHS', 'Tipe', 'Kode Item', 'Koefisien']
+      ]);
+      $ahsItems = AhsItem::all()
+        ->sortBy(function($item) {
+          return array_search(
+            $item->section,
+            ['labor', 'ingredients', 'tools', 'others']
+          );
+        })
+        ->sortBy('ahs_id')
+        ->values();
+      $this->totalAhsItemCount = count($ahsItems);
+      foreach ($ahsItems as $ahsItem) {
+        $ahsItemCollection->push([
+          $ahsItem->ahs_id,
+          $this->ahsItemTypes->first(function ($value, $key) use ($ahsItem) {
+            return $value['key'] == $ahsItem->section;
+          })['title'],
+          $ahsItem->ahs_itemable_id,
+          $ahsItem->coefficient,
+        ]);
+      }
+      return $ahsItemCollection;
+  }
+
+  public function title(): string {
+      return 'AHS ITEM';
+  }
+
+  public function registerEvents(): array {
+    return [
+        AfterSheet::class => function(AfterSheet $event) {
+          for ($i=0; $i < $this->totalAhsItemCount; $i++) {
+            // Setup Ahs Code Dropdown List
+            $validation = $event->sheet->getCell("A".($i + 2))->getDataValidation();
+            $validation->setType(DataValidation::TYPE_LIST);
+            $validation->setAllowBlank(false);
+            $validation->setShowDropDown(true);
+            $validation->setPrompt('Please pick a value from the drop-down list.');
+            $validation->setFormula1('AHS!$A$2:$A$998');
+
+            // Setup Section Dropdown List
+            $validation = $event->sheet->getCell("B".($i + 2))->getDataValidation();
+            $validation->setType(DataValidation::TYPE_LIST);
+            $validation->setAllowBlank(false);
+            $validation->setShowDropDown(true);
+            $validation->setPrompt('Please pick a value from the drop-down list.');
+            $validation->setFormula1(sprintf('"%s"',implode(', ', $this->ahsItemTypes->map(function($ahsItemType){
+              return $ahsItemType['title'];
+            })->values()->all())));
+          }
+        },
+    ];
+  }
+
+  public function columnWidths(): array {
+    return [
+        'A' => 18,
+        'B' => 18,
+        'C' => 18,
+        'D' => 10,           
+    ];
+  }
+
+  public function styles(Worksheet $sheet) {
+    return [
+      'A1' => $this->headerStyle,
+      'B1' => $this->headerStyle,
+      'C1' => $this->headerStyle,
+      'D1' => $this->headerStyle
+    ];
+  }
+}
+
+class MasterAhsExportController implements WithMultipleSheets {
+  private $headerStyle = [
+    'alignment' => [
+      'horizontal' => Alignment::HORIZONTAL_CENTER
+    ],
+    'fill' => [
+      'fillType'   => Fill::FILL_SOLID,
+      'startColor' => ['rgb' => '153346'],
+    ],
+    'font' => [
+      'color' => [
+        'rgb' => Color::COLOR_WHITE
+      ]
+    ]
+  ];
+
+  public function sheets(): array {
+      return [
+        new MasterAhsParentSheet($this->headerStyle),
+        new MasterAhsItemSheet($this->headerStyle)
+      ];
+  }
 }
