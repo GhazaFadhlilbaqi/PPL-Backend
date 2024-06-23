@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
@@ -33,6 +34,22 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class AhsController extends CountableItemController
 {
+  private $masterAhsGroups;
+  private $ahsItemTypes;
+
+  public function __construct() {
+    $this->masterAhsGroups = new Collection([
+      ['key' => 'reference', 'title' => 'PUPR 2016'],
+      ['key' => 'reference-2023', 'title' => 'PUPR 2023']
+    ]);
+    $this->ahsItemTypes = new Collection([
+      ['key' => 'labor', 'title' => 'TENAGA KERJA'],
+      ['key' => 'ingredients', 'title' => 'BAHAN'],
+      ['key' => 'tools', 'title' => 'PERALATAN'],
+      ['key' => 'others', 'title' => 'LAIN-LAIN']
+    ]);
+  }
+
     public function index(Request $request, $ahsId = null)
     {
         $ahs = !is_null($ahsId) ? Ahs::where('id', $ahsId) : Ahs::query();
@@ -197,32 +214,115 @@ class AhsController extends CountableItemController
         ];
     }
 
-    public function import(Request $request) {}
+    public function import(Request $request) {
+      $this->validate($request, [
+        'file' => 'required|mimes:csv,xls,xlsx'
+      ]);
+      $uploadedFile = $request->file('file');
+      $fileName = $uploadedFile->hashName();
+      $temporaryPath = $uploadedFile->storeAs('public/excel/', $fileName);
+      try {
+        Excel::import(
+          new MasterAhsImportController(
+            $this->masterAhsGroups,
+            $this->ahsItemTypes
+          ),
+          storage_path('app/public/excel/'.$fileName)
+        );
+        Storage::delete($temporaryPath);
+        return response()->json([
+          'status' => 'success',
+          'data' => Ahs::all()
+        ]);
+      } catch(Exception) {
+        return response()->json([
+          'status' => 'error',
+          'message' => 'Gagal menambah data'
+        ]);
+      }
+    }
 
     public function export() {
-      return Excel::download(new MasterAhsExportController, 'Master Ahs.xlsx');
+      return Excel::download(
+        new MasterAhsExportController(
+          $this->masterAhsGroups,
+          $this->ahsItemTypes
+        ),
+        'Master Ahs.xlsx'
+      );
     }
 }
 
-class MasterAhsImportController implements ToCollection {
-  function collection(Collection $rows) {}
+class MasterAhsImportController implements WithMultipleSheets {
+  private $masterAhsGroups;
+  private $ahsItemTypes;
+
+  public function __construct($masterAhsGroups, $ahsItemTypes) {
+    $this->masterAhsGroups = $masterAhsGroups;
+    $this->ahsItemTypes = $ahsItemTypes;
+  }
+
+  public function sheets(): array {
+    return [
+        new MasterAhsImportSheet($this->masterAhsGroups),
+        new MasterAhsItemImportSheet($this->ahsItemTypes)
+    ];
+  }
 }
 
-class MasterAhsParentSheet extends CountableItemController implements FromCollection, WithColumnWidths, WithStyles, WithTitle {
-  private $headerStyle;
+class MasterAhsExportController implements WithMultipleSheets {
+  private $headerStyle = [
+    'alignment' => [
+      'horizontal' => Alignment::HORIZONTAL_CENTER
+    ],
+    'fill' => [
+      'fillType'   => Fill::FILL_SOLID,
+      'startColor' => ['rgb' => '153346'],
+    ],
+    'font' => [
+      'color' => [
+        'rgb' => Color::COLOR_WHITE
+      ]
+    ]
+  ];
+  private $masterAhsGroups;
+  private $ahsItemTypes;
 
-  public function __construct($headerStyle) {
+  public function __construct($masterAhsGroups, $ahsItemTypes) {
+    $this->masterAhsGroups = $masterAhsGroups;
+    $this->ahsItemTypes = $ahsItemTypes;
+  }
+
+  public function sheets(): array {
+      return [
+        new MasterAhsExportSheet($this->headerStyle, $this->masterAhsGroups),
+        new MasterAhsItemExportSheet($this->headerStyle, $this->ahsItemTypes)
+      ];
+  }
+}
+
+class MasterAhsExportSheet extends CountableItemController implements FromCollection, WithEvents, WithColumnWidths, WithStyles, WithTitle {
+  private $headerStyle;
+  private $masterAhsGroups;
+
+  public function __construct($headerStyle, $masterAhsGroups) {
     $this->headerStyle = $headerStyle;
+    $this->masterAhsGroups = $masterAhsGroups;
   }
 
   public function collection() {
       $ahsCollection = new Collection([
-        ['Kode', 'Name']
+        ['No', 'Kode', 'Groups', 'Name']
       ]);
       $ahsList = Ahs::all();
-      foreach ($ahsList as $ahs) {
+      $this->totalAhsCount = count($ahsList);
+      foreach ($ahsList as $index => $ahs) {
         $ahsCollection->push([
+          $index + 1,
           $ahs->id,
+          $this->masterAhsGroups->first(function($masterAhsGroup) use ($ahs) {
+            return $masterAhsGroup['key'] == $ahs->groups;
+          })['title'],
           $ahs->name
         ]);
       }
@@ -235,37 +335,107 @@ class MasterAhsParentSheet extends CountableItemController implements FromCollec
 
   public function columnWidths(): array {
     return [
-        'A' => 15,
-        'B' => 40,            
+        'A' => 5,
+        'B' => 15,
+        'C' => 15,
+        'D' => 40,            
     ];
   }
 
   public function styles(Worksheet $sheet) {
     return [
+      'A' => [
+        'alignment' => [
+          'horizontal' => Alignment::HORIZONTAL_CENTER
+        ]
+      ],
       'A1' => $this->headerStyle,
-      'B1' => $this->headerStyle
+      'B1' => $this->headerStyle,
+      'C1' => $this->headerStyle,
+      'D1' => $this->headerStyle
+    ];
+  }
+
+  public function registerEvents(): array {
+    return [
+        AfterSheet::class => function(AfterSheet $event) {
+          for ($i=0; $i < $this->totalAhsCount; $i++) {
+            // Setup Ahs Groups Dropdown List
+            $validation = $event->sheet->getCell("C".($i + 2))->getDataValidation();
+            $validation->setType(DataValidation::TYPE_LIST);
+            $validation->setAllowBlank(false);
+            $validation->setShowDropDown(true);
+            $validation->setShowErrorMessage(true);
+            $validation->setError('Value is not in list.');
+            $validation->setPrompt('Please pick a value from the drop-down list.');
+            $validation->setFormula1(sprintf('"%s"', implode(', ', $this->masterAhsGroups->map(function($masterAhsGroups){
+              return $masterAhsGroups['title'];
+            })->values()->all())));
+          }
+        },
     ];
   }
 }
 
-class MasterAhsItemSheet extends CountableItemController implements FromCollection, WithColumnWidths, WithEvents, WithStrictNullComparison, WithStyles, WithTitle {
+class MasterAhsImportSheet implements ToCollection {
+  private $masterAhsGroups;
+
+  public function __construct($masterAhsGroups) {
+    $this->masterAhsGroups = $masterAhsGroups;
+  }
+
+  public function collection(Collection $rows) {
+      // Remove table header
+      $rows->shift();
+
+      // Get all ahs datas
+      $ahsList = Ahs::all();
+
+      // Create new ahs when ahs code from excel is not found on databasse
+      foreach ($rows as $ahsRow) {
+        $ahs = $ahsList->first(function($ahs) use ($ahsRow) {
+          return $ahs->id == $ahsRow[1];
+        });
+        if ($ahs) { continue; }
+        Ahs::create([
+          'id' => $ahsRow[1],
+          'groups' => $this->masterAhsGroups->first(function($masterAhsGroup) use ($ahsRow) {
+            return $masterAhsGroup['title'] == $ahsRow[2];
+          })['key'],
+          'name' => $ahsRow[3]
+        ]);
+        $rows = $rows->filter(function($row) use ($ahsRow) {
+          return $row[1] != $ahsRow[1];
+        });
+      }
+
+      // Update existing ahs (when id found) or remove when id from database is not found excel
+      foreach ($ahsList as $ahs) {
+        $row = $rows->first(function($row) use ($ahs) {
+          return $ahs->id == $row[1];
+        });
+        if ($row) {
+          $ahs->update(['name' => $row[3]]);
+          continue;
+        }
+        $ahs->delete();
+      }
+  }
+}
+
+class MasterAhsItemExportSheet extends CountableItemController implements FromCollection, WithColumnWidths, WithEvents, WithStrictNullComparison, WithStyles, WithTitle {
   private $ahsItemTypes;
   private $totalAhsItemCount = 0;
   private $headerStyle;
 
-  public function __construct($headerStyle) {
+  public function __construct($headerStyle, $ahsItemTypes) {
     $this->headerStyle = $headerStyle;
-    $this->ahsItemTypes = new Collection([
-      ['key' => 'labor', 'title' => 'TENAGA KERJA'],
-      ['key' => 'ingredients', 'title' => 'BAHAN'],
-      ['key' => 'tools', 'title' => 'PERALATAN'],
-      ['key' => 'others', 'title' => 'LAIN-LAIN']
-    ]);
+    $this->ahsItemTypes = $ahsItemTypes;
   }
 
   public function collection() {
       $ahsItemCollection = new Collection([
-        ['Kode AHS', 'Tipe', 'Kode Item', 'Koefisien']
+        ['No', 'Kode AHS', 'Tipe', 'Kode Item', 'Koefisien']
       ]);
       $ahsItems = AhsItem::all()
         ->sortBy(function($item) {
@@ -277,8 +447,9 @@ class MasterAhsItemSheet extends CountableItemController implements FromCollecti
         ->sortBy('ahs_id')
         ->values();
       $this->totalAhsItemCount = count($ahsItems);
-      foreach ($ahsItems as $ahsItem) {
+      foreach ($ahsItems as $index => $ahsItem) {
         $ahsItemCollection->push([
+          $index + 1,
           $ahsItem->ahs_id,
           $this->ahsItemTypes->first(function ($value, $key) use ($ahsItem) {
             return $value['key'] == $ahsItem->section;
@@ -299,20 +470,24 @@ class MasterAhsItemSheet extends CountableItemController implements FromCollecti
         AfterSheet::class => function(AfterSheet $event) {
           for ($i=0; $i < $this->totalAhsItemCount; $i++) {
             // Setup Ahs Code Dropdown List
-            $validation = $event->sheet->getCell("A".($i + 2))->getDataValidation();
-            $validation->setType(DataValidation::TYPE_LIST);
-            $validation->setAllowBlank(false);
-            $validation->setShowDropDown(true);
-            $validation->setPrompt('Please pick a value from the drop-down list.');
-            $validation->setFormula1('AHS!$A$2:$A$998');
-
-            // Setup Section Dropdown List
             $validation = $event->sheet->getCell("B".($i + 2))->getDataValidation();
             $validation->setType(DataValidation::TYPE_LIST);
             $validation->setAllowBlank(false);
             $validation->setShowDropDown(true);
+            $validation->setShowErrorMessage(true);
+            $validation->setError('Value is not in list.');
             $validation->setPrompt('Please pick a value from the drop-down list.');
-            $validation->setFormula1(sprintf('"%s"',implode(', ', $this->ahsItemTypes->map(function($ahsItemType){
+            $validation->setFormula1('AHS!$B$2:$B$998');
+
+            // Setup Section Dropdown List
+            $validation = $event->sheet->getCell("C".($i + 2))->getDataValidation();
+            $validation->setType(DataValidation::TYPE_LIST);
+            $validation->setAllowBlank(false);
+            $validation->setShowDropDown(true);
+            $validation->setShowErrorMessage(true);
+            $validation->setError('Value is not in list.');
+            $validation->setPrompt('Please pick a value from the drop-down list.');
+            $validation->setFormula1(sprintf('"%s"', implode(', ', $this->ahsItemTypes->map(function($ahsItemType){
               return $ahsItemType['title'];
             })->values()->all())));
           }
@@ -322,43 +497,66 @@ class MasterAhsItemSheet extends CountableItemController implements FromCollecti
 
   public function columnWidths(): array {
     return [
-        'A' => 18,
+        'A' => 5,
         'B' => 18,
         'C' => 18,
-        'D' => 10,           
+        'D' => 18,
+        'E' => 10         
     ];
   }
 
   public function styles(Worksheet $sheet) {
     return [
+      'A' => [
+        'alignment' => [
+          'horizontal' => Alignment::HORIZONTAL_CENTER
+        ]
+      ],
       'A1' => $this->headerStyle,
       'B1' => $this->headerStyle,
       'C1' => $this->headerStyle,
-      'D1' => $this->headerStyle
+      'D1' => $this->headerStyle,
+      'E1' => $this->headerStyle
     ];
   }
 }
 
-class MasterAhsExportController implements WithMultipleSheets {
-  private $headerStyle = [
-    'alignment' => [
-      'horizontal' => Alignment::HORIZONTAL_CENTER
-    ],
-    'fill' => [
-      'fillType'   => Fill::FILL_SOLID,
-      'startColor' => ['rgb' => '153346'],
-    ],
-    'font' => [
-      'color' => [
-        'rgb' => Color::COLOR_WHITE
-      ]
-    ]
-  ];
+class MasterAhsItemImportSheet implements ToCollection {
+  private $ahsItemTypes;
 
-  public function sheets(): array {
-      return [
-        new MasterAhsParentSheet($this->headerStyle),
-        new MasterAhsItemSheet($this->headerStyle)
-      ];
+  public function __construct($ahsItemTypes) {
+    $this->ahsItemTypes = $ahsItemTypes;
+  }
+  
+  public function collection(Collection $rows) {
+      // Remove table header
+      $rows->shift();
+
+      // Get all ahs datas
+      $ahsList = Ahs::all();
+
+      // Clear ahs list item first
+      foreach ($ahsList as $ahs) {
+        AhsItem::where('ahs_id', $ahs->id)->delete();
+      }
+  
+      // Re-add all ahs item
+      foreach ($rows as $row) {
+        $isAhsReference = $ahsList->contains('id', $row[3]);
+        if (!$ahsList->contains('id', $row[1])) {
+          continue;
+        }
+        AhsItem::create([
+          'ahs_id' => $row[1],
+          'section' => $this->ahsItemTypes->first(function($ahsItemType) use ($row) {
+            return $ahsItemType['title'] == $row[2];
+          })['key'],
+          'ahs_itemable_id' => $row[3],
+          'ahs_itemable_type' => $isAhsReference
+            ? 'App\\Models\\Ahs'
+            : 'App\\Models\\ItemPrice',
+          'coefficient' => $row[4],
+        ]);
+      }
   }
 }

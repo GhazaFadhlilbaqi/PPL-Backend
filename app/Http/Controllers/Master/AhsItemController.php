@@ -117,7 +117,8 @@ class AhsItemController extends Controller
             return [
                 'ahs_itemable_type' => "App\\Models\\ItemPrice",
                 'id' => $itemPrice->id,
-                'display_id' => $itemPrice->id
+                'display_id' => $itemPrice->id,
+                'name' => $itemPrice->name
             ];
         });
 
@@ -127,6 +128,7 @@ class AhsItemController extends Controller
                 'ahs_itemable_type' => "App\\Models\\Ahs",
                 'id' => $ahs->id,
                 'display_id' => $ahs->id,
+                'name' => $ahs->name
             ];
         });
 
@@ -136,6 +138,7 @@ class AhsItemController extends Controller
                 'ahs_itemable_type' => 'App\\Models\\Ahp',
                 'id' => $ahp->id,
                 'display_id' => $ahp->id,
+                'name' => $ahp->name
             ];
         });
 
