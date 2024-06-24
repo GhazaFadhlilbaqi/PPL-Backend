@@ -97,6 +97,14 @@ class MasterAhsItemImportSheet implements ToCollection {
         if (!$ahsList->contains('id', $row[1])) {
           continue;
         }
+        $ahsName = null; 
+        if ($isAhsReference) {
+          $ahsName = !$row[4]
+            ? $ahsList->first(function($ahs) use ($row) {
+              return $ahs->id == $row[3];
+            })->name
+            : $row[4]; 
+        }
         AhsItem::create([
           'ahs_id' => $row[1],
           'section' => $this->ahsItemTypes->first(function($ahsItemType) use ($row) {
@@ -106,7 +114,7 @@ class MasterAhsItemImportSheet implements ToCollection {
           'ahs_itemable_type' => $isAhsReference
             ? 'App\\Models\\Ahs'
             : 'App\\Models\\ItemPrice',
-          'name' => $isAhsReference ? $row[4] : null,
+          'name' => $ahsName,
           'unit_id' => $isAhsReference
             ? Unit::where(['name' => $row[5]])->pluck('id')->first()
             : null,
