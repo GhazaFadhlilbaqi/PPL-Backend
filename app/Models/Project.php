@@ -12,7 +12,7 @@ class Project extends Model
 {
     use HasFactory, HasHashid, HashidRouting;
 
-    protected $appends = ['hashid', 'hashed_province_id'];
+    protected $appends = ['hashid', 'hashed_province_id', 'activeOrder'];
     protected $hidden = ['id', 'province_id'];
 
     protected $fillable = [
@@ -26,7 +26,10 @@ class Project extends Model
         'fiscal_year',
         'profit_margin',
         'last_opened_at',
-        'ppn'
+        'ppn',
+        'subscription_id',
+        'activeOrder',
+        'implementation_duration'
     ];
 
     public function user()
@@ -64,8 +67,28 @@ class Project extends Model
         return $this->hasMany(CustomAhs::class);
     }
 
+    public function subscription()
+    {
+        return $this->belongsTo(Subscription::class);
+    }
+
+    public function order()
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function getHashedProvinceIdAttribute()
     {
         return Hashids::encode($this->province_id);
+    }
+
+    public function getActiveOrderAttribute()
+    {
+        return $this->order->where('is_active', true)->first() ?? null;
+    }
+
+    public function implementationSchedule()
+    {
+        return $this->hasMany(ImplementationSchedule::class);
     }
 }

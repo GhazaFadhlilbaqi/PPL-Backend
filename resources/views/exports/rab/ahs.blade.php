@@ -68,8 +68,10 @@
                 <td>{{ $laborAhs->customAhsItemable->code }}</td>
                 <td>{{ $laborAhs->customAhsItemable ? ($laborAhs->custom_ahs_itemable_type == 'App\\Models\\CustomAhs' ? $laborAhs->unit->name : $laborAhs->customAhsItemable->unit->name) : $laborAhs->unit->name }}</td>
                 <td>{{ $laborAhs->coefficient }}</td>
-                <td>{{ $laborAhs->customAhsItemable->subtotal }}</td>
-                <td>{{ $laborAhs->customAhsItemable->subtotal * $laborAhs->coefficient }}</td>
+                {{-- <td>{{ $laborAhs->customAhsItemable->subtotal }}</td> --}}
+                <td>{{ $laborAhs->customAhsItemable->price }}</td>
+                <td>{{ $laborAhs->customAhsItemable->price * $laborAhs->coefficient }}</td>
+                {{-- <td>{{ $laborAhs->customAhsItemable->subtotal * $laborAhs->coefficient }}</td> --}}
             </tr>
             @php $laborAhsSum += $laborAhs->subtotal @endphp
         @endforeach
@@ -94,8 +96,10 @@
                 <td>{{ $ingredientsAhs->customAhsItemable->code }}</td>
                 <td>{{ $ingredientsAhs->customAhsItemable->unit->name }}</td>
                 <td>{{ $ingredientsAhs->coefficient }}</td>
-                <td>{{ $ingredientsAhs->customAhsItemable->subtotal }}</td>
-                <td>{{ $ingredientsAhs->customAhsItemable->subtotal * $ingredientsAhs->coefficient }}</td>
+                <td>{{ $ingredientsAhs->customAhsItemable->price }}</td>
+                {{-- <td>{{ $ingredientsAhs->customAhsItemable->subtotal }}</td> --}}
+                <td>{{ $ingredientsAhs->customAhsItemable->price * $ingredientsAhs->coefficient }}</td>
+                {{-- <td>{{ $ingredientsAhs->customAhsItemable->subtotal * $ingredientsAhs->coefficient }}</td> --}}
             </tr>
             @php $laborAhsSum += $ingredientsAhs->subtotal @endphp
         @endforeach
@@ -118,10 +122,13 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ determineCustomAhsItemName($toolsAhs) }}</td>
                 <td>{{ $toolsAhs->customAhsItemable->code }}</td>
-                <td>{{ $toolsAhs->customAhsItemable->unit->name }}</td>
+                <td>{{ $toolsAhs->custom_ahs_itemable_type == 'App\\Models\\CustomAhp' ? $toolsAhs->unit->name : ($toolsAhs->customAhsItemable->unit ? $toolsAhs->customAhsItemable->unit->name : 'Tidak ada satuan') }}</td>
+                <td>{{ $toolsAhs->customAhsItemable->unit ? $toolsAhs->customAhsItemable->unit->name : 'Tidak ada satuan' }}</td>
                 <td>{{ $toolsAhs->coefficient }}</td>
-                <td>{{ $toolsAhs->customAhsItemable->subtotal }}</td>
-                <td>{{ $toolsAhs->customAhsItemable->subtotal * $toolsAhs->coefficient }}</td>
+                {{-- <td>{{ $toolsAhs->customAhsItemable->subtotal }}</td> --}}
+                <td>{{ $toolsAhs->customAhsItemable->price }}</td>
+                <td>{{ $toolsAhs->customAhsItemable->price * $toolsAhs->coefficient }}</td>
+                {{-- <td>{{ $toolsAhs->customAhsItemable->subtotal * $toolsAhs->coefficient }}</td> --}}
             </tr>
             @php $toolsAhsSum += $toolsAhs->subtotal @endphp
         @endforeach
@@ -146,8 +153,10 @@
                 <td>{{ $othersAhs->customAhsItemable->code }}</td>
                 <td>{{ $othersAhs->customAhsItemable->unit->name }}</td>
                 <td>{{ $othersAhs->coefficient }}</td>
-                <td>{{ $othersAhs->customAhsItemable->subtotal }}</td>
-                <td>{{ $othersAhs->customAhsItemable->subtotal * $othersAhs->coefficient }}</td>
+                {{-- <td>{{ $othersAhs->customAhsItemable->subtotal }}</td> --}}
+                <td>{{ $othersAhs->customAhsItemable->price }}</td>
+                <td>{{ $othersAhs->customAhsItemable->price * $othersAhs->coefficient }}</td>
+                {{-- <td>{{ $othersAhs->customAhsItemable->subtotal * $othersAhs->coefficient }}</td> --}}
             </tr>
             @php $othersAhsSum += $othersAhs->subtotal @endphp
         @endforeach

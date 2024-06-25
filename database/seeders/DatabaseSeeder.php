@@ -32,5 +32,10 @@ class DatabaseSeeder extends Seeder
                 ItemPriceProvinceSeeder::class,
             ]);
         }
+
+        $this->call([
+            SubscriptionSeeder::class,
+            MasterRabCategorySeeder::class,
+        ]);
     }
 }

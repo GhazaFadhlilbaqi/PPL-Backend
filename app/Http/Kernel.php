@@ -70,5 +70,7 @@ class Kernel extends HttpKernel
         'request.strip-empty-char-on-request' => \App\Http\Middleware\Request\StripEmptyCharOnRequestMiddleware::class,
         'project.ensure-project-eligible-to-export' => \App\Http\Middleware\Project\EnsureProjectEligibleToExportMiddleware::class,
         'protect-debug' => \App\Http\Middleware\ProtectDebugMiddleware::class,
+        'ensure.demo.eligibility' => \App\Http\Middleware\Project\EnsureDemoEligibilityMiddleware::class,
+        'project.subscription.limitation.guard' => \App\Http\Middleware\Project\ProjectSubscriptionLimitationGuard::class,
     ];
 }

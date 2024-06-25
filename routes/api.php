@@ -10,12 +10,17 @@ use App\Http\Controllers\CustomAhsItemController;
 use App\Http\Controllers\CustomItemPriceController;
 use App\Http\Controllers\CustomItemPriceGroupController;
 use App\Http\Controllers\DebugController;
+use App\Http\Controllers\ImplementationScheduleController;
 use App\Http\Controllers\Master\AhpController;
 use App\Http\Controllers\Master\AhsController;
 use App\Http\Controllers\Master\AhsItemController;
 use App\Http\Controllers\Master\ItemPriceController;
 use App\Http\Controllers\Master\ItemPriceGroupController;
+use App\Http\Controllers\Master\MasterRabCategoryController;
+use App\Http\Controllers\Master\MasterRabItemHeaderController;
 use App\Http\Controllers\Master\ProvinceController;
+use App\Http\Controllers\Master\RabController as MasterRabController;
+use App\Http\Controllers\Master\RabItemController as MasterRabItemController;
 use App\Http\Controllers\Master\UnitController;
 use App\Http\Controllers\Order\OrderController;
 use App\Http\Controllers\Payment\PaymentController;
@@ -24,6 +29,7 @@ use App\Http\Controllers\RabController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\RabItemController;
 use App\Http\Controllers\RabItemHeaderController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TutorialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -75,7 +81,10 @@ Route::prefix('user')->middleware('auth:sanctum')->group(function() {
 });
 
 Route::prefix('payment')->middleware('auth:sanctum')->group(function() {
+    # NOTE: Clean fetch-snap-token route
     Route::post('fetch-snap-token', [PaymentController::class, 'fetchSnapToken']);
+    Route::post('fetch-subscription-snap-token', [PaymentController::class, 'fetchSubscriptionSnapToken'])->middleware('ensure.demo.eligibility');
+    Route::post('set-canceled', [PaymentController::class, 'setCanceled']);
     Route::post('set-pending', [PaymentController::class, 'setPending']);
     # NOTE: For demo purpose only
     Route::post('demo-add-token', [PaymentController::class, 'addToken']);
@@ -124,6 +133,8 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
 
     Route::prefix('ahs')->group(function() {
         Route::get('ids', [AhsController::class, 'getAhsIds']);
+        Route::get('export', [AhsController::class, 'export']);
+        Route::post('import', [AhsController::class, 'import']);
         Route::get('{ahsId?}', [AhsController::class, 'index']);
         Route::post('{ahsId?}', [AhsController::class, 'store']);
         Route::post('{ahs}/update', [AhsController::class, 'update']);
@@ -144,6 +155,34 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
         Route::get('{ahp}/delete', [AhpController::class, 'destroy']);
         Route::post('{ahp}', [AhpController::class, 'update']);
     });
+
+    Route::prefix('rab')->group(function() {
+        Route::get('', [MasterRabController::class, 'index']);
+        Route::post('', [MasterRabController::class, 'store']);
+        Route::get('{masterRab}', [MasterRabController::class, 'show']);
+        Route::post('{masterRab}', [MasterRabController::class, 'update']);
+        Route::get('{masterRab}/delete', [MasterRabController::class, 'destroy']);
+
+        Route::prefix('{masterRab}/item')->group(function() {
+            Route::post('', [MasterRabItemController::class, 'store']);
+            Route::post('{masterRabItem}', [MasterRabItemController::class, 'update']);
+            Route::get('{masterRabItem}/delete', [MasterRabItemController::class, 'destroy']);
+        });
+
+        Route::prefix('{masterRab}/item-header')->group(function() {
+            Route::get('', [MasterRabItemHeaderController::class, 'index']);
+            Route::post('', [MasterRabItemHeaderController::class, 'store']);
+            Route::post('{masterRabItemHeader}', [MasterRabItemHeaderController::class, 'update']);
+            Route::get('{masterRabItemHeader}/delete', [MasterRabItemHeaderController::class, 'destroy']);
+        });
+    });
+
+    Route::prefix('master-rab-categories')->group(function() {
+        Route::get('', [MasterRabCategoryController::class, 'index']);
+        Route::post('', [MasterRabCategoryController::class, 'store']);
+        Route::get('{masterRabCategory}', [MasterRabCategoryController::class, 'show']);
+        Route::get('{masterRabCategory}/delete', [MasterRabCategoryController::class, 'destroy']);
+    });
 });
 
 
@@ -154,7 +193,7 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
  */
 Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page'])->group(function() {
     Route::get('', [ProjectController::class, 'index']);
-    Route::post('', [ProjectController::class, 'store']);
+    Route::post('', [ProjectController::class, 'store'])->middleware('ensure.demo.eligibility');
     Route::post('{project}', [ProjectController::class, 'update']);
     Route::get('{project}', [ProjectController::class, 'show']);
     Route::get('{project}/delete', [ProjectController::class, 'destroy']);
@@ -165,9 +204,10 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
      * PROJECT BASED ROUTE  |
      * ----------------------
      */
-    Route::prefix('{project}')->middleware(['auth:sanctum', 'project.ensure-project-belonging'])->group(function() {
+    Route::prefix('{project}')->middleware(['auth:sanctum', 'project.ensure-project-belonging', 'project.subscription.limitation.guard'])->group(function() {
 
         Route::get('export', [ProjectController::class, 'export'])->middleware('project.ensure-project-eligible-to-export');
+        Route::post('renew', [ProjectController::class, 'renew']);
 
         Route::prefix('rab')->group(function() {
             Route::get('', [RabController::class, 'index']);
@@ -188,6 +228,16 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
                 Route::post('{rabItemHeader}', [RabItemHeaderController::class, 'update']);
                 Route::get('{rabItemHeader}/delete', [RabItemHeaderController::class, 'destroy']);
             });
+        });
+
+        Route::prefix('implementation-schedules')->group(function() {
+            Route::get('implementation-schedule-duration', [ImplementationScheduleController::class, 'getProjectDuration']);
+            Route::get('', [ImplementationScheduleController::class, 'index']);
+            Route::post('', [ImplementationScheduleController::class, 'update']);
+            Route::get('{implementationSchedule}/delete', [ImplementationScheduleController::class, 'destroy']);
+            Route::post('update-project-duration', [ImplementationScheduleController::class, 'updateProjectDuration']);
+            Route::delete('{rabItem}', [ImplementationScheduleController::class, 'destroy']);
+            // Route::post('', [ImplementationScheduleController::class, '']);
         });
 
         Route::prefix('custom-item-price-group')->group(function() {
@@ -236,6 +286,10 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
 Route::prefix('tutorials')->middleware('auth:sanctum')->group(function() {
     Route::get('', [TutorialController::class, 'index'])->name('tutorials');
     Route::post('update', [TutorialController::class, 'update'])->name('tutorials.update');
+});
+
+Route::prefix('subscriptions')->middleware('auth:sanctum')->group(function() {
+    Route::get('', [SubscriptionController::class, 'index']);
 });
 
 Route::prefix('debug')->middleware('protect-debug')->group(function() {

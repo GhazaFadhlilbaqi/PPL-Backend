@@ -49,10 +49,13 @@
     </thead>
     <tbody>
         @php $rabSum = 0; @endphp
+        {{-- @php logger()->info($rabs) @endphp --}}
         @foreach ($rabs ?? [] as $rab)
             <tr>
                 <td><b>{{ numToAlphabet($loop->index) }}</b></td>
-                <td><b>{{ $rab->name }}</b></td>
+                <td>
+                    {{ $rab->name }}
+                </td>
                 <td></td>
                 <td></td>
                 <td></td>

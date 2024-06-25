@@ -9,7 +9,9 @@ use App\Mail\EmailVerificationMail;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -19,10 +21,11 @@ class RegisterController extends Controller
     {
         try {
             $request->merge([
-                'password' => Hash::make($request->password)
+                'password' => Hash::make($request->password),
+                'demo_quota' => 1
             ]);
 
-            $user = User::create($request->only(['first_name', 'last_name', 'email', 'password', 'job', 'phone']));
+            $user = User::create($request->only(['first_name', 'last_name', 'email', 'password', 'job', 'phone', 'demo_quota']));
             $user->assignRole('owner');
 
             // Send verification mail
@@ -43,11 +46,18 @@ class RegisterController extends Controller
 
     public function confirmEmail($token)
     {
-        $user = User::where('verification_token', $token)->where('email_verified_at', null)->first();
+        $user = User::where('email', Crypt::decryptString($token))->first();
 
-        if (!$user) return redirect(config('app.email_verification.callback_domain') . '/auth/verification/callback?status=fail&msg=invalid');
+        Log::info('[INFO] Confirming email at ' . Carbon::now()->format('Y'));
+        Log::info('[INFO] Email token : ' . $token);
 
-        $user->verification_token = null;
+        if (!$user) {
+            Log::error('[INFO] Email verification failed, no user assigned for token : ' . $token);
+            return redirect(config('app.email_verification.callback_domain') . '/auth/verification/callback?status=fail&msg=invalid');
+        }
+
+        Log::info('[INFO] Email verified successfully for uid : ' . $user->hashid);
+
         $user->email_verified_at = Carbon::now();
         $user->save();
 
@@ -56,7 +66,7 @@ class RegisterController extends Controller
 
     protected function sendVerificationMail(User $user)
     {
-        $token = Str::random(32);
+        $token = Crypt::encryptString($user->email);
 
         $user->verification_token = $token;
         $user->save();

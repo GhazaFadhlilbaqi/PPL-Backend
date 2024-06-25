@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
@@ -109,7 +110,7 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
                             'type' => self::RAB_ITEM_HEADER
                         ];
 
-                        foreach ($rabItemHeader->rabItem as $rabItem) {
+                        foreach ($rabItemHeader->rabItem as $key4 => $rabItem) {
 
                             if ($rabItem->customAhs) {
 
@@ -117,7 +118,7 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
                                 $countedAhs->price = $countedAhs->subtotal;
                                 $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
                                 $rabItem->subtotal = $countedAhs->subtotal;
-                                $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
+                                $rabs[$key]->rabItemHeader[$key3]->rabItem[$key4]['custom_ahs'] = $countedAhs;
                                 $rabSubtotal += $countedAhs->subtotal;
                                 $rabPerSectionCount += $countedAhs->subtotal;
 
@@ -148,10 +149,21 @@ class AhsRekapExportSheet extends CountableItemController implements FromView, W
                 $pointer++;
             }
 
+            Log::info('Printing RABs');
+
             $this->finalPointerLocation = $pointer - 1;
+
+            if ($rabs && count($rabs) > 0) {
+                Log::info('Printing RABs');
+                Log::info($rabs);
+            } else {
+                Log::error('No RABS');
+            }
 
             return $rabs;
         } catch (Exception $e) {
+            Log::info('Error happened');
+            Log::error($e);
             return response()->json([
                 'error' => $e->getMessage(),
             ], 500);

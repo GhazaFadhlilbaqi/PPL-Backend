@@ -27,19 +27,16 @@ class AhsItemController extends Controller
 
     public function store(AhsItemRequest $request, Ahs $ahs)
     {
-
         $request->merge([
             'ahs_id' => $ahs->id,
             'ahs_itemable_type' => "App\\Models\\" . $request->ahs_itemable_type,
         ]);
-
-        AhsItem::create($request->only([
+        $createdAhsItem = AhsItem::create($request->only([
             'ahs_id', 'name', 'unit_id', 'coefficient', 'section', 'ahs_itemable_id', 'ahs_itemable_type',
         ]));
-
         return response()->json([
             'status' => 'success',
-            'data' => AhsItem::all()
+            'data' => $createdAhsItem
         ]);
     }
 
@@ -120,7 +117,8 @@ class AhsItemController extends Controller
             return [
                 'ahs_itemable_type' => "App\\Models\\ItemPrice",
                 'id' => $itemPrice->id,
-                'display_id' => $itemPrice->id
+                'display_id' => $itemPrice->id,
+                'name' => $itemPrice->name
             ];
         });
 
@@ -130,6 +128,7 @@ class AhsItemController extends Controller
                 'ahs_itemable_type' => "App\\Models\\Ahs",
                 'id' => $ahs->id,
                 'display_id' => $ahs->id,
+                'name' => $ahs->name
             ];
         });
 
@@ -139,6 +138,7 @@ class AhsItemController extends Controller
                 'ahs_itemable_type' => 'App\\Models\\Ahp',
                 'id' => $ahp->id,
                 'display_id' => $ahp->id,
+                'name' => $ahp->name
             ];
         });
 

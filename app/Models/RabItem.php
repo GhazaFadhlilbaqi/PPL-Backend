@@ -20,6 +20,8 @@ class RabItem extends Model
         'id', 'rab_id', 'rab_item_header_id', 'unit_id'
     ];
 
+    protected $with = ['implementationSchedule'];
+
     protected $appends = [
         'hashid', 'hashed_rab_item_header_id', 'hashed_rab_id', 'hashed_unit_id'
     ];
@@ -57,5 +59,10 @@ class RabItem extends Model
     public function getHashedUnitIdAttribute()
     {
         return Hashids::encode($this->unit_id);
+    }
+
+    public function implementationSchedule()
+    {
+        return $this->hasMany(ImplementationSchedule::class);
     }
 }

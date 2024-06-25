@@ -8,7 +8,9 @@ use App\Models\CustomAhp;
 use App\Models\CustomAhs;
 use App\Models\CustomAhsItem;
 use App\Models\CustomItemPrice;
+use App\Models\CustomItemPriceGroup;
 use App\Models\ItemPrice;
+use App\Models\ItemPriceGroup;
 use App\Models\Project;
 use App\Models\Rab;
 use Carbon\Carbon;
@@ -220,6 +222,42 @@ class CustomAhsController extends CountableItemController
 
                     $relatedDependency = $this->getRelatedCustomAhsItemDependency($ahsItem2, $project->hashidToId($project->hashid));
 
+                    /** BUGFIX: Since the Master Item Price will keep growing, and the copy of item price for user is fixed (not tracking the changes of parent's item price)
+                     * so, it's possible that the referenced AHS contains the Item Price that are not available yet for user (not registered in custom item price).
+                     * So we need to check and copy it if the item price is not available.
+                     * 
+                     * NOTE: $relatedDependency value will be replaced in below's logic.
+                    */
+                    if ($ahsItem2->ahs_itemable_type == ItemPrice::class && !$relatedDependency['model']) {
+
+                        $referencedItemPriceDependency = ItemPrice::find($ahsItem2->ahs_itemable_id);
+                        $referencedItemPriceDependencyGroup = CustomItemPriceGroup::where('project_id', $project->hashidToId($project->hashid))->where('name', $referencedItemPriceDependency->itemPriceGroup->name)->first();
+
+                        // Check if item price group exist. If not, create it first
+                        if (!$referencedItemPriceDependencyGroup) {
+                            $referencedItemPriceDependencyGroup = CustomItemPriceGroup::create([
+                                'project_id' => $project->hashidToId($project->hashid),
+                                'name' => $referencedItemPriceDependency->itemPriceGroup->name,
+                                'is_default' => true,
+                            ]);
+                        }
+                        // Create custom item price group
+                        $customItemPrice = CustomItemPrice::create([
+                            'code' => $referencedItemPriceDependency->id,
+                            'custom_item_price_group_id' => $referencedItemPriceDependencyGroup->id,
+                            'unit_id' => $referencedItemPriceDependency->unit_id,
+                            'project_id' => $project->hashidToId($project->hashid),
+                            'name' => $referencedItemPriceDependency->name,
+                            'is_default' => true,
+                            'price' => count($referencedItemPriceDependency->price) > 0 ? $referencedItemPriceDependency->price[0]->price : 0,
+                            'default_price' => count($referencedItemPriceDependency->price) > 0 ? $referencedItemPriceDependency->price[0]->price : 0,
+                            'created_at' => Carbon::now()
+                        ]);
+
+                        $relatedDependency['model'] = $customItemPrice;
+                        $relatedDependency['type'] = CustomItemPrice::class;
+                    }
+
                     $customAhsItemRemapped[] = [
                         'custom_ahs_id' => $customAhs->id,
                         'name' => $ahsItem2->name,
@@ -244,12 +282,12 @@ class CustomAhsController extends CountableItemController
     private function getRelatedCustomAhsItemDependency($ahsItem, $projectId)
     {
         switch ($ahsItem->ahs_itemable_type) {
-            case Ahp::class :
+            case Ahp::class:
                 return [
                     'model' => CustomAhp::where('code', $ahsItem->ahsItemable->id)->where('project_id', $projectId)->first(),
                     'type' => CustomAhp::class,
                 ];
-            case ItemPrice::class :
+            case ItemPrice::class:
                 return [
                     'model' => CustomItemPrice::where('code', $ahsItem->ahsItemable->id)->where('project_id', $projectId)->first(),
                     'type' => CustomItemPrice::class,
