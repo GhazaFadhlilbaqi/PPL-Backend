@@ -53,7 +53,7 @@ class RegisterController extends Controller
 
         if (!$user) {
             Log::error('[INFO] Email verification failed, no user assigned for token : ' . $token);
-            return redirect('auth/verification/callback?status=fail&msg=invalid');
+            return redirect(config('app.email_verification.callback_domain') . '/auth/verification/callback?status=fail&msg=invalid');
         }
 
         Log::info('[INFO] Email verified successfully for uid : ' . $user->hashid);
@@ -61,7 +61,7 @@ class RegisterController extends Controller
         $user->email_verified_at = Carbon::now();
         $user->save();
 
-        return redirect('auth/verification/callback?status=success&uid=' . $user->hashid);
+        return redirect(config('app.email_verification.callback_domain') . '/auth/verification/callback?status=success&uid=' . $user->hashid);
     }
 
     protected function sendVerificationMail(User $user)
