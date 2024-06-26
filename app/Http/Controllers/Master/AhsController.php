@@ -4,17 +4,37 @@ namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\CountableItemController;
 use App\Http\Requests\AhsRequest;
+
 use App\Models\Ahs;
 use App\Models\AhsItem;
-use App\Models\Province;
 use Vinkla\Hashids\Facades\Hashids;
-use Illuminate\Http\Request;
+
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+
 use Exception;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AhsController extends CountableItemController
 {
+  private $masterAhsGroups;
+  private $ahsItemTypes;
+
+  public function __construct() {
+    $this->masterAhsGroups = new Collection([
+      ['key' => 'reference', 'title' => 'PUPR 2016'],
+      ['key' => 'reference-2023', 'title' => 'PUPR 2023']
+    ]);
+    $this->ahsItemTypes = new Collection([
+      ['key' => 'labor', 'title' => 'TENAGA KERJA'],
+      ['key' => 'ingredients', 'title' => 'BAHAN'],
+      ['key' => 'tools', 'title' => 'PERALATAN'],
+      ['key' => 'others', 'title' => 'LAIN-LAIN']
+    ]);
+  }
+
     public function index(Request $request, $ahsId = null)
     {
         $ahs = !is_null($ahsId) ? Ahs::where('id', $ahsId) : Ahs::query();
@@ -177,5 +197,43 @@ class AhsController extends CountableItemController
             'total_rows' => $totalRows,
             'ahs' => $ahs
         ];
+    }
+
+    public function import(Request $request) {
+      $this->validate($request, [
+        'file' => 'required|mimes:csv,xls,xlsx'
+      ]);
+      $uploadedFile = $request->file('file');
+      $fileName = $uploadedFile->hashName();
+      $temporaryPath = $uploadedFile->storeAs('public/excel/', $fileName);
+      try {
+        Excel::import(
+          new MasterAhsImportController(
+            $this->masterAhsGroups,
+            $this->ahsItemTypes
+          ),
+          storage_path('app/public/excel/'.$fileName)
+        );
+        Storage::delete($temporaryPath);
+        return response()->json([
+          'status' => 'success',
+          'data' => Ahs::all()
+        ]);
+      } catch(Exception) {
+        return response()->json([
+          'status' => 'error',
+          'message' => 'Gagal menambah data'
+        ]);
+      }
+    }
+
+    public function export() {
+      return Excel::download(
+        new MasterAhsExportController(
+          $this->masterAhsGroups,
+          $this->ahsItemTypes
+        ),
+        'Master Ahs.xlsx'
+      );
     }
 }

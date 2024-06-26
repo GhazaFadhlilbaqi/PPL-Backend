@@ -10,14 +10,12 @@ use App\Models\CustomAhsItem;
 use App\Models\CustomItemPrice;
 use App\Models\CustomItemPriceGroup;
 use App\Models\ItemPrice;
-use App\Models\ItemPriceGroup;
 use App\Models\Project;
 use App\Models\Rab;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Vinkla\Hashids\Facades\Hashids;
 
 class CustomAhsController extends CountableItemController
 {
@@ -135,11 +133,19 @@ class CustomAhsController extends CountableItemController
 
     public function getAhsIds(Project $project)
     {
-        $ahsItemIds = $project->customAhs->map(function($data) {
+        $customAhsItems = CustomAhs::with('customAhsItem.customAhsItemable')
+          ->where(['project_id' => $project->hashidToId($project->hashid)])
+          ->get();
+        $ahsItemIds = $customAhsItems->map(function($data) use ($project) {
+            $price = 0;
+            foreach ($data->customAhsItem as $customAhsItem) {
+              $price += $customAhsItem->customAhsItemable->price * $customAhsItem->coefficient;
+            }
             return [
                 'hashid' => $data->hashid,
                 'code' => $data->code,
-                'name' => $data->name
+                'name' => $data->name,
+                'price' => $price + (($project->profit_margin/100) * $price)
             ];
         })->toArray();
 

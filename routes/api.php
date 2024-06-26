@@ -133,6 +133,8 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
 
     Route::prefix('ahs')->group(function() {
         Route::get('ids', [AhsController::class, 'getAhsIds']);
+        Route::get('export', [AhsController::class, 'export']);
+        Route::post('import', [AhsController::class, 'import']);
         Route::get('{ahsId?}', [AhsController::class, 'index']);
         Route::post('{ahsId?}', [AhsController::class, 'store']);
         Route::post('{ahs}/update', [AhsController::class, 'update']);
