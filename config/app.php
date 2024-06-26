@@ -137,11 +137,11 @@ return [
     */
 
     'email_verification' => [
-        'callback_domain' => 'http://localhost:8080',
+        'callback_domain' => env('CALLBACK_DOMAIN', ''),
     ],
 
     'password_reset_form' => [
-        'callback_domain' => 'http://localhost:8080',
+        'callback_domain' => env('CALLBACK_DOMAIN', ''),
         'form_route' => '/auth/reset-password',
     ],
 
