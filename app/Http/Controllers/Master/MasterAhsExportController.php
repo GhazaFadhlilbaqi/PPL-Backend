@@ -186,7 +186,7 @@ class MasterAhsItemExportSheet extends CountableItemController implements FromCo
             $validation->setShowErrorMessage(true);
             $validation->setError('Value is not in list.');
             $validation->setPrompt('Please pick a value from the drop-down list.');
-            $validation->setFormula1('AHS!$B$2:$B$998');
+            $validation->setFormula1('AHS!$B$2:$B$9999');
 
             // Setup Section Dropdown List
             $validation = $event->sheet->getCell("C".($i + 2))->getDataValidation();
@@ -200,7 +200,7 @@ class MasterAhsItemExportSheet extends CountableItemController implements FromCo
               return $ahsItemType['title'];
             })->values()->all())));
 
-            // Setup Section Dropdown List
+            // Setup Unit Dropdown List
             $validation = $event->sheet->getCell("F".($i + 2))->getDataValidation();
             $validation->setType(DataValidation::TYPE_LIST);
             $validation->setAllowBlank(false);

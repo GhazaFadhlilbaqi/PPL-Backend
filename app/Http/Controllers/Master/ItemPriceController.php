@@ -11,7 +11,9 @@ use App\Models\ItemPriceGroup;
 use App\Models\ItemPriceProvince;
 use App\Models\Province;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Vinkla\Hashids\Facades\Hashids;
 
 class ItemPriceController extends Controller
@@ -156,5 +158,12 @@ class ItemPriceController extends Controller
         return response()->json([
             'status' => 'success',
         ]);
+    }
+
+    public function export() {
+      return Excel::download(
+        new MasterItemPriceExportController(),
+        'Master Unit Price.xlsx'
+      );
     }
 }
