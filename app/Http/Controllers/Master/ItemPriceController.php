@@ -162,10 +162,11 @@ class ItemPriceController extends Controller
     }
 
     public function export() {
-      return Excel::download(
-        new MasterItemPriceExportController(),
-        'Master Unit Price.xlsx'
-      );
+      echo ItemPrice::with(['itemPriceGroup', 'province'])->get();
+      // return Excel::download(
+      //   new MasterItemPriceExportController(),
+      //   'Master Unit Price.xlsx'
+      // );
     }
 
     public function import(Request $request) {
