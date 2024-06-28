@@ -172,7 +172,7 @@ class MasterItemPriceExportController extends CountableItemController implements
           $unitOptions = Unit::all()->pluck('name')->toArray();
           for ($i=0; $i < count($this->itemPrices); $i++) {
             // Setup Item Group Dropdown List
-            $validation = $event->sheet->getCell("B".($i + 2))->getDataValidation();
+            $validation = $event->sheet->getCell("B".($i + 3))->getDataValidation();
             $validation->setType(DataValidation::TYPE_LIST);
             $validation->setAllowBlank(false);
             $validation->setShowDropDown(true);
@@ -184,7 +184,7 @@ class MasterItemPriceExportController extends CountableItemController implements
             })->values()->all())));
 
             // Setup Unit Dropdown List
-            $validation = $event->sheet->getCell("E".($i + 2))->getDataValidation();
+            $validation = $event->sheet->getCell("E".($i + 3))->getDataValidation();
             $validation->setType(DataValidation::TYPE_LIST);
             $validation->setAllowBlank(false);
             $validation->setShowDropDown(true);

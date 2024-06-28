@@ -13,6 +13,7 @@ use App\Models\Province;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Vinkla\Hashids\Facades\Hashids;
 
@@ -165,5 +166,30 @@ class ItemPriceController extends Controller
         new MasterItemPriceExportController(),
         'Master Unit Price.xlsx'
       );
+    }
+
+    public function import(Request $request) {
+      $this->validate($request, [
+        'file' => 'required|mimes:csv,xls,xlsx'
+      ]);
+      $uploadedFile = $request->file('file');
+      $fileName = $uploadedFile->hashName();
+      $temporaryPath = $uploadedFile->storeAs('public/excel/', $fileName);
+      try {
+        Excel::import(
+          new MasterItemPriceImportController(),
+          storage_path('app/public/excel/'.$fileName)
+        );
+        Storage::delete($temporaryPath);
+        return response()->json([
+          'status' => 'success',
+          'data' => ItemPrice::all()
+        ]);
+      } catch(Exception) {
+        return response()->json([
+          'status' => 'error',
+          'message' => 'Gagal menambah data'
+        ]);
+      }
     }
 }

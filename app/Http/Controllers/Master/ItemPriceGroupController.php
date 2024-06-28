@@ -28,6 +28,12 @@ class ItemPriceGroupController extends Controller
 
     public function store(ItemPriceGroupRequest $request)
     {
+        if (str_contains($request->name, ',')) {
+          return response()->json([
+            'status' => 'fail',
+            'message' => "Nama tidak boleh memuat tanda comma",
+          ], 400);
+        }
         $itemPrice = ItemPriceGroup::create($request->only(['name']));
         return response()->json([
             'status' => 'success',
@@ -52,6 +58,12 @@ class ItemPriceGroupController extends Controller
 
     public function update(ItemPriceGroup $itemPriceGroup, ItemPriceGroupRequest $request)
     {
+        if (str_contains($request->name, ',')) {
+          return response()->json([
+            'status' => 'fail',
+            'message' => "Nama tidak boleh memuat tanda koma",
+          ], 400);
+        }
         $itemPriceGroup->update($request->only(['name']));
         return response()->json([
             'status' => 'success',
