@@ -162,14 +162,10 @@ class ItemPriceController extends Controller
     }
 
     public function export() {
-      try {
-        return response()->json([
-          'status' => 'success',
-          'data' => json_encode(ItemPrice::all())
-        ]);
-      } catch(Exception $error) {
-        echo $error;
-      }
+      return Excel::download(
+        new MasterItemPriceExportController(),
+        'Master Unit Price.xlsx'
+      );
     }
 
     public function import(Request $request) {
