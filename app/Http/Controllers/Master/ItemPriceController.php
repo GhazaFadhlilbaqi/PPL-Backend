@@ -165,7 +165,7 @@ class ItemPriceController extends Controller
       try {
         return response()->json([
           'status' => 'success',
-          'data' => ItemPrice::all()
+          'data' => json_encode(ItemPrice::with(['itemPriceGroup', 'province'])->get()->sortBy('item_price_group_id')->values())
         ]);
       } catch(Exception $error) {
         echo $error;
