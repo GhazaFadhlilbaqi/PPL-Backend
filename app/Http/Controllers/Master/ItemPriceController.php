@@ -163,7 +163,10 @@ class ItemPriceController extends Controller
 
     public function export() {
       try {
-        echo ItemPrice::all();
+        return response()->json([
+          'status' => 'success',
+          'data' => ItemPrice::all()
+        ]);
       } catch(Exception $error) {
         echo $error;
       }
