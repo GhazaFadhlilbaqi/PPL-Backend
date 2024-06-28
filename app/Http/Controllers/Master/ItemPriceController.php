@@ -188,7 +188,7 @@ class ItemPriceController extends Controller
       } catch(Exception) {
         return response()->json([
           'status' => 'error',
-          'message' => 'Gagal menambah data'
+          'message' => 'Gagal mengubah/ menambah data, cek kembali excel yang diupload'
         ]);
       }
     }

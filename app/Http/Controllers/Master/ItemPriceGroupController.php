@@ -31,7 +31,7 @@ class ItemPriceGroupController extends Controller
         if (str_contains($request->name, ',')) {
           return response()->json([
             'status' => 'fail',
-            'message' => "Nama tidak boleh memuat tanda comma",
+            'message' => "Nama tidak boleh memuat tanda koma",
           ], 400);
         }
         $itemPrice = ItemPriceGroup::create($request->only(['name']));
