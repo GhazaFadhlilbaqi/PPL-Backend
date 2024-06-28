@@ -62,6 +62,7 @@ class MasterItemPriceImportController implements ToCollection {
         $itemPriceProvince->update(['price' => $row[$index]]);
         continue;
       };
+      if ($row[$index] == null) { continue; }
       ItemPriceProvince::create([
         'province_id' => Hashids::decode($province->hashId)[0],
         'item_price_id' => $itemPrice->id,
