@@ -200,7 +200,7 @@ class MasterAhsItemExportSheet extends CountableItemController implements FromCo
               return $ahsItemType['title'];
             })->values()->all())));
 
-            // Setup Section Dropdown List
+            // Setup Unit Dropdown List
             $validation = $event->sheet->getCell("F".($i + 2))->getDataValidation();
             $validation->setType(DataValidation::TYPE_LIST);
             $validation->setAllowBlank(false);

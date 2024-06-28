@@ -221,9 +221,9 @@ class AhsController extends CountableItemController
         ]);
       } catch(Exception) {
         return response()->json([
-          'status' => 'error',
-          'message' => 'Gagal menambah data'
-        ]);
+          'status' => 'fail',
+          'message' => 'Gagal mengubah/ menambah data, cek kembali excel yang diupload'
+        ], 400);
       }
     }
 
