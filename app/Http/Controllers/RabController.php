@@ -287,30 +287,6 @@ class RabController extends CountableItemController
             }
         }
 
-        foreach ($masterRab->masterRabItem as $masterRabItem) {
-            $customAhsId = null;
-            if ($masterRabItem->ahs) {
-                // Loop through AHS content, create the ahs item
-                // Check if the user already have the AHS with the same identifier
-                $userCustomAhs = CustomAhs::where('code', $masterRabItem->ahs->id)->where('project_id', $project->id)->first();
-                if ($userCustomAhs) {
-                    $customAhsId = $userCustomAhs->id;
-                } else {
-                    // Begin Custom AHS Creation
-                    $customAhsId = $this->createCustomAhs($request, $project, $masterRabItem->ahs)->id;
-                }
-            }
-            $rabItem = RabItem::create([
-                'rab_id' => $customRab->id,
-                'rab_item_header_id' => null,
-                'name' => $masterRabItem->name,
-                'custom_ahs_id' => $customAhsId,
-                'volume' => $masterRabItem->volume,
-                'price' => $masterRabItem->price,
-                'unit_id' => $masterRabItem->unit_id,
-            ]);
-        }
-
         return $customRab;
     }
 
