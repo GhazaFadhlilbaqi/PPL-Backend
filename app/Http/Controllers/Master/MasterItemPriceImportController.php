@@ -16,6 +16,7 @@ class MasterItemPriceImportController implements ToCollection {
       // Remove table header
       $rows->shift();
       $provinceHeaders = $rows->shift();
+      $provinces = Province::all();
 
       $itemPrices = ItemPrice::all();
       foreach ($itemPrices as $itemPrice) {
@@ -33,7 +34,7 @@ class MasterItemPriceImportController implements ToCollection {
           'name' => $itemPriceRow[3],
           'unit_id' => Unit::where(['name' => $itemPriceRow[4]])->pluck('id')->first()
         ]);
-        $this->updateItemPriceProvince($provinceHeaders, $itemPrice, $itemPriceRow);
+        $this->updateItemPriceProvince($provinces, $provinceHeaders, $itemPrice, $itemPriceRow);
 
         $rows = $rows->filter(function($row) use ($itemPriceRow) {
           return $row[2] != $itemPriceRow[2];
@@ -47,14 +48,16 @@ class MasterItemPriceImportController implements ToCollection {
           'name' => $row[3],
           'unit_id' => Unit::where(['name' => $row[4]])->pluck('id')->first()
         ]);
-        $this->updateItemPriceProvince($provinceHeaders, $itemPrice, $row);
+        $this->updateItemPriceProvince($provinces, $provinceHeaders, $itemPrice, $row);
       }
   }
 
-  private function updateItemPriceProvince($provinceHeaders, $itemPrice, $row) {
+  private function updateItemPriceProvince($provinces, $provinceHeaders, $itemPrice, $row) {
     foreach ($provinceHeaders as $index => $provinceHeader) {
       if ($provinceHeader == null) { continue; }
-      $province = Province::where(['name' => strtoupper($provinceHeader)])->first();
+      $province = $provinces->first(function($province) use ($provinceHeader) {
+        return $province->name == strtoupper($provinceHeader);
+      });
       $itemPriceProvince = ItemPriceProvince::where('province_id', Hashids::decode($province->hashId)[0])
         ->where('item_price_id', $itemPrice->id)
         ->first();
@@ -62,6 +65,7 @@ class MasterItemPriceImportController implements ToCollection {
         $itemPriceProvince->update(['price' => $row[$index]]);
         continue;
       };
+      if ($row[$index] == null) { continue; }
       ItemPriceProvince::create([
         'province_id' => Hashids::decode($province->hashId)[0],
         'item_price_id' => $itemPrice->id,

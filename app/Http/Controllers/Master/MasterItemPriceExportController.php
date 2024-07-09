@@ -57,7 +57,7 @@ class MasterItemPriceExportController extends CountableItemController implements
     }
 
     // Setup item price columns
-    $this->itemPrices = ItemPrice::with(['itemPriceGroup', 'province'])->get()->sortBy('item_price_group_id')->values();
+    $this->itemPrices = ItemPrice::with(['itemPriceGroup'])->get()->sortBy('item_price_group_id')->values();
     foreach ($this->itemPrices as $index => $itemPrice) {
       $itemPriceRow = new Collection([
         $index + 1,
