@@ -137,6 +137,7 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
         Route::get('ids', [AhsController::class, 'getAhsIds']);
         Route::get('export', [AhsController::class, 'export']);
         Route::post('import', [AhsController::class, 'import']);
+        Route::get('project', [AhsController::class, 'fetchMasterAhsProject']);
         Route::get('{ahsId?}', [AhsController::class, 'index']);
         Route::post('{ahsId?}', [AhsController::class, 'store']);
         Route::post('{ahs}/update', [AhsController::class, 'update']);
@@ -222,6 +223,7 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
                 Route::post('', [RabItemController::class, 'store']);
                 Route::get('{rabItem}/delete', [RabItemController::class, 'destroy']);
                 Route::post('{rabItem}', [RabItemController::class, 'update'])->middleware('request.strip-empty-char-on-request:unit_id,volume');
+                Route::post('{rabItem}/ahs', [RabItemController::class, 'updateAhs']);
             });
 
             Route::prefix('{rab}/item-header')->group(function() {

@@ -84,39 +84,38 @@ class AhsController extends CountableItemController
         ]);
     }
 
-    public function getAhsIds()
+    public function getAhsIds(Request $request)
     {
+      // FIXME: Definiteluy need more improovement !
+      $ahses = Ahs::all();
+      $arrayAhses = [];
 
-        // FIXME: Definiteluy need more improovement !
-        $ahses = Ahs::all();
-        $arrayAhses = [];
+      $ahses = $ahses->filter(function($ahs) {
+          foreach ($ahs->ahsItem as $ahsItem) {
+              if ($ahsItem->ahs_itemable_type == Ahs::class) return false;
+          }
+          return true;
+      });
 
-        $ahses = $ahses->filter(function($ahs) {
-            foreach ($ahs->ahsItem as $ahsItem) {
-                if ($ahsItem->ahs_itemable_type == Ahs::class) return false;
-            }
-            return true;
-        });
+      $ahses = $ahses->map(function($ahs) {
+          return [
+              'name' => $ahs->name,
+              'code' => $ahs->code,
+              'groups' => $ahs->groups,
+              'id' => $ahs->id,
+          ];
+      });
 
-        $ahses = $ahses->map(function($ahs) {
-            return [
-                'name' => $ahs->name,
-                'code' => $ahs->code,
-                'groups' => $ahs->groups,
-                'id' => $ahs->id,
-            ];
-        });
+      foreach ($ahses as $ahs) {
+          $arrayAhses[] = $ahs;
+      }
 
-        foreach ($ahses as $ahs) {
-            $arrayAhses[] = $ahs;
-        }
+      $ahses = $arrayAhses;
 
-        $ahses = $arrayAhses;
-
-        return response()->json([
-            'status' => 'success',
-            'data' => compact('ahses')
-        ]);
+      return response()->json([
+          'status' => 'success',
+          'data' => compact('ahses')
+      ]);
     }
 
     public function store(AhsRequest $request)
@@ -235,5 +234,29 @@ class AhsController extends CountableItemController
         ),
         'Master Ahs.xlsx'
       );
+    }
+
+    public function fetchMasterAhsProject(Request $request) {
+      $ahsQuery = Ahs::query();
+      if ($request->filled('group')) {
+        $ahsQuery->where('groups', $request->group);
+      }
+      $masterAhsItems = $ahsQuery->where(function ($query) use ($request) {
+          $query->where('id', 'LIKE', "%$request->q%")
+                ->orWhere('name', 'LIKE', "%$request->q%");
+        })
+        ->take($request->limit)
+        ->select(['id', 'name', 'groups'])
+        ->without('ahsItem')
+        ->get();
+      $mutatedMasterAhsItems = $masterAhsItems->map(function($data) {
+        return $data;
+      })->toArray();
+      return response()->json([
+        'status' => 'success',
+        'data' => [
+          'ahsList' => $mutatedMasterAhsItems
+        ]
+      ]);
     }
 }
