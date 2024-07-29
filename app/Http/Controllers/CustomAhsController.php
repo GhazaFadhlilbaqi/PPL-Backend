@@ -131,10 +131,18 @@ class CustomAhsController extends CountableItemController
         ]);
     }
 
-    public function getAhsIds(Project $project)
-    {
-        $customAhsItems = CustomAhs::with('customAhsItem.customAhsItemable')
+    public function getAhsIds(Project $project, Request $request) {
+        $customAhsQuery = CustomAhs::query();
+        if ($request->has('limit')) {
+          $customAhsQuery->take($request->limit);
+        }
+        $customAhsItems = $customAhsQuery->with('customAhsItem.customAhsItemable')
           ->where(['project_id' => $project->hashidToId($project->hashid)])
+          ->where(function ($query) use ($request) {
+            $query->where('code', 'LIKE', "%$request->q%")
+                  ->orWhere('name', 'LIKE', "%$request->q%");
+          })
+          ->latest()
           ->get();
         $ahsItemIds = $customAhsItems->map(function($data) use ($project) {
             $price = 0;
@@ -200,14 +208,14 @@ class CustomAhsController extends CountableItemController
         ]);
     }
 
-    private function copyCustomAhsFromAhs(Project $project, $ahsReferenceId, Request $request)
+    public function copyCustomAhsFromAhs(Project $project, $ahsReferenceId, Request $request)
     {
 
         $referencedAhs = Ahs::find($ahsReferenceId);
 
         if ($referencedAhs) {
 
-            DB::transaction(function() use ($project, $referencedAhs, $request) {
+            $result = DB::transaction(function() use ($project, $referencedAhs, $request) {
 
                 $customAhsItemRemapped = [];
 
@@ -277,8 +285,9 @@ class CustomAhsController extends CountableItemController
                 }
 
                 CustomAhsItem::insert($customAhsItemRemapped);
-
             });
+
+            return $result;
 
         } else {
             throw new Exception('No parent reference found');
