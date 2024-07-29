@@ -142,6 +142,7 @@ class CustomAhsController extends CountableItemController
             $query->where('code', 'LIKE', "%$request->q%")
                   ->orWhere('name', 'LIKE', "%$request->q%");
           })
+          ->latest()
           ->get();
         $ahsItemIds = $customAhsItems->map(function($data) use ($project) {
             $price = 0;

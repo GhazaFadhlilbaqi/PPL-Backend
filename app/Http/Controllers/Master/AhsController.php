@@ -248,6 +248,7 @@ class AhsController extends CountableItemController
         ->take($request->limit)
         ->select(['id', 'name', 'groups'])
         ->without('ahsItem')
+        ->latest()
         ->get();
       $mutatedMasterAhsItems = $masterAhsItems->map(function($data) {
         return $data;

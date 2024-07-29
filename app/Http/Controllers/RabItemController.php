@@ -66,7 +66,17 @@ class RabItemController extends Controller
   }
 
   public function updateAhs(Project $project, Rab $rab, RabItem $rabItem, Request $request) {
-    // 1) Create new AHS project when requested ahs is not AHS project
+    // 1) Check duplicated AHS project
+    $savedCustomAhs = $project->customAhs
+        ->where('code', $request->ahs_id)
+        ->first();
+    if ($request->group_id && $savedCustomAhs) {
+      return response()->json([
+        'message' => 'Kode AHS ini sudah digunakan !'
+      ], 422);
+    };
+
+    // 2) Create new AHS project when requested ahs is not AHS project
     if ($request->group_id) {
       $request = $this->createNewAHSProject($project, $request);
     }
@@ -74,7 +84,7 @@ class RabItemController extends Controller
       'custom_ahs_id' => Hashids::decode($request->ahs_id)[0]
     ]);
 
-    // 2) Calculate custom AHS price
+    // 3) Calculate custom AHS price
     $customAhs = CustomAhs::where(['id' => Hashids::decode($request->ahs_id)[0]])
       ->with('customAhsItem.customAhsItemable')
       ->first();
@@ -84,9 +94,8 @@ class RabItemController extends Controller
       $projectPrice = $vendorPrice + ($vendorPrice * ($project->profit_margin/100));
       $customAhs->price = $customAhs->price + $projectPrice;
     }
-    // unset($customAhs->customAhsItem);
 
-    // 3) Send response to client
+    // 4) Send response to client
     return response()->json([
       'status' => 'success',
       'data' => compact('customAhs')
@@ -105,16 +114,6 @@ class RabItemController extends Controller
   // MARK: Private Functions
 
   private function createNewAHSProject(Project $project, Request $request) {
-    $savedCustomAhs = $project->customAhs
-      ->where('code', $request->ahs_id)
-      ->first();
-    if ($savedCustomAhs) {
-      return response()->json([
-        'errors' => [
-          'code' => ['Kode AHS ini sudah digunakan !']
-        ]
-      ], 422);
-    };
     $masterAhs = Ahs::where(['id' => $request->ahs_id])->first();
     $request->merge([
       'code' => $masterAhs->id,
