@@ -37,51 +37,56 @@ class AhsController extends CountableItemController
 
     public function index(Request $request, $ahsId = null)
     {
-        $ahs = !is_null($ahsId) ? Ahs::where('id', $ahsId) : Ahs::query();
-        $ahs = $ahs->with(['ahsItem' => function($ahsItem) { $ahsItem->with(['ahsItemable', 'unit']); }])->orderBy('created_at', 'ASC');
-        $isPaginateRequest = $request->has('page') && (int) $request->page > 0;
-        $paginationAttribute = [];
+      $ahs = !is_null($ahsId) ? Ahs::where('id', $ahsId) : Ahs::query();
+      $ahs = $ahs->with(['ahsItem' => function($ahsItem) {
+                $ahsItem->with(['ahsItemable', 'unit']);
+              }])
+              ->orderBy('created_at', 'ASC')
+              ->where('name', 'LIKE', '%' . $request->q . '%')
+              ->orWhere('id', 'LIKE', '%' . $request->q . '%');
+      $isPaginateRequest = $request->has('page') && (int) $request->page > 0;
+      $paginationAttribute = [];
 
-        if ($request->selected_ahs_group && $request->selected_ahs_group != '' && $request->selected_ahs_group != 'all') {
-            $ahs->where('groups', $request->selected_ahs_group);
-        }
+      if ($request->selected_ahs_group && $request->selected_ahs_group != '' && $request->selected_ahs_group != 'all') {
+          $ahs->where('groups', $request->selected_ahs_group);
+      }
 
-        # Paginate AHS
-        if ($isPaginateRequest) {
-            $paginationResult = $this->paginateAhs($ahs, $request->page, $request->per_page);
-            $ahs = $paginationResult['ahs'];
-            $paginationAttribute['total_page'] = $paginationResult['total_page'];
-            $paginationAttribute['total_rows'] = $paginationResult['total_rows'];
-        };
+      # Paginate AHS
+      if ($isPaginateRequest) {
+          $paginationResult = $this->paginateAhs($ahs, $request->page, $request->per_page);
+          $ahs = $paginationResult['ahs'];
+          $paginationAttribute['total_page'] = $paginationResult['total_page'];
+          $paginationAttribute['total_rows'] = $paginationResult['total_rows'];
+      };
 
-        $ahs = $ahs->get();
+      $ahs = $ahs->get();
 
-        $provinceId = Hashids::decode($request->province);
+      $provinceId = Hashids::decode($request->province);
 
-        # Categorizing by section
-        if ($request->arrange == 'true' && $request->has('province')) {
+      # Categorizing by section
+      if ($request->arrange == 'true' && $request->has('province')) {
 
-            $itemArranged = [];
+          $itemArranged = [];
 
-            foreach ($ahs as $key => $a) {
+          foreach ($ahs as $key => $a) {
 
-                # Categorizing by it's section. (e.g labor, ingredients, etc)
-                foreach ($a->ahsItem as $key2 => $aItem) $itemArranged[$aItem->section][] = $aItem;
+              # Categorizing by it's section. (e.g labor, ingredients, etc)
+              foreach ($a->ahsItem as $key2 => $aItem) $itemArranged[$aItem->section][] = $aItem;
 
-                $ahs[$key]['item_arranged'] = $itemArranged;
+              $ahs[$key]['item_arranged'] = $itemArranged;
 
-                $itemArranged = [];
-                $ahs[$key] = $this->countAhsSubtotal($a, $provinceId);
-            }
-        }
+              $itemArranged = [];
+              $ahs[$key] = $this->countAhsSubtotal($a, $provinceId);
+          }
+      }
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'ahs' => $ahs,
-                'pagination_attribute' => $paginationAttribute,
-            ]
-        ]);
+      return response()->json([
+          'status' => 'success',
+          'data' => [
+              'ahs' => $ahs,
+              'pagination_attribute' => $paginationAttribute,
+          ]
+      ]);
     }
 
     public function getAhsIds(Request $request)
