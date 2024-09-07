@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ProjectRabExport;
+use App\Helpers\ProjectHelper;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Requests\ProjectUpdateRequest;
 use App\Models\Order;
@@ -37,7 +38,7 @@ class ProjectController extends Controller
               ->make();
     }
 
-    public function store(ProjectRequest $request)
+    public function store_demo(ProjectRequest $request)
     {
 
         DB::beginTransaction();
@@ -60,14 +61,12 @@ class ProjectController extends Controller
         ]));
 
         $user = Auth::user();
-
-        // We assume user has demo quota
         $order = Order::create([
             'order_id' => $this->generateOrderId(),
             'user_id' => $user->id,
             'project_id' => $project->id,
             'is_active' => true,
-            'expired_at' => Carbon::now()->subMonth(-1),
+            'expired_at' => ProjectHelper::get_expired_date('demo'),
             'subscription_id' => 'demo',
             'status' => 'completed',
             'used_at' => Carbon::now(),

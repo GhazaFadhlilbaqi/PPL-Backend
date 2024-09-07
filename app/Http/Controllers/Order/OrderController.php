@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Order;
 
+use App\Helpers\ProjectHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Project;
@@ -172,12 +173,10 @@ class OrderController extends Controller
         Order::where('project_id', $project->id)->update([
             'is_active' => false,
         ]);
-
         $order->project_id = $project->id;
         $order->status = 'completed';
-        $order->expired_at = $order->subscription->subscription_type == 'MONTHLY' ? Carbon::now()->subMonth(-1) : ($order->subscription->subscription_type == 'ANNUALLY' ? Carbon::now()->subYear(-1) : ($order->subscription->subscription_type == 'QUARTERLY' ? Carbon::now()->subMonth(-3) : ($order->subscription->subscription_type == 'THREEDAYS' ? Carbon::now()->subDay(-3) : Carbon::now()->subDay(-1))));
         $order->is_active = true;
-
+        $order->expired_at = ProjectHelper::get_expired_date('demo');
         $order->save();
     }
 }
