@@ -196,7 +196,7 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
  */
 Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page'])->group(function() {
     Route::get('', [ProjectController::class, 'index']);
-    Route::post('', [ProjectController::class, 'store'])->middleware('ensure.demo.eligibility');
+    Route::post('', [ProjectController::class, 'store_demo'])->middleware('ensure.demo.eligibility');
     Route::post('{project}', [ProjectController::class, 'update']);
     Route::get('{project}', [ProjectController::class, 'show']);
     Route::get('{project}/delete', [ProjectController::class, 'destroy']);

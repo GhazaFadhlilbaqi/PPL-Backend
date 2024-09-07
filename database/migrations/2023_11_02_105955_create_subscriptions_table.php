@@ -17,7 +17,7 @@ class CreateSubscriptionsTable extends Migration
             $table->string('id')->primary();
             $table->string('name');
             $table->double('price');
-            $table->enum('subscription_type', ['DAILY', 'THREEWEEKLY', 'MONTHLY', 'ANNUALLY', 'QUARTERLY']);
+            $table->enum('subscription_type', ['DAILY', 'THREEDAYS', 'MONTHLY', 'ANNUALLY', 'QUARTERLY']);
             $table->text('description')->nullable();
             $table->boolean('is_show')->default(1);
             $table->integer('order')->nullable();

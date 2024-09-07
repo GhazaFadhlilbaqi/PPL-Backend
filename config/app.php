@@ -248,6 +248,9 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Vuetable' => Vuetable\VuetableFacade::class,
         'Terbilang' => Riskihajar\Terbilang\Facades\Terbilang::class,
+
+        // Custom Helpers
+        'ProjectHelper' => App\Helpers\ProjectHelper::class,
     ],
 
 ];
