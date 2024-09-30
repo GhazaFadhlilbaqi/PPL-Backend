@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Master;
 
+use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ItemPriceBatchUpdateRequest;
 use App\Http\Requests\ItemPriceRequest;
@@ -185,10 +186,14 @@ class ItemPriceController extends Controller
           'status' => 'success',
           'data' => ItemPrice::all()
         ]);
-      } catch(Exception) {
+      } catch(Exception $error) {
+        $errorMessage = 'Gagal mengubah/ menambah data, cek kembali excel yang diupload';
+        if ($error instanceof CustomException) {
+          $errorMessage = $error->getMessage();
+        }
         return response()->json([
           'status' => 'fail',
-          'message' => 'Gagal mengubah/ menambah data, cek kembali excel yang diupload'
+          'message' => $errorMessage
         ], 400);
       }
     }
