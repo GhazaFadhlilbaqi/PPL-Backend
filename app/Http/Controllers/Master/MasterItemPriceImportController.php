@@ -50,7 +50,7 @@ class MasterItemPriceImportController implements ToCollection {
         // 3.5) Exclude item price data from excel for create new data flow
         $rows = $rows->filter(function($row) use ($itemPriceRow) {
           return $row[2] != $itemPriceRow[2];
-        })->values();
+        })->all();
       }
 
       // 4) Create item price when item price data is not exists on database
