@@ -13,13 +13,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Vinkla\Hashids\Facades\Hashids;
 
 class MasterItemPriceImportController implements ToCollection {
-  private Collection $itemPriceRows;
-
   public function collection(Collection $rows) {
-      $this->itemPriceRows = $rows;
       // 1) Remove table header
-      $this->itemPriceRows->shift();
-      $provinceHeaders = $this->itemPriceRows->shift();
+      $rows->shift();
+      $provinceHeaders = $rows->shift();
 
       // 2) Fetch provinces for update item price based on provinces
       $provinces = Province::all();
@@ -28,7 +25,7 @@ class MasterItemPriceImportController implements ToCollection {
       $itemPrices = ItemPrice::all();
       foreach ($itemPrices as $itemPrice) {
          // 3.1) Remove item price data when data is not found in excel
-        $itemPriceRow = $this->itemPriceRows->first(function($row) use ($itemPrice){
+        $itemPriceRow = $rows->first(function($row) use ($itemPrice){
           return $row[2] == $itemPrice->id;
         });
         if (!$itemPriceRow) {
@@ -37,10 +34,10 @@ class MasterItemPriceImportController implements ToCollection {
         }
 
         // 3.2) Check item price group availability
-        $itemPriceGroupId = $this->checkItemPriceGroupValidity($this->itemPriceRows, $itemPriceRow[2], $itemPriceRow[1]);
+        $itemPriceGroupId = $this->checkItemPriceGroupValidity($rows, $itemPriceRow[2], $itemPriceRow[1]);
 
         // 3.3) Check unit id availability
-        $unitId = $this->checkUnitValidity($this->itemPriceRows, $itemPriceRow[2],$itemPriceRow[4]);
+        $unitId = $this->checkUnitValidity($rows, $itemPriceRow[2],$itemPriceRow[4]);
 
         // 3.4) Update item price data with updated one from excel
         $itemPrice->update([
@@ -51,20 +48,24 @@ class MasterItemPriceImportController implements ToCollection {
         $this->updateItemPriceProvince($provinces, $provinceHeaders, $itemPrice, $itemPriceRow);
 
         // 3.5) Exclude item price data from excel for create new data flow
-        $this->itemPriceRows = $this->itemPriceRows->filter(function($row) use ($itemPriceRow) {
+        $rows = $rows->filter(function($row) use ($itemPriceRow) {
           return $row[2] != $itemPriceRow[2];
         })->values();
       }
 
       // 4) Create item price when item price data is not exists on database
-      foreach ($this->itemPriceRows as $row) {
+      foreach ($rows as $row) {
         // 4.1) Check item price group availability
-        $itemPriceGroupId = $this->checkItemPriceGroupValidity($this->itemPriceRows, $row[2],$row[1]);
+        $itemPriceGroupId = $this->checkItemPriceGroupValidity($rows, $row[2],$row[1]);
 
         // 4.2) Check unit id availability
-        $unitId = $this->checkUnitValidity($this->itemPriceRows, $row[2], $row[4]);
+        $unitId = $this->checkUnitValidity($rows, $row[2], $row[4]);
 
         // 4.3) Create item price data
+        if (ItemPrice::where('id', $row[2])->exists()) {
+          throw new CustomException('Duplicated '.$row[2].' data inside excel.');
+          continue;
+        }
         $itemPrice = ItemPrice::create([
           'id' => $row[2],
           'item_price_group_id' => $itemPriceGroupId,
