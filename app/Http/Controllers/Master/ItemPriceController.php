@@ -187,6 +187,7 @@ class ItemPriceController extends Controller
           'data' => ItemPrice::all()
         ]);
       } catch(Exception $error) {
+        \Sentry\captureException($error);
         $errorMessage = 'Gagal mengubah/ menambah data, cek kembali excel yang diupload';
         if ($error instanceof CustomException) {
           $errorMessage = $error->getMessage();
