@@ -61,18 +61,20 @@ class RegisterController extends Controller
     }
 
     private function removeUnverifiedUser(RegisterRequest $request) {
-      $existingUser = User::where('email', $request->email)
+      $existingUsers = User::where('email', $request->email)
                           ->orWhere('phone', $request->phone)
-                          ->first();
-      if(!$existingUser) { return; }
-      if ($existingUser->email_verified_at === null) {
-        $existingUser->delete();
-        return;
+                          ->get();
+      if($existingUsers->isEmpty()) { return; }
+      foreach ($existingUsers as $existingUser) {
+        if($existingUser->email_verified_at === null) {
+          $existingUser->delete();
+          continue;
+        }
+        $validationRules = $request->rules();
+        $validationRules['email'] .= "|unique:users,email";
+        $validationRules['phone'] .= "|unique:users,phone";
+        $request->validate($validationRules);
       }
-      $validationRules = $request->rules();
-      $validationRules['email'] .= "|unique:users,email";
-      $validationRules['phone'] .= "|unique:users,phone";
-      $request->validate($validationRules);
     }
 
     private function createUserAccount(RegisterRequest $request) {
