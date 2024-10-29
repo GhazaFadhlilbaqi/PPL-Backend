@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Sentry;
 use App\Models\User;
 use App\Observers\UserObserver;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +26,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+      if (app()->environment('local')) {
+        Sentry\init(['dsn' => '']);
+    } else {
+        Sentry\init(['dsn' => env('SENTRY_DSN')]);
+    }
     }
 }
