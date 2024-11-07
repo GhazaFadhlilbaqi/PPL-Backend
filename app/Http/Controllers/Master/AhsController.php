@@ -231,7 +231,8 @@ class AhsController extends CountableItemController
         }
         return response()->json([
           'status' => 'fail',
-          'message' => $error_message
+          'message' => $error_message,
+          'dev_message' => $error->getMessage()
         ], 400);
       }
     }
