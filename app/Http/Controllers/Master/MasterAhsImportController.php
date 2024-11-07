@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Master;
 
+use Exception;
+use App\Exceptions\CustomException;
 use App\Models\Ahs;
 use App\Models\AhsItem;
 use App\Models\Unit;
@@ -105,21 +107,25 @@ class MasterAhsItemImportSheet implements ToCollection {
             })->name
             : $row[4]; 
         }
-        AhsItem::create([
-          'ahs_id' => $row[1],
-          'section' => $this->ahsItemTypes->first(function($ahsItemType) use ($row) {
-            return $ahsItemType['title'] == $row[2];
-          })['key'],
-          'ahs_itemable_id' => $row[3],
-          'ahs_itemable_type' => $isAhsReference
-            ? 'App\\Models\\Ahs'
-            : 'App\\Models\\ItemPrice',
-          'name' => $ahsName,
-          'unit_id' => $isAhsReference
-            ? Unit::where(['name' => $row[5]])->pluck('id')->first()
-            : null,
-          'coefficient' => $row[6],
-        ]);
+        try {
+          AhsItem::create([
+            'ahs_id' => $row[1],
+            'section' => $this->ahsItemTypes->first(function($ahsItemType) use ($row) {
+              return $ahsItemType['title'] == $row[2];
+            })['key'],
+            'ahs_itemable_id' => $row[3],
+            'ahs_itemable_type' => $isAhsReference
+              ? 'App\\Models\\Ahs'
+              : 'App\\Models\\ItemPrice',
+            'name' => $ahsName,
+            'unit_id' => $isAhsReference
+              ? Unit::where(['name' => $row[5]])->pluck('id')->first()
+              : null,
+            'coefficient' => $row[6],
+          ]);
+        } catch (Exception) {
+          throw new CustomException("There's an error on row ".$row[0].". please check.");
+        }
       }
   }
 }

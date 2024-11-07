@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Master;
 
+use App\Exceptions\CustomException;
 use App\Http\Controllers\CountableItemController;
 use App\Http\Requests\AhsRequest;
 
@@ -223,10 +224,14 @@ class AhsController extends CountableItemController
           'status' => 'success',
           'data' => Ahs::all()
         ]);
-      } catch(Exception) {
+      } catch(Exception $error) {
+        $error_message = 'Gagal mengubah/ menambah data, cek kembali excel yang diupload';
+        if ($error instanceof CustomException) {
+          $error_message = $error->getMessage();
+        }
         return response()->json([
           'status' => 'fail',
-          'message' => 'Gagal mengubah/ menambah data, cek kembali excel yang diupload'
+          'message' => $error_message
         ], 400);
       }
     }
