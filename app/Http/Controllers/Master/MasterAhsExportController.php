@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Master;
 
+use App\Enums\AhsSectionEnum;
 use App\Http\Controllers\CountableItemController;
 use App\Models\Ahs;
 use App\Models\AhsItem;
@@ -147,7 +148,12 @@ class MasterAhsItemExportSheet extends CountableItemController implements FromCo
         ->sortBy(function($item) {
           return array_search(
             $item->section,
-            ['labor', 'ingredients', 'tools', 'others']
+            [
+                AhsSectionEnum::LABOR->value,
+                AhsSectionEnum::INGREDIENTS->value,
+                AhsSectionEnum::TOOLS->value,
+                AhsSectionEnum::OTHERS->value
+            ]
           );
         })
         ->sortBy('ahs_id')

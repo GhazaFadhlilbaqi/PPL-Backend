@@ -203,6 +203,41 @@ class ProjectController extends Controller
 
     }
 
+    public function getMaterialSummary(Project $project)
+    {
+        // 1) Merge all custom ahs item data into one collection
+        $rabs = $project->load(['rab.rabItem.customAhs.customAhsItem.customAhsItemable'])->rab;
+        $ahsItems = $rabs->flatMap(function ($rab) {
+            return $rab->rabItem->flatMap(function ($rabItem) {
+                return $rabItem->customAhs->customAhsItem;
+            });
+        });
+
+        // 2) Check for any duplicated ahs item and increment coefficient & price
+        $mergedAhsItems = new Collection();
+        foreach ($ahsItems as $ahsItem) {
+            $customAhsItem = $ahsItem->customAhsItemable;
+            $mergedAhsItem = $mergedAhsItems->first(function ($mergedAhsItem) use ($customAhsItem) {
+                return $mergedAhsItem['name'] == $customAhsItem->name;
+            });
+            if (isset($mergedAhsItem)) {
+                $mergedAhsItem['total_coefficient'] = $mergedAhsItem['total_coefficient'] + $ahsItem->coefficient;
+            } else {
+                $mergedAhsItems->push(new Collection([
+                    'name' => $customAhsItem->name,
+                    'unit_name' => $customAhsItem->unit->name,
+                    'total_coefficient' => $ahsItem->coefficient,
+                    'total_price' => $customAhsItem->price,
+                    'section' => $ahsItem->section
+                ]));
+            }
+        }
+
+        return $mergedAhsItems->sortBy('name')->values()->sortBy(function ($item) {
+            return $item['section'] != AhsSectionEnum::LABOR->value;
+        })->values();
+    }
+
     private function giveUnbelongedAccessResponse()
     {
         return response()->json([

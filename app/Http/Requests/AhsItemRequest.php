@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\AhsSectionEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AhsItemRequest extends FormRequest
@@ -23,8 +24,14 @@ class AhsItemRequest extends FormRequest
      */
     public function rules()
     {
+        $ahsSections = [
+            AhsSectionEnum::LABOR->value,
+            AhsSectionEnum::INGREDIENTS->value,
+            AhsSectionEnum::TOOLS->value,
+            AhsSectionEnum::OTHERS->value
+        ];
         return [
-            'section' => 'required|in:labor,ingredients,tools,others',
+            'section' => 'required|in:'.implode(',', $ahsSections),
             'ahs_itemable_id' => 'required',
             'ahs_itemable_type' => 'required',
         ];
