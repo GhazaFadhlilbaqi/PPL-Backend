@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Master;
 
+use App\Enums\AhsSectionEnum;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\CountableItemController;
 use App\Http\Requests\AhsRequest;
@@ -29,10 +30,10 @@ class AhsController extends CountableItemController
       ['key' => 'reference-2023', 'title' => 'PUPR 2023']
     ]);
     $this->ahsItemTypes = new Collection([
-      ['key' => 'labor', 'title' => 'TENAGA KERJA'],
-      ['key' => 'ingredients', 'title' => 'BAHAN'],
-      ['key' => 'tools', 'title' => 'PERALATAN'],
-      ['key' => 'others', 'title' => 'LAIN-LAIN']
+        ['key' => AhsSectionEnum::LABOR->value, 'title' => 'TENAGA KERJA'],
+        ['key' => AhsSectionEnum::INGREDIENTS->value, 'title' => 'BAHAN'],
+        ['key' => AhsSectionEnum::TOOLS->value, 'title' => 'PERALATAN'],
+        ['key' => AhsSectionEnum::OTHERS->value, 'title' => 'LAIN-LAIN']
     ]);
   }
 

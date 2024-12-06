@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AhsSectionEnum;
 use App\Exports\ProjectRabExport;
 use App\Helpers\ProjectHelper;
 use App\Http\Requests\ProjectRequest;
@@ -12,6 +13,7 @@ use App\Models\Province;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -201,6 +203,56 @@ class ProjectController extends Controller
         //     return abort(403);
         // }
 
+    }
+
+    public function getMaterialSummary(Project $project)
+    {
+        // TODO: GET RAB ITEM INSTEAD OF CUSTOM AHS BCS CUSTOM AHS CAN BE NULL
+
+        // 1) Merge all custom ahs item data into one collection
+        $rabs = $project->load(['rab.rabItem.customAhs.customAhsItem.customAhsItemable', 'rab.rabItem.unit'])->rab;
+        $rabItems = $rabs->flatMap(function ($rab) {
+            return $rab->rabItem;
+        });
+
+        // return $rabItems;
+
+        // 2) Check for custom rab item (not related to ahs) & any duplicated ahs item and increment coefficient & price
+        $mergedAhsItems = new Collection();
+        foreach ($rabItems as $rabItem) {
+            if (!isset($rabItem->customAhs)) {
+                $mergedAhsItems->push(new Collection([
+                    'name' => $rabItem->name,
+                    'unit_name' => $rabItem->unit->name,
+                    'total_coefficient' => $rabItem->volume,
+                    'total_price' => $rabItem->price ?? 0,
+                    'section' => null
+                ]));
+                continue;
+            }
+            $ahsItems = $rabItem->customAhs->customAhsItem;
+            foreach ($ahsItems as $ahsItem) {
+                $customAhsItem = $ahsItem->customAhsItemable;
+                $mergedAhsItem = $mergedAhsItems->first(function ($mergedAhsItem) use ($customAhsItem) {
+                    return $mergedAhsItem['name'] == $customAhsItem->name;
+                });
+                if (isset($mergedAhsItem)) {
+                    $mergedAhsItem['total_coefficient'] = $mergedAhsItem['total_coefficient'] + $ahsItem->coefficient;
+                    continue;
+                }
+                $mergedAhsItems->push(new Collection([
+                    'name' => $customAhsItem->name,
+                    'unit_name' => $customAhsItem->unit->name,
+                    'total_coefficient' => $ahsItem->coefficient,
+                    'total_price' => $customAhsItem->price,
+                    'section' => $ahsItem->section
+                ]));
+            }
+        }
+
+        return $mergedAhsItems->sortBy('name')->values()->sortBy(function ($item) {
+            return $item['section'] != AhsSectionEnum::LABOR->value && $item['section'] == null;
+        })->values();
     }
 
     private function giveUnbelongedAccessResponse()

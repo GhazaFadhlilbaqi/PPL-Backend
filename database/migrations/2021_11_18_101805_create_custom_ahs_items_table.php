@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AhsSectionEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +20,12 @@ class CreateCustomAhsItemsTable extends Migration
             $table->string('name')->nullable();
             $table->unsignedBigInteger('unit_id')->nullable();
             $table->float('coefficient')->default(0.0);
-            $table->enum('section', ['labor', 'ingredients', 'tools', 'others']);
+            $table->enum('section', [
+                AhsSectionEnum::LABOR->value,
+                AhsSectionEnum::INGREDIENTS->value,
+                AhsSectionEnum::TOOLS->value,
+                AhsSectionEnum::OTHERS->value
+            ]);
             $table->string('custom_ahs_itemable_id');
             $table->string('custom_ahs_itemable_type');
             $table->timestamps();
