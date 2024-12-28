@@ -11,49 +11,42 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailVerificationMail;
-use Illuminate\Support\Facades\Crypt;
 
 class LoginController extends Controller
 {
     public function login(LoginRequest $request)
     {
         $credentials = $request->only(['email', 'password']);
-
-        if (Auth::attempt($credentials)) {
-
-            if (!is_null(Auth::user()->email_verified_at)) {
-
-                $user = Auth::user();
-                $user->getAllPermissions();
-                $token = $user->createToken('auth');
-
-                // Populate company data
-                $user->company;
-
-                return response()->json([
-                    'status' => 'success',
-                    'data' => compact('user', 'token')
-                ]);
-
-            } else {
-
-                $this->sendVerificationMail(Auth::user());
-                Auth::logout();
-
-                return response()->json([
-                    'status' => 'fail',
-                    'message' => 'Email anda belum diverifikasi. Instruksi verifikasi telah dikirim ke alamat email Anda. Silakan cek dan ikuti petunjuknya untuk menyelesaikan verifikasi.'
-                ], 401);
-            }
-
-        } else {
-
+        if (!Auth::attempt($credentials)) {
             return response()->json([
                 'status' => 'fail',
                 'message' => 'The credentials is wrong'
             ], 401);
-
         }
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        
+        // Check Email Verification Status
+        if (is_null($user ->email_verified_at)) {
+            $this->sendVerificationMail(Auth::user());
+            Auth::logout();
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Email anda belum diverifikasi. Instruksi verifikasi telah dikirim ke alamat email Anda. Silakan cek dan ikuti petunjuknya untuk menyelesaikan verifikasi.'
+            ], 401);
+        }
+
+        $user->update(['last_login' => now()]);
+        $user->getAllPermissions();
+        $token = $user->createToken('auth');
+
+        // Populate company data
+        $user->company;
+
+        return response()->json([
+            'status' => 'success',
+            'data' => compact('user', 'token')
+        ]);
     }
 
     public function logout(Request $request)

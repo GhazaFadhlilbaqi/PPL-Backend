@@ -17,6 +17,33 @@ class UserController extends Controller
     const PHOTO_PROFILE_PATH = '/storage/uploads/users/profile-photo/';
     const DEFAULT_PHOTO_NAME = 'default-profile-picture.svg';
 
+    public function index(Request $request)
+    {
+        $searchQuery = $request->query('search');
+        $query = User::where('email', 'LIKE', '%' . $searchQuery . '%')
+            ->orWhere('phone', 'LIKE', '%' . $searchQuery . '%')
+            ->withCount(['project' => function($query) {
+                $query->whereHas('order', function ($query) {
+                    $query->where('expired_at', '>', now());
+                });
+            }]);
+        if ($request->sort === 'project_count') {
+            $query->orderBy('project_count', 'desc');
+        }
+        $query->orderBy('last_login', 'desc');
+        $users = $query->paginate($request->query('limit', 15));
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'users' => $users->items(),
+                'pagination_attribute' => [
+                    'total_page' => $users->lastPage(),
+                    'total_data' => $users->total()
+                ]
+            ]
+        ]);
+    }
+
     public function show(User $user)
     {
         return response()->json([
@@ -63,7 +90,6 @@ class UserController extends Controller
                 'status' => 'success',
                 'data' => compact('user')
             ]);
-
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'fail',
