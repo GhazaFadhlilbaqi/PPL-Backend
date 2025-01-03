@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminProjectController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -48,6 +49,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(('auth:sanctum'))->group(function() {
     Route::resource('users', UserController::class);
+    Route::resource('admin/projects', AdminProjectController::class);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
