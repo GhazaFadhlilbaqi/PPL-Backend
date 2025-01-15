@@ -45,7 +45,7 @@ class AhsController extends CountableItemController
       $ahs = $ahs->with(['ahsItem' => function($ahsItem) {
         $ahsItem->with(['ahsItemable', 'unit']);
       }])
-      ->orderBy('created_at', 'ASC');
+      ->orderBy('created_at', 'DESC');
 
       if (isset($request->q)) {
         $ahs->where('name', 'LIKE', '%' . $request->q . '%')
