@@ -27,7 +27,8 @@ class AhsController extends CountableItemController
   public function __construct() {
     $this->masterAhsGroups = new Collection([
       ['key' => 'reference', 'title' => 'PUPR 2016'],
-      ['key' => 'reference-2023', 'title' => 'PUPR 2023']
+      ['key' => 'reference-2023', 'title' => 'PUPR 2023'],
+      ['key' => 'reference-2024', 'title' => 'PUPR 2024']
     ]);
     $this->ahsItemTypes = new Collection([
         ['key' => AhsSectionEnum::LABOR->value, 'title' => 'TENAGA KERJA'],
@@ -40,20 +41,24 @@ class AhsController extends CountableItemController
     public function index(Request $request, $ahsId = null)
     {
       $ahs = !is_null($ahsId) ? Ahs::where('id', $ahsId) : Ahs::query();
+
       $ahs = $ahs->with(['ahsItem' => function($ahsItem) {
-                $ahsItem->with(['ahsItemable', 'unit']);
-              }])
-              ->orderBy('created_at', 'ASC')
-              ->where('name', 'LIKE', '%' . $request->q . '%')
-              ->orWhere('id', 'LIKE', '%' . $request->q . '%');
-      $isPaginateRequest = $request->has('page') && (int) $request->page > 0;
-      $paginationAttribute = [];
+        $ahsItem->with(['ahsItemable', 'unit']);
+      }])
+      ->orderBy('created_at', 'ASC');
+
+      if (isset($request->q)) {
+        $ahs->where('name', 'LIKE', '%' . $request->q . '%')
+            ->orWhere('id', 'LIKE', '%' . $request->q . '%');
+      }
 
       if ($request->selected_ahs_group && $request->selected_ahs_group != '' && $request->selected_ahs_group != 'all') {
-          $ahs->where('groups', $request->selected_ahs_group);
+        $ahs->where('groups', $request->selected_ahs_group);
       }
 
       # Paginate AHS
+      $isPaginateRequest = $request->has('page') && (int) $request->page > 0;
+      $paginationAttribute = [];
       if ($isPaginateRequest) {
           $paginationResult = $this->paginateAhs($ahs, $request->page, $request->per_page);
           $ahs = $paginationResult['ahs'];
