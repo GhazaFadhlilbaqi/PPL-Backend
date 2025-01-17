@@ -143,7 +143,7 @@ class MasterAhsItemExportSheet extends CountableItemController implements FromCo
       $ahsItemCollection = new Collection([
         ['No', 'Kode AHS', 'Tipe', 'Kode Item', 'Nama', 'Satuan', 'Koefisien']
       ]);
-      $ahsItems = AhsItem::with('unit')
+      $ahsItems = AhsItem::with('unit')->with('ahsItemable')
         ->get()
         ->sortBy(function($item) {
           return array_search(
@@ -167,8 +167,12 @@ class MasterAhsItemExportSheet extends CountableItemController implements FromCo
             return $value['key'] == $ahsItem->section;
           })['title'],
           $ahsItem->ahs_itemable_id,
-          $ahsItem->name,
-          $ahsItem->unit->name ?? "",
+          $ahsItem->ahsItemable !== null
+            ? $ahsItem->ahsItemable->name
+            : $ahsItem->name,
+          $ahsItem->ahsItemable !== null
+            ? $ahsItem->ahsItemable->unit->name ?? ""
+            : $ahsItem->unit->name ?? "",
           $ahsItem->coefficient,
         ]);
       }
