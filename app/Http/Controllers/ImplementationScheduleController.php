@@ -135,10 +135,9 @@ class ImplementationScheduleController extends Controller
       return number_format((($rabItem['volume'] * $rabItem['price']) / $totalPrice) * 100, 2);
     }
 
-    $project = Project::where('id', 4770)->first();
+    // $project = Project::where('id', 4770)->first();
 
-    // $budgetPlans = Rab::where('project_id', $project->hashidToId($project->hashid))
-    $budgetPlans = Rab::where('project_id', 4770)
+    $budgetPlans = Rab::where('project_id', $project->hashidToId($project->hashid))
       ->with(['rabItemHeader.rabItem.unit', 'rabItemHeader.rabItem.implementationSchedule', 'rabItem.unit'])
       ->get()
       ->map(function ($rab) {
