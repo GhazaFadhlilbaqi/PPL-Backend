@@ -1,5 +1,7 @@
 <?php
 
+use App\Exports\SCurveExport;
+
 use App\Http\Controllers\AdminProjectController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -45,7 +47,6 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 
 Route::middleware(('auth:sanctum'))->group(function() {
     Route::resource('users', UserController::class);
@@ -248,8 +249,8 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
             Route::post('', [ImplementationScheduleController::class, 'update']);
             Route::get('{implementationSchedule}/delete', [ImplementationScheduleController::class, 'destroy']);
             Route::post('update-project-duration', [ImplementationScheduleController::class, 'updateProjectDuration']);
+            Route::get('s-curve', [ImplementationScheduleController::class, 'downloadSCurve']);
             Route::delete('{rabItem}', [ImplementationScheduleController::class, 'destroy']);
-            // Route::post('', [ImplementationScheduleController::class, '']);
         });
 
         Route::prefix('custom-item-price-group')->group(function() {
