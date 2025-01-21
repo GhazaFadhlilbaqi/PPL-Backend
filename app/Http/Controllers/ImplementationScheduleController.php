@@ -301,6 +301,6 @@ class ImplementationScheduleController extends Controller
         throw new ProcessFailedException($process);
     }
 
-    return response()->download($fileName)->deleteFileAfterSend(true);;
+    return response()->download($fileName)->deleteFileAfterSend(true);
   }
 }
