@@ -10,7 +10,6 @@ use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Spatie\Browsershot\Browsershot;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Vinkla\Hashids\Facades\Hashids;
@@ -293,28 +292,15 @@ class ImplementationScheduleController extends Controller
       'total_accumulative_weekly_efforts' => $total_accumulative_weekly_efforts
     ]);
 
-    // $filePath = storage_path('app/temp/custom.pdf');
-    // $pdf = Browsershot::html(view('s-curve', ['data' => $data])->render())
-    //     ->showBackground()
-    //     ->format('A4')
-    //     ->timeout(120)
-    //     ->pdf();
+    $pathToScript = base_path('resources/js/generate-pdf.js');
+    $fileName = 'Kurva S - '.$project->name.'.pdf';
+    $process = new Process(['node', $pathToScript, view('s-curve', ['data' => $data])->render(), $fileName]);
+    $process->run();
 
-    Browsershot::html(view('s-curve', ['data' => $data])->render())->save('example.pdf');
+    if (!$process->isSuccessful()) {
+        throw new ProcessFailedException($process);
+    }
 
-    // $pathToScript = base_path('resources/js/generate-pdf.js');
-    // $fileName = 'Kurva S - '.$project->name.'.pdf';
-    // $process = new Process(['node', $pathToScript, view('s-curve', ['data' => $data])->render(), $fileName]);
-    // $process->run();
-
-    // echo $process->getOutput();
-
-    // if (!$process->isSuccessful()) {
-    //     throw new ProcessFailedException($process);
-    // }
-
-    // return response($pdf)
-    //         ->header('Content-Type', 'application/pdf')
-    //         ->header('Content-Disposition', 'attachment; filename="custom.pdf"');
+    return response()->download($fileName)->deleteFileAfterSend(true);
   }
 }

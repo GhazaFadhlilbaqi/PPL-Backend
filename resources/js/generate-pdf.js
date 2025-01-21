@@ -43,7 +43,7 @@ console.log(process.cwd());
 
     // const browser = await puppeteer.launch({executablePath: path.resolve(__dirname, 'chrome')});
     // const browser = await puppeteer.launch({executablePath: '/root/.cache/puppeteer/chrome/linux-132.0.6834.83/chrome-linux64/chrome', args: ['--no-sandbox', '--disable->
-    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
+    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-crash-reporter', '--no-crashpad']});
  console.log("===> (DEBUG) A");
 
     const page = await browser.newPage();
