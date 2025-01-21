@@ -19,6 +19,7 @@
         "riskihajar/terbilang": "^1.2",
         "santigarcor/laravel-vuetable": "^1.1",
         "sentry/sentry-laravel": "^3.4",
+        "spatie/browsershot": "*",
         "spatie/laravel-permission": "^4.2"
     },
     "require-dev": {
