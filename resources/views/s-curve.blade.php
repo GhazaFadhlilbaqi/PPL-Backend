@@ -6,16 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom Line Graph</title>
     <style>
-        html, body {
-            margin: 24px;
-            width: 210mm;
+        html {
+            padding: 24px;
         }
 
         body {
+            height: 100%;
             font-family: Arial, sans-serif;
             font-size: 12px;
             margin: 0px;
             overflow: hidden;
+        }
+
+        h1 {
+            margin-top: 0px;
         }
 
         h2 {
@@ -53,7 +57,7 @@
 </head>
 
 <body>
-    <div class="chart-container">
+    <div style="position: relative">
         <div style="margin-bottom: 24px;">
             <h1 style="display: flex; font-size: 21px;">{{ $data['company'] }}</h1>
             <h2 style="display: flex; margin-bottom: 4px;"><span style="min-width: 150px;">PEKERJAAN</span>:
@@ -65,7 +69,7 @@
         <table style="border-collapse: collapse;">
             <thead>
                 <tr>
-                    <th rowspan="2">URAIAN PEKERJAAN</th>
+                    <th rowspan="2" style="width: 150px;">URAIAN PEKERJAAN</th>
                     <th rowspan="2">VOLUME</th>
                     <th rowspan="2">SATUAN</th>
                     <th rowspan="2">TOTAL HARGA (Rp)</th>
@@ -146,11 +150,15 @@
     <script>
         const table = document.querySelector("table");
         const canvas = document.querySelector("canvas");
+        const htmlPadding = parseInt(window.getComputedStyle(
+            document.documentElement
+        ).padding);
 
         function setupChartCanvas() {
             const tableRect = table.getBoundingClientRect();
             canvas.width = tableRect.x + tableRect.width;
             canvas.height = tableRect.bottom;
+            document.documentElement.style.width = (canvas.width - htmlPadding) +'px';
             drawLineGraph();
         }
 
@@ -164,15 +172,15 @@
             const workRows = Array.from(document.getElementsByClassName('work-row'));
             const workColumns = workRows[workRows.length - 1].querySelectorAll('.week-column');
             const startColumnRect = workColumns[0].getBoundingClientRect();
-            ctx.moveTo(startColumnRect.x, (startColumnRect.y + startColumnRect.height));
+            ctx.moveTo(startColumnRect.x - 24, (startColumnRect.y + startColumnRect.height - htmlPadding));
 
             // Move line for each week based on its effort
             const workloadCols = Array.from(document.getElementsByClassName('workload-column'));
             workloadCols.forEach((workloadCol) => {
                 const rect = workloadCol.getBoundingClientRect();
                 ctx.lineTo(
-                    rect.x + rect.width,
-                    (startColumnRect.y - ((workRows.length * startColumnRect.height) * (workloadCol.innerHTML / 100))) + startColumnRect.height
+                    rect.x + rect.width - htmlPadding,
+                    (startColumnRect.y - ((workRows.length * startColumnRect.height) * (workloadCol.innerHTML / 100))) + startColumnRect.height - htmlPadding
                 );
             })
 

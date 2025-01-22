@@ -27,7 +27,6 @@ class RabController extends CountableItemController
 
     public function index(Request $request, Project $project)
     {
-
         if ($request->has('q') && $request->q != '' && $request->has('category') && $request->category != '' && in_array($request->category, self::ALLOWED_SEARCH_CRITERIA)) {
             $rabs = Rab::where('project_id', $project->hashidToId($project->hashid));
 
@@ -37,19 +36,21 @@ class RabController extends CountableItemController
                 // TODO: Implement search by header feature
             }
 
-            $rabs = $rabs->with(['rabItemHeader.rabItem'])
+            $rabs = $rabs->with(['rabItemHeader.rabItem.unit'])
                 ->with('rabItem', function($q) {
                     $q->where('rab_item_header_id', NULL);
-                    $q->with(['customAhs', 'implementationSchedule']);
+                    $q->with(['unit', 'customAhs', 'implementationSchedule']);
                 })->get();
 
         } else {
             $rabs = Rab::where('project_id', $project->hashidToId($project->hashid))
-                ->with(['rabItemHeader.rabItem'])
-                ->with('rabItem', function($q) {
-                    $q->where('rab_item_header_id', NULL);
-                    $q->with(['customAhs', 'implementationSchedule']);
-                })
+                ->with([
+                    'rabItemHeader.rabItem.unit:id,name',
+                    'rabItem' => function ($query) {
+                        $query->whereNull('rab_item_header_id')
+                              ->with(['unit:id,name', 'customAhs', 'implementationSchedule']);
+                    }
+                ])
                 ->get();
         }
 

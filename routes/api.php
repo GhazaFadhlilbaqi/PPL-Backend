@@ -249,7 +249,8 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
             Route::post('', [ImplementationScheduleController::class, 'update']);
             Route::get('{implementationSchedule}/delete', [ImplementationScheduleController::class, 'destroy']);
             Route::post('update-project-duration', [ImplementationScheduleController::class, 'updateProjectDuration']);
-            Route::get('s-curve', [ImplementationScheduleController::class, 'downloadSCurve']);
+            Route::get('download-s-curve', [ImplementationScheduleController::class, 'downloadSCurve']);
+            Route::get('show-s-curve', [ImplementationScheduleController::class, 'showSCurveContent']);
             Route::delete('{rabItem}', [ImplementationScheduleController::class, 'destroy']);
         });
 
