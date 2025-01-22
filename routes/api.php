@@ -48,8 +48,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('s-curve', [ImplementationScheduleController::class, 'downloadSCurve']);
-
 Route::middleware(('auth:sanctum'))->group(function() {
     Route::resource('users', UserController::class);
     Route::resource('admin/projects', AdminProjectController::class);
