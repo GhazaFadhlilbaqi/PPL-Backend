@@ -293,20 +293,15 @@ class ImplementationScheduleController extends Controller
       'total_accumulative_weekly_efforts' => $total_accumulative_weekly_efforts
     ]);
 
-    // $pathToScript = base_path('resources/js/generate-pdf.js');
-    // $fileName = 'Kurva S - '.$project->name.'.pdf';
-    // $process = new Process(['node', $pathToScript, view('s-curve', ['data' => $data])->render(), $fileName]);
-    // $process->run();
-
     $path = storage_path('app/public/'.'Kurva S - '.$project->name.'.pdf');
     Browsershot::html(view('s-curve', ['data' => $data])->render())
+        ->setChromePath(env('CHROME_PATH', ''))
         ->showBackground()
+        ->setOption('headless', true)
+        ->setEnvironmentOptions([
+            'CHROME_CONFIG_HOME' => storage_path('app/chrome/.config')
+        ])
         ->save($path);
-
-    // if (!$process->isSuccessful()) {
-    //     throw new ProcessFailedException($process);
-    // }
-
     return response()->download($path)->deleteFileAfterSend(true);
   }
 }

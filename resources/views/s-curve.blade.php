@@ -6,10 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom Line Graph</title>
     <style>
+        html, body {
+            margin: 24px;
+            width: 210mm;
+        }
+
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
             margin: 0px;
+            overflow: hidden;
         }
 
         h2 {
@@ -39,10 +45,10 @@
         }
 
         @media print {
-    @page {
-        size: landscape;
-    }
-}
+            @page {
+                size: landscape;
+            }
+        }
     </style>
 </head>
 
@@ -51,7 +57,8 @@
         <div style="margin-bottom: 24px;">
             <h1 style="display: flex; font-size: 21px;">{{ $data['company'] }}</h1>
             <h2 style="display: flex; margin-bottom: 4px;"><span style="min-width: 150px;">PEKERJAAN</span>:
-                {{ strtoupper($data['project_name']) }}</h2>
+                {{ strtoupper($data['project_name']) }}
+            </h2>
             <h2 style="display: flex;"><span style="min-width: 150px;">FISCAL YEAR</span>: {{ $data['fiscal_year'] }}
             </h2>
         </div>
@@ -68,50 +75,49 @@
                 <tr>
                     @for ($i = 0; $i < $data['implementation_duration']; $i++)
                         <th>M{{$i + 1}}</th>
-                    @endfor
+                        @endfor
                 </tr>
             </thead>
             <tbody>
                 @foreach ($data['works'] as $work)
-                    <tr>
-                        <td
-                            colspan="{{5 + $data['implementation_duration']}}"
-                            style="font-weight: bold;"
-                        >
-                            A. {{ $work['name'] }}
-                        </td>
-                    </tr>
-                    @foreach ($work['rab_items'] as $rab_item)
-                        <tr class="work-row">
-                            <td>{{ $rab_item['name'] }}</td>
-                            <td>{{ $rab_item['volume'] }}</td>
-                            <td>{{ $rab_item['unit_name'] }}</td>
-                            <td style="text-align: right;">{{ number_format($rab_item['price'], 0, ',', '.') }}</td>
-                            <td>{{ $rab_item['effort'] }}</td>
-                            @foreach($rab_item['weeks_efforts'] as $week_effort)
-                                <td class="week-column">{{ $week_effort }}</td>
-                            @endforeach
-                        </tr>
+                <tr>
+                    <td
+                        colspan="{{5 + $data['implementation_duration']}}"
+                        style="font-weight: bold;">
+                        A. {{ $work['name'] }}
+                    </td>
+                </tr>
+                @foreach ($work['rab_items'] as $rab_item)
+                <tr class="work-row">
+                    <td>{{ $rab_item['name'] }}</td>
+                    <td>{{ $rab_item['volume'] }}</td>
+                    <td>{{ $rab_item['unit_name'] }}</td>
+                    <td style="text-align: right;">{{ number_format($rab_item['price'], 0, ',', '.') }}</td>
+                    <td>{{ $rab_item['effort'] }}</td>
+                    @foreach($rab_item['weeks_efforts'] as $week_effort)
+                    <td class="week-column">{{ $week_effort }}</td>
                     @endforeach
+                </tr>
+                @endforeach
 
-                    @foreach ($work['rab_item_headers'] as $rab_item_header)
-                        <tr class="work-row">
-                            <td colspan="{{5 + $data['implementation_duration']}}">I. {{ $rab_item_header['name'] }}</td>
-                        </tr>
-                        @foreach ($rab_item_header['rab_items'] as $rab_item)
-                            <tr class="work-row">
-                                <td>{{ $rab_item['name'] }}</td>
-                                <td>{{ $rab_item['volume'] }}</td>
-                                <td>{{ $rab_item['unit_name'] }}</td>
-                                <td style="text-align: right;">{{ number_format($rab_item['price'], 0, ',', '.') }}
-                                </td>
-                                <td>{{ $rab_item['effort'] }}</td>
-                                @foreach($rab_item['weeks_efforts'] as $week_effort)
-                                    <td class="week-column">{{ $week_effort }}</td>
-                                @endforeach
-                            </tr>
-                        @endforeach
+                @foreach ($work['rab_item_headers'] as $rab_item_header)
+                <tr class="work-row">
+                    <td colspan="{{5 + $data['implementation_duration']}}">I. {{ $rab_item_header['name'] }}</td>
+                </tr>
+                @foreach ($rab_item_header['rab_items'] as $rab_item)
+                <tr class="work-row">
+                    <td>{{ $rab_item['name'] }}</td>
+                    <td>{{ $rab_item['volume'] }}</td>
+                    <td>{{ $rab_item['unit_name'] }}</td>
+                    <td style="text-align: right;">{{ number_format($rab_item['price'], 0, ',', '.') }}
+                    </td>
+                    <td>{{ $rab_item['effort'] }}</td>
+                    @foreach($rab_item['weeks_efforts'] as $week_effort)
+                    <td class="week-column">{{ $week_effort }}</td>
                     @endforeach
+                </tr>
+                @endforeach
+                @endforeach
                 @endforeach
 
                 <tr>
@@ -123,28 +129,23 @@
                 <tr>
                     <td colspan="5" style="text-align: center;">BOBOT PEKERJAAN PER-MINGGU</td>
                     @foreach ($data['total_weekly_efforts'] as $total_weekly_effort)
-                        <td>{{$total_weekly_effort}}</td>
+                    <td>{{$total_weekly_effort}}</td>
                     @endforeach
                 </tr>
                 <tr>
                     <td colspan="5" style="text-align: center;">BOBOT KUMULATIF PEKERJAAN PER-MINGGU</td>
                     @foreach ($data['total_accumulative_weekly_efforts'] as $total_accumulative_weekly_effort)
-                        <td class="workload-column">{{$total_accumulative_weekly_effort}}</td>
+                    <td class="workload-column">{{$total_accumulative_weekly_effort}}</td>
                     @endforeach
                 </tr>
             </tbody>
         </table>
-
-        <canvas id="lineGraph" width="2000" height="400" style="position: absolute; top: 0; left: 0;"></canvas>
+        <canvas id="lineGraph" style="position: absolute; top: 0; left: 0px;"></canvas>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         const table = document.querySelector("table");
         const canvas = document.querySelector("canvas");
-        
-        const { jsPDF } = window.jspdf;
 
         function setupChartCanvas() {
             const tableRect = table.getBoundingClientRect();
@@ -154,10 +155,6 @@
         }
 
         setupChartCanvas();
-
-        window.addEventListener("resize", function() {
-            setupChartCanvas();
-        });
 
         function drawLineGraph() {
             const ctx = canvas.getContext('2d');
@@ -175,7 +172,7 @@
                 const rect = workloadCol.getBoundingClientRect();
                 ctx.lineTo(
                     rect.x + rect.width,
-                    (startColumnRect.y - ((workRows.length * startColumnRect.height) * (workloadCol.innerHTML /100))) + startColumnRect.height
+                    (startColumnRect.y - ((workRows.length * startColumnRect.height) * (workloadCol.innerHTML / 100))) + startColumnRect.height
                 );
             })
 
