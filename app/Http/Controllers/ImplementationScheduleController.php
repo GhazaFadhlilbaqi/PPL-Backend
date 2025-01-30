@@ -9,10 +9,9 @@ use App\Models\RabItem;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\Browsershot\Browsershot;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
 use Vinkla\Hashids\Facades\Hashids;
 
 class ImplementationScheduleController extends Controller
@@ -317,7 +316,7 @@ class ImplementationScheduleController extends Controller
         }
 
         $data = new Collection([
-            'company' => 'PT. SOLUSI DIGITAL KONTRUKSI', // 'company' => Auth::user()->company,
+            'company' => Auth::user()->company,
             'project_name' => $project->name,
             'fiscal_year' => $project->fiscal_year,
             'implementation_duration' => $project->implementation_duration,
