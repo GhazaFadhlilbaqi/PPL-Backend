@@ -45,13 +45,16 @@ class ImplementationScheduleController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Berhasil mengubah durasi proyek'
+                'message' => 'Berhasil mengubah durasi proyek',
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 500);
+            return response()->json(
+                [
+                    'message' => $e->getMessage(),
+                ],
+                500,
+            );
         }
     }
 
@@ -60,7 +63,9 @@ class ImplementationScheduleController extends Controller
         try {
             DB::beginTransaction();
 
-            ImplementationSchedule::where('project_id', $project->hashidToId($project->hashid))->where('rab_item_id', Hashids::decode($request->rab_item_id)[0])->delete();
+            ImplementationSchedule::where('project_id', $project->hashidToId($project->hashid))
+                ->where('rab_item_id', Hashids::decode($request->rab_item_id)[0])
+                ->delete();
 
             foreach ($request->implementation_schedules as $is) {
                 ImplementationSchedule::create([
@@ -75,21 +80,26 @@ class ImplementationScheduleController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Berhasil mengubah jadwal pelaksanaan'
+                'message' => 'Berhasil mengubah jadwal pelaksanaan',
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'message' => 'Gagal mengubah jadwal pengerjaan proyek',
-                'err' => $e->getMessage(),
-            ], 500);
+            return response()->json(
+                [
+                    'message' => 'Gagal mengubah jadwal pengerjaan proyek',
+                    'err' => $e->getMessage(),
+                ],
+                500,
+            );
         }
     }
 
     public function destroy(Project $project, RabItem $rabItem)
     {
         try {
-            ImplementationSchedule::where('rab_item_id', $rabItem->hashidToId($rabItem->hashid))->where('project_id', $project->hashidToId($project->hashid))->delete();
+            ImplementationSchedule::where('rab_item_id', $rabItem->hashidToId($rabItem->hashid))
+                ->where('project_id', $project->hashidToId($project->hashid))
+                ->delete();
             return response()->json([
                 'message' => 'Berhasil menghapus jadwal pelaksanaan',
             ]);
@@ -139,12 +149,14 @@ class ImplementationScheduleController extends Controller
             ->fullPage()
             ->setOption('headless', true)
             ->setEnvironmentOptions([
-                'CHROME_CONFIG_HOME' => storage_path('app/chrome/.config')
+                'CHROME_CONFIG_HOME' => storage_path('app/chrome/.config'),
             ])
             ->save($path);
-        return response()->file($path, [
-            'Content-Type' => 'image/png',
-        ])->deleteFileAfterSend(true);
+        return response()
+            ->file($path, [
+                'Content-Type' => 'image/png',
+            ])
+            ->deleteFileAfterSend(true);
     }
 
     public function downloadSCurve(Project $project)
@@ -157,7 +169,7 @@ class ImplementationScheduleController extends Controller
             ->showBackground()
             ->setOption('headless', true)
             ->setEnvironmentOptions([
-                'CHROME_CONFIG_HOME' => storage_path('app/chrome/.config')
+                'CHROME_CONFIG_HOME' => storage_path('app/chrome/.config'),
             ])
             ->save($path);
         return response()->download($path)->deleteFileAfterSend(true);
@@ -165,27 +177,39 @@ class ImplementationScheduleController extends Controller
 
     private function generateSCurveHtml(Project $project)
     {
-
         function calculateEffort($rabItem, $totalPrice)
         {
-            return number_format((($rabItem['volume'] * $rabItem['price']) / $totalPrice) * 100, 2);
+            return number_format((($rabItem['price']) / $totalPrice) * 100, 2);
         }
 
         $budgetPlans = Rab::where('project_id', $project->hashidToId($project->hashid))
-            ->with(['rabItemHeader.rabItem.unit', 'rabItemHeader.rabItem.implementationSchedule', 'rabItem.unit'])
+            ->with([
+                'rabItemHeader.rabItem.unit',
+                'rabItemHeader.rabItem.customAhs.customAhsItem.customAhsItemable',
+                'rabItemHeader.rabItem.implementationSchedule',
+                'rabItem.unit',
+                'rabItem.customAhs.customAhsItem.customAhsItemable']
+            )
             ->get()
             ->map(function ($rab) {
                 $rabItems = $rab->rabItem->where('hashed_rab_item_header_id', null)->map(function ($item) {
                     return [
                         'name' => $item->name,
                         'volume' => $item->volume,
-                        'price' => $item->price,
+                        'price' => $item->customAhs == null
+                            ? $item->volume * $item->price
+                            : $item->volume * collect($item->customAhs->customAhsItem)->sum(
+                                fn($customItem) => ($customItem->coefficient * $customItem->customAhsItemable->price)  * 1.1
+                            ),
                         'unit_name' => $item->unit->name,
-                        'implementation_schedule' => count($item->implementationSchedule) > 0 ? new Collection([
-                            'start_of_week' => $item->implementationSchedule[0]->start_of_week,
-                            'end_of_week' => $item->implementationSchedule[0]->end_of_week
-                        ]) : null,
-                        'weeks_efforts' => new Collection()
+                        'implementation_schedule' =>
+                            count($item->implementationSchedule) > 0
+                                ? new Collection([
+                                    'start_of_week' => $item->implementationSchedule[0]->start_of_week,
+                                    'end_of_week' => $item->implementationSchedule[0]->end_of_week,
+                                ])
+                                : null,
+                        'weeks_efforts' => new Collection(),
                     ];
                 });
 
@@ -196,13 +220,21 @@ class ImplementationScheduleController extends Controller
                             return [
                                 'name' => $item->name,
                                 'volume' => $item->volume,
-                                'price' => $item->price,
+                                'price' => $item->customAhs == null
+                                    ? $item['volume'] * $item->price
+                                    : $item->volume * collect($item->customAhs->customAhsItem)->sum(
+                                        fn($customItem) => ($customItem->coefficient * $customItem->customAhsItemable->price) * 1.1
+                                    ),
                                 'unit_name' => $item->unit->name,
-                                'implementation_schedule' => count($item->implementationSchedule) > 0  ? new Collection([
-                                    'start_of_week' => $item->implementationSchedule[0]->start_of_week,
-                                    'end_of_week' => $item->implementationSchedule[0]->end_of_week
-                                ]) : null,
-                                'weeks_efforts' => new Collection()
+                                'implementation_schedule' =>
+                                    count($item->implementationSchedule) > 0
+                                        ? new Collection([
+                                            'start_of_week' => $item->implementationSchedule[0]->start_of_week,
+                                            'end_of_week' => $item->implementationSchedule[0]->end_of_week,
+                                        ])
+                                        : null,
+                                'weeks_efforts' => new Collection(),
+                                'test' => $item->customAhs,
                             ];
                         }),
                     ];
@@ -223,11 +255,11 @@ class ImplementationScheduleController extends Controller
         $total_pretax_price = 0;
         foreach ($budgetPlans as $budgetPlan) {
             foreach ($budgetPlan['rab_items'] as $rab_item) {
-                $total_pretax_price += ($rab_item['volume'] * $rab_item['price']);
+                $total_pretax_price += $rab_item['price'];
             }
             foreach ($budgetPlan['rab_item_headers'] as $rab_item_header) {
                 foreach ($rab_item_header['rab_items'] as $rab_item) {
-                    $total_pretax_price += ($rab_item['volume'] * $rab_item['price']);
+                    $total_pretax_price += $rab_item['price'];
                 }
             }
         }
@@ -235,58 +267,55 @@ class ImplementationScheduleController extends Controller
         // Calculate Rab Item Effort
         $total_effort = 0;
         $budgetPlans = $budgetPlans->map(function ($budgetPlan) use ($project, $total_pretax_price, &$total_effort) {
-
             // Setup Weekly Effort for each RAB Item
-            $budgetPlan['rab_items'] = $budgetPlan['rab_items']->map(function ($rab_item) use ($project, $total_pretax_price, &$total_effort) {
-                $rab_item['effort'] = calculateEffort($rab_item, $total_pretax_price);
-                $total_effort += $rab_item['effort'];
-
-                $total_weeks = 0;
-                if ($rab_item['implementation_schedule'] !== null) {
-                    $total_weeks = ($rab_item['implementation_schedule']['end_of_week'] - $rab_item['implementation_schedule']['start_of_week']) + 1;
-                }
-
-                for ($i = 0; $i < $project['implementation_duration']; $i++) {
-                    if (
-                        $rab_item['implementation_schedule'] != null
-                        && ($i + 1) >= $rab_item['implementation_schedule']['start_of_week']
-                        && ($i + 1) <= $rab_item['implementation_schedule']['end_of_week']
-                    ) {
-                        $rab_item['weeks_efforts']->push($rab_item['effort'] / $total_weeks);
-                    } else {
-                        $rab_item['weeks_efforts']->push(null);
-                    }
-                }
-                return $rab_item;
-            })->toArray();
-
-            // Setup Weekly Effort for each RAB Header Item
-            $budgetPlan['rab_item_headers'] = $budgetPlan['rab_item_headers']->map(function ($rab_item_header) use ($project, $total_pretax_price, &$total_effort) {
-                $rab_item_header['rab_items'] = $rab_item_header['rab_items']->map(function ($rab_item) use ($project, $total_pretax_price, &$total_effort) {
+            $budgetPlan['rab_items'] = $budgetPlan['rab_items']
+                ->map(function ($rab_item) use ($project, $total_pretax_price, &$total_effort) {
                     $rab_item['effort'] = calculateEffort($rab_item, $total_pretax_price);
                     $total_effort += $rab_item['effort'];
 
                     $total_weeks = 0;
                     if ($rab_item['implementation_schedule'] !== null) {
-                        $total_weeks = ($rab_item['implementation_schedule']['end_of_week'] - $rab_item['implementation_schedule']['start_of_week']) + 1;
+                        $total_weeks = $rab_item['implementation_schedule']['end_of_week'] - $rab_item['implementation_schedule']['start_of_week'] + 1;
                     }
 
                     for ($i = 0; $i < $project['implementation_duration']; $i++) {
-                        if (
-                            $rab_item['implementation_schedule'] != null
-                            && ($i + 1) >= $rab_item['implementation_schedule']['start_of_week']
-                            && ($i + 1) <= $rab_item['implementation_schedule']['end_of_week']
-                        ) {
+                        if ($rab_item['implementation_schedule'] != null && $i + 1 >= $rab_item['implementation_schedule']['start_of_week'] && $i + 1 <= $rab_item['implementation_schedule']['end_of_week']) {
                             $rab_item['weeks_efforts']->push($rab_item['effort'] / $total_weeks);
                         } else {
                             $rab_item['weeks_efforts']->push(null);
                         }
                     }
-
                     return $rab_item;
-                })->toArray();
-                return $rab_item_header;
-            })->toArray();
+                })
+                ->toArray();
+
+            // Setup Weekly Effort for each RAB Header Item
+            $budgetPlan['rab_item_headers'] = $budgetPlan['rab_item_headers']
+                ->map(function ($rab_item_header) use ($project, $total_pretax_price, &$total_effort) {
+                    $rab_item_header['rab_items'] = $rab_item_header['rab_items']
+                        ->map(function ($rab_item) use ($project, $total_pretax_price, &$total_effort) {
+                            $rab_item['effort'] = calculateEffort($rab_item, $total_pretax_price);
+                            $total_effort += $rab_item['effort'];
+
+                            $total_weeks = 0;
+                            if ($rab_item['implementation_schedule'] !== null) {
+                                $total_weeks = $rab_item['implementation_schedule']['end_of_week'] - $rab_item['implementation_schedule']['start_of_week'] + 1;
+                            }
+
+                            for ($i = 0; $i < $project['implementation_duration']; $i++) {
+                                if ($rab_item['implementation_schedule'] != null && $i + 1 >= $rab_item['implementation_schedule']['start_of_week'] && $i + 1 <= $rab_item['implementation_schedule']['end_of_week']) {
+                                    $rab_item['weeks_efforts']->push($rab_item['effort'] / $total_weeks);
+                                } else {
+                                    $rab_item['weeks_efforts']->push(null);
+                                }
+                            }
+
+                            return $rab_item;
+                        })
+                        ->toArray();
+                    return $rab_item_header;
+                })
+                ->toArray();
 
             return $budgetPlan;
         });
@@ -309,14 +338,12 @@ class ImplementationScheduleController extends Controller
             }
 
             $total_weekly_efforts->push($total_weekly_effort);
-            $accumulative_weekly_effort = $i == 0
-                ? $total_weekly_effort
-                : $total_accumulative_weekly_efforts[$i - 1] + $total_weekly_effort;
+            $accumulative_weekly_effort = $i == 0 ? $total_weekly_effort : $total_accumulative_weekly_efforts[$i - 1] + $total_weekly_effort;
             $total_accumulative_weekly_efforts->push($accumulative_weekly_effort);
         }
 
         $data = new Collection([
-            'company' => Auth::user()->company,
+            'company' => Auth::user()->company->name,
             'project_name' => $project->name,
             'fiscal_year' => $project->fiscal_year,
             'implementation_duration' => $project->implementation_duration,
@@ -324,7 +351,7 @@ class ImplementationScheduleController extends Controller
             'total_effort' => $total_effort,
             'works' => $budgetPlans,
             'total_weekly_efforts' => $total_weekly_efforts,
-            'total_accumulative_weekly_efforts' => $total_accumulative_weekly_efforts
+            'total_accumulative_weekly_efforts' => $total_accumulative_weekly_efforts,
         ]);
 
         return view('s-curve', ['data' => $data])->render();
