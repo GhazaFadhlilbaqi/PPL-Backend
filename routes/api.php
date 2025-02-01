@@ -137,7 +137,7 @@ Route::prefix('master')->middleware(['auth:sanctum'])->group(function() {
         Route::post('import', [ItemPriceController::class, 'import']);
         Route::post('{itemPriceId}', [ItemPriceController::class, 'update']);
         Route::post('{itemPrice}/batch-update', [ItemPriceController::class, 'batchUpdatePrice']);
-        Route::get('{itemPrice}/delete', [ItemPriceController::class, 'destroy']);
+        Route::post('{itemPrice}/delete', [ItemPriceController::class, 'destroy']);
         Route::post('{itemPrice}/set-price', [ItemPriceController::class, 'setPrice']);
     });
 
