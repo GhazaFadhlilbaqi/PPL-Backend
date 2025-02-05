@@ -35,10 +35,15 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
 
     public function view(): View
     {
+        $rabList = $this->generateRab();
+        $subtotal_price = $rabList->sum(fn($rab) => $rab->subtotal);
+        $tax_fee = round($subtotal_price * ($this->project->ppn/ 100));
         return view('exports.rab.rab', [
             'rabs' => $this->generateRab(),
             'project' => $this->project,
-            'company' => $this->company
+            'company' => $this->company,
+            'tax' => $tax_fee,
+            'price_after_tax' => $subtotal_price + $tax_fee
         ]);
     }
 
@@ -49,12 +54,12 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
         $pointer = $this->globalStartingIndex;
 
         $rabs = Rab::where('project_id', $this->projectId)
-          ->with(['rabItemHeader.rabItem'])
-          ->with('rabItem', function($q) {
-              $q->where('rab_item_header_id', NULL);
-              $q->with('customAhs');
-          })
-          ->get();
+            ->with(['rabItemHeader.rabItem'])
+            ->with('rabItem', function ($q) {
+                $q->where('rab_item_header_id', NULL);
+                $q->with('customAhs');
+            })
+            ->get();
 
         foreach ($rabs as $key => $rab) {
 
@@ -62,89 +67,76 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
                 'pointer' => $pointer,
                 'type' => self::RAB_HEADER
             ];
+            $pointer++;
 
             $rabPerSectionCount = 0;
 
-            if ($rab->rabItem || ($rab->rabItemHeader && $rab->rabItemHeader->rabItem)) {
+            if (!$rab->rabItem && !$rab->rabItemHeader && !$rab->rabItemHeader->rabItem) {
+                $rabSubtotal += 0;
+                continue;
+            }
 
-                foreach ($rab->rabItem as $key2 => $rabItem) {
+            // 1) Handle RAB item without header
+            foreach ($rab->rabItem as $key2 => $rabItem) {
+                $this->rabStyleArr[] = [
+                    'pointer' => $pointer,
+                    'type' => self::RAB_ITEM_CONTENT
+                ];
+                $pointer++;
 
-                    if ($rabItem->customAhs) {
+                // 1.A) Handle RAB item with no AHS attached
+                if ($rabItem->customAhs == null) {
+                    $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
+                    $rabs[$key]->rabItem[$key2] = $rabItem;
+                    $rabSubtotal += $rabItem->subtotal;
+                    $rabPerSectionCount += $rabItem->subtotal;
+                    continue;
+                }
 
-                        $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
-                        $countedAhs->price = $countedAhs->subtotal;
-                        $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
-                        $rabItem->subtotal = $countedAhs->subtotal;
-                        $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
-                        $rabSubtotal += $countedAhs->subtotal;
-                        $rabPerSectionCount += $countedAhs->subtotal;
+                // 1.B) Handle RAB item with AHS attached
+                $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
+                $countedAhs->price = round($countedAhs->subtotal * (1 + ($this->project->profit_margin/100)));
+                $rabItem->subtotal = $countedAhs->price;
+                $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
+                $rabSubtotal += $countedAhs->price;
+                $rabPerSectionCount += $countedAhs->price * $rabItem->volume;
+            }
 
-                    } else {
+            // 2) Handle RAB item with header
+            foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
+                $this->rabStyleArr[] = [
+                    'pointer' => $pointer,
+                    'type' => self::RAB_ITEM_HEADER
+                ];
+                $pointer++;
 
-                        $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
-                        $rabs[$key]->rabItem[$key2] = $rabItem;
-                        $rabSubtotal += $rabItem->subtotal;
-                        $rabPerSectionCount += $rabSubtotal;
-
-                    }
-
-                    $pointer++;
-
+                foreach ($rabItemHeader->rabItem as $key4 => $rabItem) {
                     $this->rabStyleArr[] = [
                         'pointer' => $pointer,
                         'type' => self::RAB_ITEM_CONTENT
                     ];
-
-                }
-
-                foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
-
                     $pointer++;
 
-                    $this->rabStyleArr[] = [
-                        'pointer' => $pointer,
-                        'type' => self::RAB_ITEM_HEADER
-                    ];
-
-                    foreach ($rabItemHeader->rabItem as $key4 => $rabItem) {
-
-                        if ($rabItem->customAhs) {
-
-                            $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
-                            $countedAhs->price = $countedAhs->subtotal;
-                            $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
-                            $rabItem->subtotal = $countedAhs->subtotal;
-                            $rabs[$key]->rabItemHeader[$key3]->rabItem[$key4]['custom_ahs'] = $countedAhs;
-                            $rabSubtotal += $countedAhs->subtotal;
-                            $rabPerSectionCount += $countedAhs->subtotal;
-
-                        } else {
-
-                            $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
-                            $rabSubtotal += $rabItem->subtotal;
-                            $rabPerSectionCount += $rabSubtotal;
-
-                        }
-
-                        $pointer++;
-
-                        $this->rabStyleArr[] = [
-                            'pointer' => $pointer,
-                            'type' => self::RAB_ITEM_CONTENT
-                        ];
-
+                    // 2.A) Handle RAB item with no AHS attached
+                    if ($rabItem->customAhs == null) {
+                        $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
+                        $rabSubtotal += $rabItem->subtotal;
+                        $rabPerSectionCount += $rabItem->subtotal;
+                        continue;
                     }
+
+                    // 2.B) Handle RAB item with AHS attached
+                    $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
+                    $countedAhs->price = round($countedAhs->subtotal * (1 + ($this->project->profit_margin/100)));
+                    $rabItem->subtotal = $countedAhs->price;
+                    $rabs[$key]->rabItemHeader[$key3]->rabItem[$key4]['custom_ahs'] = $countedAhs;
+                    $rabSubtotal += $countedAhs->price;
+                    $rabPerSectionCount += $countedAhs->price * $rabItem->volume;
                 }
-
-            } else {
-                $rabSubtotal += 0;
             }
-
             $rab->subtotal = $rabPerSectionCount;
-
-            $pointer++;
         }
-
+        
         $this->finalPointerLocation = $pointer - 1;
 
         return $rabs;
@@ -172,7 +164,7 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
                 // Styling for rab item header or rab header
                 // Set background color
                 $headerStyle = $sheet->getStyle('A' . $styleArr['pointer'] . ':G' . $styleArr['pointer']);
-                $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB( $styleArr['type'] == self::RAB_HEADER ? '153346' : '465059');
+                $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB($styleArr['type'] == self::RAB_HEADER ? '153346' : '465059');
                 $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
             } else {
                 // Styling for rab item
@@ -222,7 +214,8 @@ class RabSummaryExportSheet extends CountableItemController implements FromView,
         // return dd($this->rabStyleArr);
     }
 
-    public function title() : string {
+    public function title(): string
+    {
         return 'RAB';
     }
 }

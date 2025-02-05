@@ -61,7 +61,7 @@ class RabController extends CountableItemController
                 foreach ($rab->rabItem as $key2 => $rabItem) {
                     if ($rabItem->customAhs) {
                         $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
-                        $countedAhs->price = $countedAhs->subtotal + (($project->profit_margin/100) * $countedAhs->subtotal);
+                        $countedAhs->price = round($countedAhs->subtotal + (($project->profit_margin/100) * $countedAhs->subtotal));
                         $countedAhs->subtotal = $countedAhs->price * ($rabItem->volume ?? 0);
                         $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
                         $rabSubtotal += $countedAhs->subtotal;
@@ -72,26 +72,11 @@ class RabController extends CountableItemController
                     }
                 }
 
-                // foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
-                //     foreach ($rabItemHeader->rabItem as $rabItem) {
-                //         if ($rabItem->customAhs) {
-                //             $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
-                //             $countedAhs->price = $countedAhs->subtotal;
-                //             $countedAhs->subtotal = $countedAhs->subtotal * ($rabItem->volume ?? 0);
-                //             $rabs[$key]->rabItem[$key2]['custom_ahs'] = $countedAhs;
-                //             $rabSubtotal += $countedAhs->subtotal;
-                //         } else {
-                //             $rabItem->subtotal = $rabItem->price * ($rabItem->volume ?? 0);
-                //             $rabSubtotal += $rabItem->subtotal;
-                //         }
-                //     }
-                // }
-
                 foreach ($rab->rabItemHeader as $key3 => $rabItemHeader) {
                     foreach ($rabItemHeader->rabItem as $rabItem) {
                         if ($rabItem->customAhs) {
                             $countedAhs = $this->countCustomAhsSubtotal($rabItem->customAhs);
-                            $countedAhs->price = $countedAhs->subtotal + (($project->profit_margin/100) * $countedAhs->subtotal);
+                            $countedAhs->price = round($countedAhs->subtotal + (($project->profit_margin/100) * $countedAhs->subtotal));
                             $countedAhs->subtotal = $countedAhs->price * ($rabItem->volume ?? 0);
                             $rabs[$key]->rabItemHeader[$key3]['custom_ahs'] = $countedAhs;
                             $rabSubtotal += $countedAhs->subtotal;

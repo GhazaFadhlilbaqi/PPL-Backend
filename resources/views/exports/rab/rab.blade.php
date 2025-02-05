@@ -118,7 +118,7 @@
             <td></td>
             <td><b>PPN {{ $project->ppn }}%</b></td>
             @php $ppn = $project->ppn / 100 * $rabSum @endphp
-            <td>{{ $ppn }}</td>
+            <td>{{ $tax }}</td>
         </tr>
         <tr>
             <td></td>
@@ -127,7 +127,7 @@
             <td></td>
             <td></td>
             <td><b>JUMLAH TOTAL DENGAN PPN {{ $project->ppn }}%</b></td>
-            <td>{{ $rabSum + $ppn }}</td>
+            <td>{{ $price_after_tax }}</td>
         </tr>
         <tr>
             <td></td>
@@ -136,7 +136,7 @@
             <td></td>
             <td></td>
             <td><b>TERBILANG</b></td>
-            <td>{{ strtoupper(terbilang($rabSum + $ppn)) }} RUPIAH</td>
+            <td>{{ strtoupper(terbilang($price_after_tax)) }} RUPIAH</td>
         </tr>
         <tr></tr>
         <tr></tr>
