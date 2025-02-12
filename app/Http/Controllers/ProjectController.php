@@ -31,7 +31,7 @@ class ProjectController extends Controller
                 return $project->order()->where('is_active', true)->first();
               })
               ->addColumn('last_opened_at_formatted', function($data) {
-                  return $data->last_opened_at ? date('d-m-Y', strtotime($data->last_opened_at)) : 'Belum Pernah di Buka';
+                  return $data->last_opened_at ? date('d-m-Y', strtotime($data->last_opened_at)) : 'Belum pernah dibuka';
               })->addColumn('created_at_formatted', function($data) {
                   return date('d-m-Y', strtotime($data->created_at));
               })->addColumn('expired_at_formatted', function($data) {
