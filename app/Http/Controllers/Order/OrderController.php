@@ -83,7 +83,7 @@ class OrderController extends Controller
                 $monthDuration = ['MONTHLY' => 1, 'QUARTERLY' => 3];
 
                 // Check for renew same package
-                $latestOrder = Order::where('id', '!=', $order->id)->latest();
+                $latestOrder = Order::where('id', '!=', $order->id)->latest()->first();
                 $order->expired_at = Carbon::parse($latestOrder ? $latestOrder->expired_at : $order->expired_at)
                     ->addMonths($monthDuration[$subscription->subscription_type])
                     ->toDateString();
