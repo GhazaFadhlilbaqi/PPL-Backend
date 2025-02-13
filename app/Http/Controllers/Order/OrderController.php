@@ -86,7 +86,6 @@ class OrderController extends Controller
                 )->toDateString();
                 $order->save();
             }
-            return;
         }
 
         $this->markOrderAsComplete($project, $order);
@@ -174,7 +173,6 @@ class OrderController extends Controller
         $order->project_id = $project->id;
         $order->status = 'completed';
         $order->is_active = true;
-        $order->expired_at = ProjectHelper::get_expired_date('demo');
         $order->save();
     }
 }
