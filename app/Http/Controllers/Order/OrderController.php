@@ -90,7 +90,10 @@ class OrderController extends Controller
                 ->where('status', 'completed')
                 ->latest()
                 ->first();
-            $order->expired_at = Carbon::parse($latestOrder ? $latestOrder->expired_at : $order->expired_at)
+            $latestExpiredDate = $latestOrder && $order->subscription_id == $latestOrder->id
+                ? $latestOrder->expired_at
+                : $order->expired_at;
+            $order->expired_at = Carbon::parse($latestExpiredDate)
                 ->addMonths($monthDuration[$subscription->subscription_type])
                 ->toDateString();
             $order->save();
