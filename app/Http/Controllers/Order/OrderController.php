@@ -6,6 +6,7 @@ use App\Helpers\ProjectHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Project;
+use App\Models\Subscription;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -37,61 +38,56 @@ class OrderController extends Controller
 
     public function notify(Request $request)
     {
-        if ($request->has('order_id')) {
-            /**
-             * Security concern for notify
-             *
-             * - Signature check
-             * - Challenge response
-             *
-             */
-            $order = Order::where('order_id', $request->order_id)->first();
-            $order->payment_method = $this->determinePaymentMethod($request);
+        Log::info('Incoming payment notification at ' . Carbon::now()->format('Y-m-d H:i:s'));
 
-            Log::info('Incoming payment notification at ' . Carbon::now()->format('Y-m-d H:i:s'));
+        if (!$request->has('order_id')) {
+            return;
+        }
+        $order = Order::where('order_id', $request->order_id)->first();
+        $order->payment_method = $this->determinePaymentMethod($request);
 
-             // Signature Check
-             if ($request->signature_key == $this->generateSignature($order)) {
-                // Check if it's captured or not
-                if ($request->transaction_status == 'capture') {
-                    Log::info('Payment captured at ' . Carbon::now()->format('Y-m-d H:i:s'));
-                    if ($order->type == 'create') {
-                        $project = $this->makeProject($order);
-                    } else {
-                        $project = Project::find($order->project_id);
-                        $project->subscription_id = $order->subscription_id;
-                        $project->save();
-                    }
-                    $this->markOrderAsComplete($project, $order);
-                } else {
-                    switch ($request->status_code) {
-                        case '200':
-                            Log::info('Payment returned 200 at ' . Carbon::now()->format('Y-m-d H:i:s'));
-                            if ($order->type == 'create') {
-                                $project = $this->makeProject($order);
-                            } else {
-                                $project = Project::find($order->project_id);
-                                $project->subscription_id = $order->subscription_id;
-                                $project->save();
-                            }
-                            $this->markOrderAsComplete($project, $order);
-                        break;
-                        case '201':
-                            $order->status = 'pending';
-                            $order->save();
-                        break;
-                        case '202':
-                            $order->status = 'cancelled';
-                            $order->save();
-                        break;
-                    }
-                }
-             }
+        // Handle unverified order
+        if ($request->signature_key != $this->generateSignature($order)) {
+            return;
+        }
 
+        // Handle successful order
+        if ($request->transaction_status == 'capture' || $request->status_code == '200') {
+            $this->handleSuccessfulOrder($order);
             return response()->json([
                 'status' => 'ok'
             ]);
         }
+
+        // Handle pending or cancelled order
+        $order->status = $request->status_code ? 'pending' : 'cancelled';
+        $order->save();
+        return response()->json([
+            'status' => 'ok'
+        ]);
+    }
+
+    private function handleSuccessfulOrder(Order $order) {
+        $project = $order->type == 'create'
+            ? $this->makeProject($order)
+            : Project::find($order->project_id);
+
+        if ($order->type != 'create') {
+            // Update subscription id
+            $project->subscription_id = $order->subscription_id;
+            $project->save();
+
+            // Increment expire date
+            $subscription = Subscription::where('id', $order->subscription_id)->first();
+            if ($subscription) {
+                $monthDuration = ['MONTHLY' => 1, 'QUARTERLY' => 3];
+                $order->expire_at = $order->expire_at->addMonths(
+                    $monthDuration[$subscription->subscription_type]
+                );
+            }
+            return;
+        }
+        $this->markOrderAsComplete($project, $order);
     }
 
     public function orderStatusByProject(Project $project)
