@@ -53,7 +53,7 @@ class OrderController extends Controller
 
         // Handle successful order
         if ($request->transaction_status == 'capture' || $request->status_code == '200') {
-            $this->handleSuccessfulOrder($order);
+            return $this->handleSuccessfulOrder($order);
             return response()->json([
                 'status' => 'ok'
             ]);
@@ -81,12 +81,14 @@ class OrderController extends Controller
             $subscription = Subscription::where('id', $order->subscription_id)->first();
             if ($subscription) {
                 $monthDuration = ['MONTHLY' => 1, 'QUARTERLY' => 3];
-                $order->expire_at = $order->expire_at->addMonths(
+                $order->expired_at = Carbon::parse($order->expired_at)->addMonths(
                     $monthDuration[$subscription->subscription_type]
-                );
+                )->toDateString();
+                $order->save();
             }
             return;
         }
+
         $this->markOrderAsComplete($project, $order);
     }
 
@@ -164,7 +166,7 @@ class OrderController extends Controller
         return $paymentMethodStr;
     }
 
-    private function markOrderAsComplete($project, Order $order)
+    private function markOrderAsComplete(Project $project, Order $order)
     {
         Order::where('project_id', $project->id)->update([
             'is_active' => false,
