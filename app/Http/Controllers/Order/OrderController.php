@@ -71,24 +71,29 @@ class OrderController extends Controller
         $project = $order->type == 'create'
             ? $this->makeProject($order)
             : Project::find($order->project_id);
+            $monthDuration = ['MONTHLY' => 1, 'QUARTERLY' => 3];
+        $subscription = Subscription::where('id', $order->subscription_id)->first();
 
-        if ($order->type != 'create') {
+        if ($order->type == 'create') {
+            $order->expired_at = Carbon::parse($order->created_at)
+                ->addMonths($monthDuration[$subscription->subscription_type])
+                ->toDateString();
+        }
+
+        if ($order->type == 'renew') {
             // Update subscription id
             $project->subscription_id = $order->subscription_id;
             $project->save();
-
-            // Increment expire date
-            $subscription = Subscription::where('id', $order->subscription_id)->first();
-            if ($subscription) {
-                $monthDuration = ['MONTHLY' => 1, 'QUARTERLY' => 3];
-
-                // Check for renew same package
-                $latestOrder = Order::where('id', '!=', $order->id)->latest()->first();
-                $order->expired_at = Carbon::parse($latestOrder ? $latestOrder->expired_at : $order->expired_at)
-                    ->addMonths($monthDuration[$subscription->subscription_type])
-                    ->toDateString();
-                $order->save();
-            }
+            
+            // Check for renew same package
+            $latestOrder = Order::where('id', '!=', $order->id)
+                ->where('status', 'completed')
+                ->latest()
+                ->first();
+            $order->expired_at = Carbon::parse($latestOrder ? $latestOrder->expired_at : $order->expired_at)
+                ->addMonths($monthDuration[$subscription->subscription_type])
+                ->toDateString();
+            $order->save();
         }
 
         $this->markOrderAsComplete($project, $order);
