@@ -55,8 +55,10 @@ class MasterItemPriceImportController implements ToCollection {
 
       // 4) Create item price when item price data is not exists on database
       foreach ($rows as $row) {
+        if ($row[0] == null) { continue; }
+
         // 4.1) Check item price group availability
-        $itemPriceGroupId = $this->checkItemPriceGroupValidity($rows, $row[2],$row[1]);
+        $itemPriceGroupId = $this->checkItemPriceGroupValidity($rows, $row[2], $row[1]);
 
         // 4.2) Check unit id availability
         $unitId = $this->checkUnitValidity($rows, $row[2], $row[4]);
@@ -104,7 +106,7 @@ class MasterItemPriceImportController implements ToCollection {
       $province = $provinces->first(function($province) use ($provinceHeader) {
         return $province->name == strtoupper($provinceHeader);
       });
-      $itemPriceProvince = ItemPriceProvince::where('province_id', Hashids::decode($province->hashId)[0])
+      $itemPriceProvince = ItemPriceProvince::where('province_id', Hashids::decode($province->hashid)[0])
         ->where('item_price_id', $itemPrice->id)
         ->first();
       if ($itemPriceProvince) {
