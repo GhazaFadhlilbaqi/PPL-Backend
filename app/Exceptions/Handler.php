@@ -3,6 +3,9 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Sentry\Laravel\Integration;
 use Throwable;
 
@@ -38,5 +41,17 @@ class Handler extends ExceptionHandler
       $this->reportable(function (Throwable $e) {
           Integration::captureUnhandledException($e);
       });
+    }
+
+    public function render($request, Throwable $exception): JsonResponse
+    {
+        if ($exception instanceof ValidationException) {
+            $errorMessages = collect($exception->errors())->flatten()->implode(', ');
+            return response()->json([
+                'success' => false,
+                'message' => $errorMessages
+            ], 422);
+        }
+        return parent::render($request, $exception);
     }
 }

@@ -97,4 +97,15 @@ class UserController extends Controller
             ]);
         }
     }
+
+    public function updateDemoQuota(User $user, Request $request) {
+      $request->validate([
+        'demo_quota' => 'required|integer'
+      ]);
+      $user->update(['demo_quota' => $request->demo_quota]);
+      return response()->json([
+        'status' => 'success',
+        'data' => compact('user')
+    ]);
+    }
 }

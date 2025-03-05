@@ -50,6 +50,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(('auth:sanctum'))->group(function() {
     Route::resource('users', UserController::class);
+    Route::put('users/{user}/demo-quota', [UserController::class, 'updateDemoQuota']);
+
     Route::resource('admin/projects', AdminProjectController::class);
 });
 
