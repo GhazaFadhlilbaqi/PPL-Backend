@@ -49,7 +49,7 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
             'A' => 25,
             'B' => 75,
             'C' => 15,
-            'D' => 15,
+            'D' => 21,
             'E' => 20,
             'F' => 75
         ];
@@ -59,7 +59,7 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
     {
 
         $customAhpCount = $this->project->customAhp->count();
-        $startingIndex = 13;
+        $startingIndex = 12;
         $currentAIndex = $startingIndex;
 
         // Kop Surat
@@ -74,7 +74,14 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
             ]
         ]);
 
+
         for ($i = 0; $i < $customAhpCount; $i++) {
+            $sheet->getStyle('A' . ($currentAIndex - 1) . ':B' . ($currentAIndex - 1))->applyFromArray(['borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['rgb' => '000'],
+                ],
+            ]]);
 
             $sheet->getStyle('A' . $currentAIndex . ':F' . ($currentAIndex + 30))->applyFromArray(['borders' => [
                 'allBorders' => [
@@ -83,11 +90,26 @@ class AhpExportSheet extends CountableItemController implements FromView, WithTi
                 ],
             ]]);
 
+            $headerStyle = $sheet->getStyle('A' . ($currentAIndex - 2) . ':F' . ($currentAIndex - 2));
+            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');                
+
+            $headerStyle = $sheet->getStyle('A' . ($currentAIndex - 1) . ':B' . ($currentAIndex - 1));
+            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('D2E5F1');                
+
+            $headerStyle = $sheet->getStyle('C' . ($currentAIndex - 1) . ':F' . ($currentAIndex - 1));
+            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');                
+
             $headerStyle = $sheet->getStyle('A' . $currentAIndex . ':F' . $currentAIndex);
 
-            $headerStyle->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
-            $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
+            $headerStyle->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+            ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+            $sheet->getRowDimension($currentAIndex)->setRowHeight(53);
+
+            $headerStyle = $sheet->getStyle('A' . ($currentAIndex - 1) . ':F' . ($currentAIndex - 1));
+            $headerStyle->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+            ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+            $sheet->getRowDimension($currentAIndex - 1)->setRowHeight(32);
+            // $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
 
             $currentAIndex += 34;
         }

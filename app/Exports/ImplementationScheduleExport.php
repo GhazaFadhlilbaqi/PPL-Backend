@@ -27,7 +27,7 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
     
     private $projectId, $project, $company = null;
     private $rabStyleArr = [];
-    private $globalStartingIndex = 13, $finalPointerLocation = 0;
+    private $globalStartingIndex = 12, $finalPointerLocation = 0;
     private $rabs = null;
 
     const RAB_HEADER = 'rabHeader';
@@ -87,8 +87,8 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
             null,  // yAxisLabel
         );
 
-        $chart->setTopLeftPosition($this->getNameFromNumber(8 + ($this->project->implementation_duration ?? 0)) . '12');
-        $chart->setBottomRightPosition($this->getNameFromNumber(8 + ($this->project->implementation_duration ?? 0) + ($this->project->implementation_duration ?? 0)) . '25');
+        $chart->setTopLeftPosition($this->getNameFromNumber(8 + ($this->project->implementation_duration ?? 0)) . '11');
+        $chart->setBottomRightPosition($this->getNameFromNumber(8 + ($this->project->implementation_duration ?? 0) + ($this->project->implementation_duration ?? 0)) . '24');
 
         return $chart;
     }
@@ -204,17 +204,19 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
     public function columnWidths(): array
     {
         return [
-            'A' => 25,
+            'A' => 12,
             'B' => 40,
             'C' => 17,
             'D' => 17,
-            'E' => 17,
+            'E' => 22,
             'F' => 17,
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
+        $headerStyle = $sheet->getStyle('A' . 10 . ':N' . 10);
+        $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
 
         $endColumn = $this->getNameFromNumber($this->project->implementation_duration + 6);
 
@@ -224,8 +226,7 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
                 // Styling for rab item header or rab header
                 // Set background color
                 $headerStyle = $sheet->getStyle('A' . $styleArr['pointer'] . ':' . $endColumn . $styleArr['pointer']);
-                $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB( $styleArr['type'] == self::RAB_HEADER ? '153346' : '465059');
-                $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
+                $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB( $styleArr['type'] == self::RAB_HEADER ? 'D2E5F1' : 'D7D7D7');
             } else {
                 // Styling for rab item
                 // $sheet->getStyle('E' . $styleArr['pointer'])->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
@@ -238,7 +239,9 @@ class ImplementationScheduleExport extends CountableItemController implements Fr
         }
 
         // Centerize header
-        $sheet->getStyle(('A' . ($this->globalStartingIndex - 1)) . (':' . $endColumn . ($this->globalStartingIndex - 1)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle(('A' . ($this->globalStartingIndex - 1)) . (':' . $endColumn . ($this->globalStartingIndex - 1)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+        ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getRowDimension($this->globalStartingIndex - 1)->setRowHeight(56);
 
         // Kop Surat
         $sheet->getStyle($endColumn . '2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');

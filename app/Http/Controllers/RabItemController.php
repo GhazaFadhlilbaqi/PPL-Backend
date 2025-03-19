@@ -56,7 +56,7 @@ class RabItemController extends Controller
       $request->merge($dataToMerge);
 
       $rabItem->update($request->only([
-          'name', 'custom_ahs_id', 'volume', 'unit_id', 'price'
+          'name', 'custom_ahs_id', 'volume', 'unit_id', 'price', 'profit_margin'
       ]));
 
       return response()->json([

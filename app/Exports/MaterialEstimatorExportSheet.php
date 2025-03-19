@@ -19,7 +19,7 @@ class MaterialEstimatorExportSheet extends CountableItemController implements Fr
     
     private $projectId, $project, $company = null;
     private $rabStyleArr = [];
-    private $globalStartingIndex = 13, $finalPointerLocation = 0;
+    private $globalStartingIndex = 11, $finalPointerLocation = 0;
 
     const RAB_HEADER = 'rabHeader';
     const RAB_ITEM_HEADER = 'rabItemHeader';
@@ -185,8 +185,13 @@ class MaterialEstimatorExportSheet extends CountableItemController implements Fr
             }
         }
 
+        $headerStyle = $sheet->getStyle('A' . ($this->globalStartingIndex - 1) . ':H' . ($this->globalStartingIndex - 1));
+        $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');                
+
         // Centerize header
-        $sheet->getStyle(('A' . ($this->globalStartingIndex - 1)) . (':H' . ($this->globalStartingIndex - 1)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle(('A' . ($this->globalStartingIndex)) . (':H' . ($this->globalStartingIndex)))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+        ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getRowDimension($this->globalStartingIndex)->setRowHeight(53);
 
         // Kop Surat
         $sheet->getStyle('H2')->getFont()->setSize(16)->setBold(true)->getColor()->setRGB('153346');

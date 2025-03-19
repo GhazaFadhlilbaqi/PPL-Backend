@@ -45,7 +45,7 @@ class AhsExportSheet extends CountableItemController implements FromView, WithTi
     public function columnWidths(): array
     {
         return [
-            'A' => 25,
+            'A' => 12,
             'B' => 75,
             'F' => 25,
             'G' => 25,
@@ -103,14 +103,30 @@ class AhsExportSheet extends CountableItemController implements FromView, WithTi
                     'color' => ['rgb' => '000'],
                 ],
             ]]);
+            $sheet->getStyle('A' . ($currIndexPointer) . ':B' . ($currIndexPointer))->applyFromArray(['borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['rgb' => '000'],
+                ],
+            ]]);
+
+            $headerStyle = $sheet->getStyle('A' . ($currIndexPointer - 1) . ':G' . ($currIndexPointer - 1));
+            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
+
+            $headerStyle = $sheet->getStyle('A' . ($currIndexPointer) . ':B' . ($currIndexPointer));
+            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('D2E5F1');
+            $headerStyle->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+            
+            $headerStyle = $sheet->getStyle('C' . ($currIndexPointer) . ':G' . ($currIndexPointer));
+            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
 
             $headerStyle = $sheet->getStyle('A' . ($currIndexPointer + 1) . ':G' . ($currIndexPointer + 1));
+            $headerStyle->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+            $sheet->getRowDimension($currIndexPointer + 1)->setRowHeight(56);
+            $sheet->getRowDimension($currIndexPointer)->setRowHeight(21);
 
-            $headerStyle->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
-            $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
 
-            $currIndexPointer = $currIndexPointer + $customAhsCount + 2;
+            $currIndexPointer = $currIndexPointer + $customAhsCount + 3;
         }
 
         $sheet->getStyle('B9')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);

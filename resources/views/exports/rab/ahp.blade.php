@@ -26,19 +26,20 @@
     <tr>
         <td><b>KEGIATAN</b></td>
         <td><b>{{ $project->activity }}</b></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="text-align: right;"><b>LOKASI PEKERJAAN: {{ $project->province->name }}</b></td>
     </tr>
     <tr>
         <td><b>NAMA PEKERJAAN</b></td>
         <td><b>{{ $project->job }}</b></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td style="text-align: right;"><b>TAHUN ANGGARAN: {{ $project->fiscal_year }}</b></td>
     </tr>
-    <tr>
-        <td><b>LOKASI PEKERJAAN</b></td>
-        <td><b>{{ $project->province->name }}</b></td>
-    </tr>
-    <tr>
-        <td><b>TAHUN ANGGARAN</b></td>
-        <td><b>{{ $project->fiscal_year }}</b></td>
-    </tr>
+    <tr></tr>
 </table>
 @foreach ($ahps as $ahp)
 <table border="1">
@@ -52,18 +53,22 @@
             </th>
         </tr>
         <tr>
-            <th>NO.</th>
-            <th>URAIAN</th>
-            <th>KODE</th>
-            <th>KOEFISIEN</th>
-            <th>SATUAN</th>
-            <th>KET.</th>
+            <th><b>NO.</b></th>
+            <th><b>URAIAN</b></th>
+            <th><b>KODE</b></th>
+            <th><b>KOEFISIEN</b></th>
+            <th><b>SATUAN</b></th>
+            <th><b>KET.</b></th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td><b>A.</b></td>
-            <td><b>URAIAN PERALATAN</b></td>
+            <td style="background-color: #D2E5F1"><b>A.</b></td>
+            <td style="background-color: #D2E5F1"><b>URAIAN PERALATAN</b></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
         </tr>
         <tr>
             <td>1.</td>
@@ -114,18 +119,22 @@
             <td>c.</td>
             <td>Harga Alat</td>
             <td>B</td>
-            <td>{{ $ahp->W }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->W == 0 ? '-' : number_format($ahp->W, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
-            <td><b>B.</b></td>
-            <td><b>BIAYA PASTI PER JAM KERJA</b></td>
+            <td style="background-color: #D2E5F1"><b>B.</b></td>
+            <td style="background-color: #D2E5F1"><b>BIAYA PASTI PER JAM KERJA</b></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
         </tr>
         <tr>
             <td>1.</td>
             <td>Nilai Sisa Alat</td>
             <td>C</td>
-            <td>{{ $ahp->C }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->C == 0 ? '-' : number_format($ahp->C, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
@@ -139,79 +148,88 @@
             <td>a.</td>
             <td>Biaya Pengembalian Modal</td>
             <td>E</td>
-            <td>{{ $ahp->E }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->E == 0 ? '-' : number_format($ahp->E, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
             <td>b.</td>
             <td>Asuransi, dan lain - lain</td>
             <td>F</td>
-            <td>{{ $ahp->F }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->F == 0 ? '-' : number_format($ahp->F, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
             <td></td>
             <td><b>Biaya Pasti Perjam</b></td>
             <td>G</td>
-            <td>{{ $ahp->G }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->G == 0 ? '-' : number_format($ahp->G, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
-            <td><b>C.</b></td>
-            <td><b>BIAYA OPERASI PER JAM KERJA</b></td>
+            <td style="background-color: #D2E5F1"><b>C.</b></td>
+            <td style="background-color: #D2E5F1"><b>BIAYA OPERASI PER JAM KERJA</b></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
         </tr>
         <tr>
             <td>1.</td>
             <td>Bahan Bakar</td>
             <td>H</td>
-            <td>{{ $ahp->H }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->H == 0 ? '-' : number_format($ahp->H, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
             <td>2.</td>
             <td>Pelumas</td>
             <td>I</td>
-            <td>{{ $ahp->I }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->I == 0 ? '-' : number_format($ahp->I, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
             <td>3.</td>
             <td>Perawatan dan Perbaikan</td>
             <td>K</td>
-            <td>{{ $ahp->K }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->K == 0 ? '-' : number_format($ahp->K, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
             <td>4.</td>
             <td>Operator</td>
             <td>L</td>
-            <td>{{ $ahp->L }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->L == 0 ? '-' : number_format($ahp->L, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
             <td>5.</td>
             <td>Pembantu Operator</td>
             <td>M</td>
-            <td>{{ $ahp->M }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->M == 0 ? '-' : number_format($ahp->M, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
             <td></td>
             <td>Biaya Operasi per Jam</td>
             <td>P</td>
-            <td>{{ $ahp->P }}</td>
+            <td style="text-align: right;">="Rp{{ $ahp->P == 0 ? '-' : number_format($ahp->P, 2, ',', '.') }}"</td>
             <td>Rupiah</td>
         </tr>
         <tr>
-            <td><b>D.</b></td>
-            <td><b>TOTAL BIAYA SEWA ALAT / JAM</b></td>
-            <td><b>S</b></td>
-            <td><b>{{ $ahp->S }}</b></td>
-            <td><b>Rupiah</b></td>
+            <td style="background-color: #D2E5F1"><b>D.</b></td>
+            <td style="background-color: #D2E5F1"><b>TOTAL BIAYA SEWA ALAT / JAM</b></td>
+            <td style="background-color: #D2E5F1"><b>S</b></td>
+            <td style="background-color: #D2E5F1; text-align: right;"><b>="Rp{{ $ahp->S == 0 ? '-' : number_format($ahp->S, 2, ',', '.') }}"</b></td>
+            <td style="background-color: #D2E5F1"><b>Rupiah</b></td>
+            <td style="background-color: #D2E5F1"></td>
         </tr>
         <tr>
-            <td><b>E.</b></td>
-            <td><b>LAIN - LAIN</b></td>
+            <td style="background-color: #D2E5F1"><b>E.</b></td>
+            <td style="background-color: #D2E5F1"><b>LAIN - LAIN</b></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
+            <td style="background-color: #D2E5F1"></td>
         </tr>
         <tr>
             <td></td>

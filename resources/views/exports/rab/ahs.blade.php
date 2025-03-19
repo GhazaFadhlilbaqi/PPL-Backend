@@ -32,11 +32,13 @@
         <tr>
             <td><b>NAMA PEKERJAAN</b></td>
             <td><b>{{ $project->job }}</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="text-align: right;"><b>TAHUN ANGGARAN: {{ $project->fiscal_year }}</b></td>  
         </tr>
-        <tr>
-            <td><b>TAHUN ANGGARAN</b></td>
-            <td><b>{{ $project->fiscal_year }}</b></td>
-        </tr>
+        <tr></tr>
 </table>
 @foreach ($ahs as $a)
 <table>
@@ -46,13 +48,13 @@
             <td><b>{{ $a->name }}</b></td>
         </tr>
         <tr>
-            <th>No</th>
-            <th>Uraian</th>
-            <th>Kode</th>
-            <th>Satuan</th>
-            <th>Koefisien</th>
-            <th>Harga Satuan (Rp.)</th>
-            <th>Jumlah (Rp.)</th>
+            <th><b>No</b></th>
+            <th><b>Uraian</b></th>
+            <th><b>Kode</b></th>
+            <th><b>Satuan</b></th>
+            <th><b>Koefisien</b></th>
+            <th><b>Harga Satuan (Rp.)</b></th>
+            <th><b>Jumlah (Rp.)</b></th>
         </tr>
     </thead>
     <tbody>
@@ -69,8 +71,8 @@
                 <td>{{ $laborAhs->customAhsItemable ? ($laborAhs->custom_ahs_itemable_type == 'App\\Models\\CustomAhs' ? $laborAhs->unit->name : $laborAhs->customAhsItemable->unit->name) : $laborAhs->unit->name }}</td>
                 <td>{{ $laborAhs->coefficient }}</td>
                 {{-- <td>{{ $laborAhs->customAhsItemable->subtotal }}</td> --}}
-                <td>{{ $laborAhs->customAhsItemable->price }}</td>
-                <td>{{ $laborAhs->customAhsItemable->price * $laborAhs->coefficient }}</td>
+                <td style="text-align: right;">="Rp{{ $laborAhs->customAhsItemable->price == 0 ? '-' : number_format($laborAhs->customAhsItemable->price, 2, ',', '.') }}"</td>
+                <td style="text-align: right;">="Rp{{ ($laborAhs->customAhsItemable->price * $laborAhs->coefficient) == 0 ? '-' : number_format($laborAhs->customAhsItemable->price * $laborAhs->coefficient, 2, ',', '.') }}"</td>
                 {{-- <td>{{ $laborAhs->customAhsItemable->subtotal * $laborAhs->coefficient }}</td> --}}
             </tr>
             @php $laborAhsSum += $laborAhs->subtotal @endphp
@@ -82,7 +84,7 @@
             <td></td>
             <td></td>
             <td><b>JUMLAH TENAGA KERJA (A)</b></td>
-            <td><b>{{ $laborAhsSum }}</b></td>
+            <td style="text-align: right;"><b>="Rp{{ $laborAhsSum == 0 ? '0' : number_format($laborAhsSum, 2, ',', '.') }}"</b></td>
         </tr>
         <tr>
             <td><b>B</b></td>
@@ -96,9 +98,9 @@
                 <td>{{ $ingredientsAhs->customAhsItemable->code }}</td>
                 <td>{{ $ingredientsAhs->customAhsItemable->unit->name }}</td>
                 <td>{{ $ingredientsAhs->coefficient }}</td>
-                <td>{{ $ingredientsAhs->customAhsItemable->price }}</td>
+                <td style="text-align: right;">="Rp{{ $ingredientsAhs->customAhsItemable->price == 0 ? '-' : number_format($ingredientsAhs->customAhsItemable->price, 2, ',', '.') }}"</td>
                 {{-- <td>{{ $ingredientsAhs->customAhsItemable->subtotal }}</td> --}}
-                <td>{{ $ingredientsAhs->customAhsItemable->price * $ingredientsAhs->coefficient }}</td>
+                <td style="text-align: right;">="Rp{{ ($ingredientsAhs->customAhsItemable->price * $ingredientsAhs->coefficient) == 0 ? '-' : number_format($ingredientsAhs->customAhsItemable->price * $ingredientsAhs->coefficient, 2 , ',', '.') }}"</td>
                 {{-- <td>{{ $ingredientsAhs->customAhsItemable->subtotal * $ingredientsAhs->coefficient }}</td> --}}
             </tr>
             @php $laborAhsSum += $ingredientsAhs->subtotal @endphp
@@ -110,7 +112,7 @@
             <td></td>
             <td></td>
             <td><b>JUMLAH BAHAN (B)</b></td>
-            <td><b>{{ $ingredientsAhsSum }}</b></td>
+            <td style="text-align: right;"><b>="Rp{{ $ingredientsAhsSum == 0 ? '-' : number_format($ingredientsAhsSum, 2, ',', '.') }}"</b></td>
         </tr>
         <tr>
             <td><b>C</b></td>
@@ -126,8 +128,8 @@
                 <td>{{ $toolsAhs->customAhsItemable->unit ? $toolsAhs->customAhsItemable->unit->name : 'Tidak ada satuan' }}</td>
                 <td>{{ $toolsAhs->coefficient }}</td>
                 {{-- <td>{{ $toolsAhs->customAhsItemable->subtotal }}</td> --}}
-                <td>{{ $toolsAhs->customAhsItemable->price }}</td>
-                <td>{{ $toolsAhs->customAhsItemable->price * $toolsAhs->coefficient }}</td>
+                <td style="text-align: right;">="Rp{{ $toolsAhs->customAhsItemable->price == 0 ? '-' : number_format($toolsAhs->customAhsItemable->price, 2, ',', '.') }}"</td>
+                <td style="text-align: right;">="Rp{{ $toolsAhs->customAhsItemable->price * $toolsAhs->coefficient == 0 ? '-' : number_format($toolsAhs->customAhsItemable->price * $toolsAhs->coefficient, 2, ',', '.') }}"</td>
                 {{-- <td>{{ $toolsAhs->customAhsItemable->subtotal * $toolsAhs->coefficient }}</td> --}}
             </tr>
             @php $toolsAhsSum += $toolsAhs->subtotal @endphp
@@ -139,7 +141,7 @@
             <td></td>
             <td></td>
             <td><b>JUMLAH PERALATAN (C)</b></td>
-            <td><b>{{ $toolsAhsSum }}</b></td>
+            <td style="text-align: right;"><b>="Rp{{ $toolsAhsSum == 0 ? '-' : number_format($toolsAhsSum, 2, ',', '.') }}"</b></td>
         </tr>
         <tr>
             <td><b>D</b></td>
@@ -154,8 +156,8 @@
                 <td>{{ $othersAhs->customAhsItemable->unit->name }}</td>
                 <td>{{ $othersAhs->coefficient }}</td>
                 {{-- <td>{{ $othersAhs->customAhsItemable->subtotal }}</td> --}}
-                <td>{{ $othersAhs->customAhsItemable->price }}</td>
-                <td>{{ $othersAhs->customAhsItemable->price * $othersAhs->coefficient }}</td>
+                <td style="text-align: right;">="Rp{{ $othersAhs->customAhsItemable->price == 0 ? '-' : number_format($othersAhs->customAhsItemable->price, 2, ',', '.') }}"</td>
+                <td style="text-align: right;">="Rp{{ $othersAhs->customAhsItemable->price * $othersAhs->coefficient == 0 ? '-' : number_format($othersAhs->customAhsItemable->price * $othersAhs->coefficient, 2, ',', '.') }}"</td>
                 {{-- <td>{{ $othersAhs->customAhsItemable->subtotal * $othersAhs->coefficient }}</td> --}}
             </tr>
             @php $othersAhsSum += $othersAhs->subtotal @endphp
@@ -167,7 +169,7 @@
             <td></td>
             <td></td>
             <td><b>JUMLAH LAIN - LAIN (C)</b></td>
-            <td><b>{{ $othersAhsSum }}</b></td>
+            <td style="text-align: right;"><b>="Rp{{ $othersAhsSum == 0 ? '-' : number_format($othersAhsSum, 2, ',', '.') }}"</b></td>
         </tr>
         <tr>
             <td><b>E</b></td>
@@ -176,7 +178,7 @@
             <td></td>
             <td></td>
             <td><b>(A+B+C+D)</b></td>
-            <td><b>{{ $a->subtotal }}</b></td>
+            <td style="text-align: right;"><b>="Rp{{ $a->subtotal == 0 ? '-' : number_format($a->subtotal, 2, ',', '.') }}"</b></td>
         </tr>
         <tr>
             <td><b>F</b></td>
@@ -186,7 +188,7 @@
             <td></td>
             <td><b>x E</b></td>
             @php $profitMarginAndOverhead = ($project->profit_margin / 100) * $a->subtotal @endphp
-            <td><b>{{ $profitMarginAndOverhead }}</b></td>
+            <td style="text-align: right;"><b>="Rp{{ $profitMarginAndOverhead == 0 ? '-' : number_format($profitMarginAndOverhead, 2, ',', '.') }}"</b></td>
         </tr>
         <tr>
             <td><b>G</b></td>
@@ -195,13 +197,13 @@
             <td></td>
             <td></td>
             <td><b>(E+F)</b></td>
-            <td><b>{{ $a->subtotal + $profitMarginAndOverhead }}</b></td>
+            <td style="text-align: right;"><b>="Rp{{ $a->subtotal + $profitMarginAndOverhead == 0 ? '-' : number_format($a->subtotal + $profitMarginAndOverhead, 2, ',', '.') }}"</b></td>
         </tr>
     </tbody>
+    <tr></tr>
 </table>
 @endforeach
 <table>
-    <tr></tr>
     <tr></tr>
     <tr>
         <td></td>

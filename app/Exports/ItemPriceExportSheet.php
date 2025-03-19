@@ -63,13 +63,16 @@ class ItemPriceExportSheet implements FromView, WithTitle, WithColumnWidths, Wit
                 ]
             ]
         ]);
+        $headerStyle = $sheet->getStyle('A' . 10 . ':E' . 10);
+        $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
 
         $headerStyle = $sheet->getStyle('A11:E11');
-        $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
-        $headerStyle->getFont()->getColor()->setRGB('FFFFFF');
+        // $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('153346');
 
         $sheet->getStyle('E' . (12 + $this->customItemPriceGroupsCount) . ':E' . (25 + $this->customItemPriceGroupsCount))->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('A11:E11')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A11:E11')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)
+        ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
+        $sheet->getRowDimension(11)->setRowHeight(56);
 
         $sheet->getStyle('B9')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
     }
@@ -83,7 +86,7 @@ class ItemPriceExportSheet implements FromView, WithTitle, WithColumnWidths, Wit
     {
         return [
             'A' => 25,
-            'B' => 25,
+            'B' => 53,
             'C' => 10,
             'D' => 10,
             'E' => 15

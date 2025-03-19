@@ -25,26 +25,25 @@
         <tr>
             <td><b>KEGIATAN</b></td>
             <td><b>{{ $project->activity }}</b></td>
+            <td></td>
+            <td></td>
+            <td style="text-align: right;"><b>LOKASI PEKERJAAN: {{ $project->province->name }}</b></td>
         </tr>
         <tr>
             <td><b>NAMA PEKERJAAN</b></td>
             <td><b>{{ $project->job }}</b></td>
-        </tr>
-        <tr>
-            <td><b>LOKASI PEKERJAAN</b></td>
-            <td><b>{{ $project->province->name }}</b></td>
-        </tr>
-        <tr>
-            <td><b>TAHUN ANGGARAN</b></td>
-            <td><b>{{ $project->fiscal_year }}</b></td>
+            <td></td>
+            <td></td>
+            <td style="text-align: right;"><b>TAHUN ANGGARAN: {{ $project->fiscal_year }}</b></td>
         </tr>
         <tr></tr>
+        <tr></tr>
         <tr>
-            <th>No</th>
-            <th>URAIAN</th>
-            <th>KODE (AHSP)</th>
-            <th>SATUAN</th>
-            <th>HARGA SATUAN (Rp)</th>
+            <th><b>No</b></th>
+            <th><b>URAIAN</b></th>
+            <th><b>KODE (AHSP)</b></th>
+            <th><b>SATUAN</b></th>
+            <th><b>HARGA SATUAN (Rp)</b></th>
         </tr>
     </thead>
     <tbody>
@@ -68,7 +67,7 @@
                     <td>{{ $rabItem->name }}</td>
                     <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '-' }}</td>
                     <td>{{ $rabItem->unit->name }}</td>
-                    <td>{{ $rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price }}</td>
+                    <td style="text-align: right;">="Rp{{ ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) == 0 ? '-' : number_format($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price, 2, ',', '.') }}"</td>
                 </tr>
                 @php $rabSum += ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume @endphp
             @endforeach
@@ -83,7 +82,7 @@
                         <td>{{ $rabItem->name }}</td>
                         <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '-' }}</td>
                         <td>{{ $rabItem->unit->name }}</td>
-                        <td>{{ $rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price }}</td>
+                        <td style="text-align: right;">="Rp{{ ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) == 0 ? '-' : number_format($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price, 2, ',', '.') }}"</td>
                         {{-- <td>{{ $rabItem->custom_ahs_id != 'null' ? 'true' : $rabItem->price }}</td>
                         <td>{{ ($rabItem->custom_ahs_id != 'null' ? 'true' : $rabItem->price)}}</td> --}}
                         {{-- <td>{{ $rabItem }}</td>

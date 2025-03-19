@@ -13,7 +13,7 @@ class RabItem extends Model
     use HasFactory, HashidRouting, HasHashid;
 
     protected $fillable = [
-        'rab_id', 'rab_item_header_id', 'name', 'custom_ahs_id', 'price', 'volume', 'unit_id'
+        'rab_id', 'rab_item_header_id', 'name', 'custom_ahs_id', 'price', 'volume', 'unit_id', 'profit_margin'
     ];
 
     protected $hidden = [

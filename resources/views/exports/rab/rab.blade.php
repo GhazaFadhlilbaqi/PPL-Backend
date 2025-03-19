@@ -29,28 +29,31 @@
         <tr>
             <td><b>KEGIATAN</b></td>
             <td><b>{{ $project->activity }}</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="text-align: right;"><b>LOKASI PEKERJAAN: {{ $project->province->name }}</b></td>
         </tr>
         <tr>
             <td><b>NAMA PEKERJAAN</b></td>
             <td><b>{{ $project->job }}</b></td>
-        </tr>
-        <tr>
-            <td><b>LOKASI PEKERJAAN</b></td>
-            <td><b>{{ $project->province->name }}</b></td>
-        </tr>
-        <tr>
-            <td><b>TAHUN ANGGARAN</b></td>
-            <td><b>{{ $project->fiscal_year }}</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="text-align: right;"><b>TAHUN ANGGARAN: {{ $project->fiscal_year }}</b></td>
         </tr>
         <tr></tr>
+        <tr></tr>
         <tr>
-            <th>No</th>
-            <th>URAIAN PEKERJAAN</th>
-            <th>KODE ANALISA</th>
-            <th>VOLUME</th>
-            <th>SATUAN</th>
-            <th>HARGA SATUAN (Rp)</th>
-            <th>JUMLAH HARGA (Rp)</th>
+            <th><b>No</b></th>
+            <th><b>URAIAN PEKERJAAN</b></th>
+            <th><b>KODE ANALISA</b></th>
+            <th><b>VOLUME</b></th>
+            <th><b>SATUAN</b></th>
+            <th><b>HARGA SATUAN (Rp)</b></th>
+            <th><b>JUMLAH HARGA (Rp)</b></th>
         </tr>
     </thead>
     <tbody>
@@ -63,7 +66,7 @@
                 <td></td>
                 <td><b>TOTAL {{ numToAlphabet($loop->index) }}</b></td>
                 <td></td>
-                <td>{{ $rab->subtotal }}</td>
+                <td style="text-align: right;">="Rp{{ $rab->subtotal == 0 ? '-' : number_format($rab->subtotal, 2, ',', '.') }}"</td>
             </tr>
             @foreach ($rab->rabItem ?? [] as $rabItem)
                 <tr>
@@ -72,8 +75,8 @@
                     <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '-' }}</td>
                     <td>{{ $rabItem->volume }}</td>
                     <td>{{ $rabItem->unit->name }}</td>
-                    <td>{{ $rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price }}</td>
-                    <td>{{ ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume }}</td>
+                    <td style="text-align: right;">="Rp{{ ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) == 0 ? '-' : number_format($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price, 2, ',', '.') }}"</td>
+                    <td style="text-align: right;">="Rp{{ (($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume) == 0 ? '-' : number_format(($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume, 2, ',', '.') }}"</td>
                 </tr>
                 @php $rabSum += ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume @endphp
             @endforeach
@@ -89,8 +92,8 @@
                         <td>{{ $rabItem->customAhs ? $rabItem->customAhs->code : '-' }}</td>
                         <td>{{ $rabItem->volume }}</td>
                         <td>{{ $rabItem->unit->name }}</td>
-                        <td>{{ $rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price }}</td>
-                        <td>{{ ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume }}</td>
+                        <td style="text-align: right;">="Rp{{ ($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) == 0 ? '-' : number_format($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price, 2, ',', '.') }}"</td>
+                        <td style="text-align: right;">="Rp{{ (($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume) == 0 ? '-' : number_format(($rabItem->customAhs ? $rabItem->customAhs->price : $rabItem->price) * $rabItem->volume, 2, ',', '.') }}"</td>
                         {{-- <td>{{ $rabItem->custom_ahs_id != 'null' ? 'true' : $rabItem->price }}</td>
                         <td>{{ ($rabItem->custom_ahs_id != 'null' ? 'true' : $rabItem->price)}}</td> --}}
                         {{-- <td>{{ $rabItem }}</td>
@@ -108,7 +111,7 @@
             <td></td>
             <td></td>
             <td><b>JUMLAH TOTAL A + B</b></td>
-            <td>{{ $rabSum }}</td>
+            <td style="text-align: right;">="Rp{{ number_format($rabSum, 2, ',', '.') }}"</td>
         </tr>
         <tr>
             <td></td>
@@ -118,7 +121,7 @@
             <td></td>
             <td><b>PPN {{ $project->ppn }}%</b></td>
             @php $ppn = $project->ppn / 100 * $rabSum @endphp
-            <td>{{ $tax }}</td>
+            <td style="text-align: right;">="Rp{{ number_format($tax, 2, ',', '.') }}"</td>
         </tr>
         <tr>
             <td></td>
@@ -127,7 +130,7 @@
             <td></td>
             <td></td>
             <td><b>JUMLAH TOTAL DENGAN PPN {{ $project->ppn }}%</b></td>
-            <td>{{ $price_after_tax }}</td>
+            <td style="text-align: right;">="Rp{{ number_format($price_after_tax, 2, ',', '.') }}"</td>
         </tr>
         <tr>
             <td></td>
