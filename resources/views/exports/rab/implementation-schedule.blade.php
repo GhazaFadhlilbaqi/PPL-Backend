@@ -84,6 +84,10 @@
         }
       }
 
+      if ($rabSum == 0) {
+        $rabSum = 1;
+      }
+      
       @endphp
 
       @foreach ($rabs ?? [] as $rab)
