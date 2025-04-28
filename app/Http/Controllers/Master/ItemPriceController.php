@@ -31,6 +31,9 @@ class ItemPriceController extends Controller
     $decodedProvinceId = Hashids::decode($request->province_id);
     $decodedGroupId = Hashids::decode($request->group_id);
     $query = ItemPrice::where('item_price_group_id', $decodedGroupId)
+      ->when($request->query('name'), function ($q, $name) {
+        return $q->where('name', 'like', "%$name%");
+      })
       ->with([
         'unit:id,name',
         'price' => function ($q) use ($decodedProvinceId) {
