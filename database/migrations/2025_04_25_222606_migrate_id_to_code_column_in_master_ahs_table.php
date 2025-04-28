@@ -52,10 +52,10 @@ class MigrateIdToCodeColumnInMasterAhsTable extends Migration
         // });
 
         // 5. Set ahs id type as primary key
-        // Schema::table('ahs', function (Blueprint $table) {
-        //     $table->unsignedBigInteger('id')->nullable()->change();
-        // });
-        // DB::statement('ALTER TABLE ahs MODIFY COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY');
+        Schema::table('ahs', function (Blueprint $table) {
+            $table->unsignedBigInteger('id')->nullable()->change();
+        });
+        DB::statement('ALTER TABLE ahs MODIFY COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY');
 
         // 6. Change ahs_id with big integer id
         AhsItem::chunk(500, function ($items) {
