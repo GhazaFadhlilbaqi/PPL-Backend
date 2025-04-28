@@ -18,38 +18,38 @@ class MigrateIdToCodeColumnInMasterAhsTable extends Migration
     public function up()
     {
         // 1. Add code column
-        Schema::table('ahs', function (Blueprint $table) {
-            $table->string('code')->after('id');
-        });
+        // Schema::table('ahs', function (Blueprint $table) {
+        //     $table->string('code')->after('id');
+        // });
 
-        // 2. Copy id into code
-        Ahs::orderBy('created_at')->chunk(500, function ($ahses) {
-            foreach ($ahses as $ahs) {
-                $ahs->code = $ahs->id;
-                $ahs->saveQuietly();
-            }
-        });
+        // // 2. Copy id into code
+        // Ahs::orderBy('created_at')->chunk(500, function ($ahses) {
+        //     foreach ($ahses as $ahs) {
+        //         $ahs->code = $ahs->id;
+        //         $ahs->saveQuietly();
+        //     }
+        // });
 
-        // 3. Modify id to BIGINT AUTO_INCREMENT
-        Schema::table('ahs_items', function (Blueprint $table) {
-            $table->dropForeign('ahs_items_ahs_id_foreign');
-        });
-        Schema::table('master_rab_items', function (Blueprint $table) {
-            $table->dropForeign('fk_master_rab_items_ahs_id');
-        });
-        Schema::table('ahs', function (Blueprint $table) {
-            $table->dropPrimary();
-        });
+        // // 3. Modify id to BIGINT AUTO_INCREMENT
+        // Schema::table('ahs_items', function (Blueprint $table) {
+        //     $table->dropForeign('ahs_items_ahs_id_foreign');
+        // });
+        // Schema::table('master_rab_items', function (Blueprint $table) {
+        //     $table->dropForeign('fk_master_rab_items_ahs_id');
+        // });
+        // Schema::table('ahs', function (Blueprint $table) {
+        //     $table->dropPrimary();
+        // });
 
-        // 4. Manually setup ahs id incrementally
-        $count = 1;
-        Ahs::orderBy('created_at')->chunk(500, function ($rows) use (&$count) {
-            foreach ($rows as $row) {
-                $row->id = $count;
-                $row->saveQuietly();
-                $count++;
-            }
-        });
+        // // 4. Manually setup ahs id incrementally
+        // $count = 1;
+        // Ahs::orderBy('created_at')->chunk(500, function ($rows) use (&$count) {
+        //     foreach ($rows as $row) {
+        //         $row->id = $count;
+        //         $row->saveQuietly();
+        //         $count++;
+        //     }
+        // });
 
         // 5. Set ahs id type as primary key
         Schema::table('ahs', function (Blueprint $table) {
