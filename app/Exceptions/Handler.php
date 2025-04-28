@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Sentry\Laravel\Integration;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -52,6 +53,21 @@ class Handler extends ExceptionHandler
                 'message' => $errorMessages
             ], 422);
         }
-        return parent::render($request, $exception);
+
+        if ($exception instanceof HttpException) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], $exception->getStatusCode());
+        }
+
+        $json_response = [
+            'success' => false,
+            'message' => "Terdapat masalah pada server, mohon hubungi customer service"
+        ];
+        if (config('app.debug')) {
+            $json_response['trace'] = $exception->getTrace();
+        }
+        return response()->json($json_response, 500);
     }
 }

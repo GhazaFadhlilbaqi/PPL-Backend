@@ -12,7 +12,6 @@ class CustomAhs extends Model
     use HasFactory, HasHashid, HashidRouting;
 
     protected $fillable = ['code', 'name', 'project_id'];
-    protected $hidden = ['id'];
     protected $appends = ['hashid'];
 
     public function customAhsItem()

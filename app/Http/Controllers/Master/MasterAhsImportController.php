@@ -2,130 +2,167 @@
 
 namespace App\Http\Controllers\Master;
 
-use Exception;
 use App\Exceptions\CustomException;
 use App\Models\Ahs;
 use App\Models\AhsItem;
 use App\Models\Unit;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class MasterAhsImportController implements WithMultipleSheets {
+class MasterAhsImportController implements WithMultipleSheets, SkipsEmptyRows
+{
   private $masterAhsGroups;
   private $ahsItemTypes;
 
-  public function __construct($masterAhsGroups, $ahsItemTypes) {
+  public function __construct($masterAhsGroups, $ahsItemTypes)
+  {
     $this->masterAhsGroups = $masterAhsGroups;
     $this->ahsItemTypes = $ahsItemTypes;
   }
 
-  public function sheets(): array {
+  public function sheets(): array
+  {
     return [
-        new MasterAhsImportSheet($this->masterAhsGroups),
-        new MasterAhsItemImportSheet($this->ahsItemTypes)
+      new MasterAhsImportSheet($this->masterAhsGroups),
+      new MasterAhsItemImportSheet($this->ahsItemTypes)
     ];
   }
 }
 
-class MasterAhsImportSheet implements ToCollection {
+class MasterAhsImportSheet implements ToCollection, WithChunkReading
+{
   private $masterAhsGroups;
 
-  public function __construct($masterAhsGroups) {
+  public function __construct($masterAhsGroups)
+  {
     $this->masterAhsGroups = $masterAhsGroups;
   }
 
-  public function collection(Collection $rows) {
-      // Remove table header
-      $rows->shift();
+  public function chunkSize(): int
+  {
+    return 500;
+  }
 
-      // Get all ahs datas
-      $ahsList = Ahs::all();
+  public function collection(Collection $rows)
+  {
+    // Remove table header
+    $rows->shift();
 
-      // Create new ahs when ahs code from excel is not found on databasse
-      foreach ($rows as $ahsRow) {
-        $ahs = $ahsList->first(function($ahs) use ($ahsRow) {
-          return $ahs->id == $ahsRow[1];
-        });
-        if ($ahs) { continue; }
-        Ahs::create([
-          'id' => $ahsRow[1],
-          'groups' => $this->masterAhsGroups->first(function($masterAhsGroup) use ($ahsRow) {
-            return $masterAhsGroup['title'] == $ahsRow[2];
-          })['key'],
-          'name' => $ahsRow[3]
-        ]);
-        $rows = $rows->filter(function($row) use ($ahsRow) {
-          return $row[1] != $ahsRow[1];
-        });
-      }
+    // Prepare masterAhsGroups map for fast lookup
+    $referenceGroups = collect($this->masterAhsGroups)->pluck('key', 'title')->toArray();
+    $insertData = [];
+    foreach ($rows as $ahsRowData) {
+      if ($ahsRowData->filter()->isEmpty()) continue;
+      if (empty($ahsRowData[0])) continue;
+      $groupKey = $referenceGroups[$ahsRowData[2]] ?? null;
+      $insertData[] = [
+        'code' => $ahsRowData[1],
+        'name' => $ahsRowData[3],
+        'groups' => $groupKey,
+        'created_at' => now(),
+        'updated_at' => now(),
+      ];
+    }
 
-      // Update existing ahs (when id found) or remove when id from database is not found excel
-      foreach ($ahsList as $ahs) {
-        $row = $rows->first(function($row) use ($ahs) {
-          return $ahs->id == $row[1];
-        });
-        if ($row) {
-          $ahs->update(['name' => $row[3]]);
-          continue;
-        }
-        $ahs->delete();
-      }
+    // Batch insert at once
+    if (empty($insertData)) return;
+    foreach (array_chunk($insertData, 500) as $batch) {
+      Ahs::upsert(
+        $batch,
+        ['code', 'groups'],
+        ['name', 'updated_at']
+      );
+    }
   }
 }
 
-class MasterAhsItemImportSheet implements ToCollection {
+class MasterAhsItemImportSheet implements ToCollection, WithChunkReading
+{
   private $ahsItemTypes;
 
-  public function __construct($ahsItemTypes) {
+  public function __construct($ahsItemTypes)
+  {
     $this->ahsItemTypes = $ahsItemTypes;
   }
-  
-  public function collection(Collection $rows) {
-      // Remove table header
-      $rows->shift();
 
-      // Get all ahs datas
-      $ahsList = Ahs::all();
+  public function chunkSize(): int
+  {
+    return 500;
+  }
 
-      // Clear ahs list item first
-      foreach ($ahsList as $ahs) {
-        AhsItem::where('ahs_id', $ahs->id)->delete();
+  public function collection(Collection $rows)
+  {
+    $rows->shift();
+
+    AhsItem::truncate();
+
+    $ahs_list = Ahs::all()->keyBy('code');
+    $unit_names = Unit::pluck('id', 'name')
+      ->mapWithKeys(function ($id, $name) {
+          return [strtolower($name) => $id];
+      })
+      ->toArray();
+
+    $ahs_items_data = [];
+    foreach ($rows as $rowIndex => $rowData) {
+      if ($rowData->filter()->isEmpty()) continue;
+      $mutatedRowIndex = $rowIndex + 2;
+
+      $ahs = $ahs_list[$rowData[1]] ?? null;
+      if ($ahs === null) {
+        throw new CustomException("Kode AHS " . $rowData[1] . " tidak ditemukan pada row: " . $mutatedRowIndex);
+      };
+
+      $ahs_reference = $ahs_list[$rowData[3]] ?? null;
+
+      $ahs_name = $rowData[4] ?: ($ahs_reference->name ?? null);
+      if ($ahs_name === null) {
+        throw new CustomException("Nama ahs kosong pada row: " . $mutatedRowIndex);
       }
-  
-      // Re-add all ahs item
-      foreach ($rows as $row) {
-        $isAhsReference = $ahsList->contains('id', $row[3]);
-        if (!$ahsList->contains('id', $row[1])) {
-          continue;
-        }
-        $ahsName = null; 
-        if ($isAhsReference) {
-          $ahsName = !$row[4]
-            ? $ahsList->first(function($ahs) use ($row) {
-              return $ahs->id == $row[3];
-            })->name
-            : $row[4]; 
-        }
-        try {
-          AhsItem::create([
-            'ahs_id' => $row[1],
-            'section' => $this->ahsItemTypes->first(function($ahsItemType) use ($row) {
-              return $ahsItemType['title'] == $row[2];
-            })['key'],
-            'ahs_itemable_id' => $row[3],
-            'ahs_itemable_type' => $isAhsReference
-              ? 'App\\Models\\Ahs'
-              : 'App\\Models\\ItemPrice',
-            'name' => $ahsName,
-            'unit_id' => $isAhsReference
-              ? Unit::where(['name' => $row[5]])->pluck('id')->first()
-              : null,
-            'coefficient' => $row[6],
-          ]);
-        } catch (Exception) {
-          throw new CustomException("There's an error on row ".$row[0].". please check.");
-        }
+
+      $ahs_section = $this->ahsItemTypes->first(function ($ahsItemType) use ($rowData) {
+        return strtolower($ahsItemType['title']) == strtolower($rowData[2]);
+      });
+      if ($ahs_section === null) {
+        throw new CustomException("Kategori ahs " . $rowData[2] . " tidak ditemukan pada baris: " . $mutatedRowIndex);
       }
+
+      if (!isset($rowData[3])) {
+          throw new CustomException("Kode item AHS kosong pada baris: " . $mutatedRowIndex);
+      }
+
+      $unit_name = $unit_names[strtolower($rowData[5])] ?? null;
+      if ($unit_name === null) {
+        throw new CustomException("Satuan " . $rowData[5] . " tidak ditemukan pada baris: " . $mutatedRowIndex);
+      }
+
+      $coefficientData = str_replace(',', '.', $rowData[6]);
+      if (!is_numeric($coefficientData)) {
+          throw new CustomException("Coefficient tidak sesuai pada baris: " . $mutatedRowIndex);
+      }
+
+      $ahs_items_data[] =  [
+        'ahs_id' => $ahs->id,
+        'section' => $ahs_section['key'],
+        'ahs_itemable_id' => $rowData[3],
+        'ahs_itemable_type' => isset($ahs_reference)
+          ? 'App\\Models\\Ahs'
+          : 'App\\Models\\ItemPrice',
+        'name' => $ahs_name,
+        'unit_id' => $unit_name,
+        'coefficient' => (float) $coefficientData,
+        'created_at' => now(),
+        'updated_at' => now(),
+      ];
+    }
+
+    if (empty($ahs_items_data)) return;
+
+    foreach (array_chunk($ahs_items_data, 500) as $batch) {
+      AhsItem::insert($batch);
+    }
   }
 }

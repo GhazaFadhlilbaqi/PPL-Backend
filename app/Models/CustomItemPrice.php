@@ -12,7 +12,6 @@ class CustomItemPrice extends Model
 {
     use HasFactory, HasHashid, HashidRouting;
 
-    protected $hidden = ['id'];
     protected $appends = ['hashid'];
     protected $with = ['unit'];
     protected $fillable = [
