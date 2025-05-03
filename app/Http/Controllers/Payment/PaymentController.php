@@ -27,7 +27,6 @@ class PaymentController extends Controller
     public function fetchSnapToken(Request $request)
     {
         Config::$serverKey = env('MIDTRANS_MODE') == 'sandbox' ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT') : env('MIDTRANS_SERVER_KEY_PRODUCTION');
-
         if (!isset(Config::$serverKey)) return response()->json([
             'status' => 'fail',
             'message' => 'Please provide your midtrans server key !'
@@ -167,8 +166,10 @@ class PaymentController extends Controller
 
         $subscription = Subscription::find($request->subscription_id);
 
-        MidtransConfig::$serverKey = env('MIDTRANS_MODE') == 'sandbox' ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT') : env('MIDTRANS_SERVER_KEY_PRODUCTION');
-        MidtransConfig::$isProduction = env('MIDTRANS_MODE') == 'production';
+        MidtransConfig::$serverKey = config('app.midtrans_env')
+            ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT')
+            : env('MIDTRANS_SERVER_KEY_PRODUCTION');
+        MidtransConfig::$isProduction = config('app.midtrans_env') == 'production';
         MidtransConfig::$is3ds = true;
 
         $user = Auth::user();
@@ -225,6 +226,8 @@ class PaymentController extends Controller
         ];
 
         $snapToken = null;
+
+        // echo json_encode($params);
 
         try {
             $snapToken = MidtransSnap::getSnapToken($params);

@@ -149,6 +149,8 @@ return [
         'callback_route' => 'http://localhost:8080/auth/login',
     ],
 
+    'midtrans_env' => env('MIDTRANS_MODE', 'sandbox'),
+
     'providers' => [
 
         /*
