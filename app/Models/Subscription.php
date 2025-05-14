@@ -13,4 +13,10 @@ class Subscription extends Model
 
     public $incrementing = false;
 
+
+    public function features()
+    {
+        return $this->belongsToMany(Feature::class, 'subscription_feature')
+                    ->withTimestamps();
+    }
 }

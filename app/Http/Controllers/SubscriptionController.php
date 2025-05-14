@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SubscriptionResource;
 use App\Models\Subscription;
 use Illuminate\Http\Request;
 
@@ -9,12 +10,15 @@ class SubscriptionController extends Controller
 {
     public function index()
     {
-
-        $subscriptions = Subscription::orderBy('order', 'ASC')->get(['id', 'name', 'price', 'subscription_type', 'description', 'is_show', 'promotion_price']);
-
+        $subscriptions = Subscription::with(['features'])
+            ->orderBy('order', 'ASC')
+            ->where('id', '!=', 'demo')
+            ->get();
         return response()->json([
             'status' => 'success',
-            'data' => compact('subscriptions')
+            'data' => [
+                "subscriptions" => SubscriptionResource::collection($subscriptions)
+            ]
         ]);
     }
 }

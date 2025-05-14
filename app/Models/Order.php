@@ -11,7 +11,19 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id', 'user_id', 'project_id', 'midtrans_snap_token', 'gross_amount', 'status', 'subscription_id', 'expired_at', 'is_active', 'type'];
+    protected $fillable = [
+        'order_id',
+        'user_id',
+        'project_id',
+        'midtrans_snap_token',
+        'gross_amount',
+        'status',
+        'subscription_id',
+        'subscription_duration_type',
+        'expired_at',
+        'is_active',
+        'type'
+    ];
     protected $appends = ['hashed_project_id', 'is_expired'];
 
     public function project()

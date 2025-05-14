@@ -28,6 +28,7 @@ class Project extends Model
         'last_opened_at',
         'ppn',
         'subscription_id',
+        'subscription_duration_type',
         'activeOrder',
         'implementation_duration'
     ];

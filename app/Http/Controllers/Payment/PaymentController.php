@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Payment;
 
+use App\Enums\SubscriptionDurationType;
+use App\Helpers\OrderHelper;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
@@ -10,7 +12,6 @@ use App\Http\Controllers\Midtrans\Snap;
 use App\Models\Order;
 use App\Models\ProjectTemporary;
 use App\Models\Subscription;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -66,7 +67,6 @@ class PaymentController extends Controller
                     $order->save();
                     $order = $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0], self::productPrice);
                 }
-
             } else {
                 $order = $this->setOrder($orderId, $customer, Hashids::decode($request->project_id)[0], self::productPrice);
             }
@@ -160,11 +160,18 @@ class PaymentController extends Controller
 
         DB::beginTransaction();
 
+        $request->validate([
+            'subscription_type' => ['required', 'in:MONTHLY,YEARLY']
+        ]);
+
         if ($request->type != 'create' && $request->type != 'renew') {
             throw new Exception('Invalid type');
         }
 
         $subscription = Subscription::find($request->subscription_id);
+        $subscriptionPrice = $request->subscription_type === SubscriptionDurationType::YEARLY->value
+            ? $subscription->yearly_price * 12
+            : $subscription->monthly_price * $subscription->min_month;
 
         MidtransConfig::$serverKey = config('app.midtrans_env')
             ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT')
@@ -180,8 +187,9 @@ class PaymentController extends Controller
             'user_id' => $user->id,
             'project_id' => $request->type == 'create' ? null : Hashids::decode($request->project_hashid)[0],
             'subscription_id' => $subscription->id,
+            'subscription_duration_type' => $request->subscription_type,
             'status' => 'waiting_for_payment',
-            'gross_amount' => $subscription->price,
+            'gross_amount' => $subscriptionPrice,
             'type' => $request->type == 'create' ? 'create' : 'renew'
         ]);
 
@@ -211,7 +219,7 @@ class PaymentController extends Controller
             'item_details' => [
                 [
                     'id' => $subscription->hashid,
-                    'price' => $subscription->price,
+                    'price' => $subscriptionPrice,
                     'quantity' => 1,
                     'name' => 'Project Plan : ' . $subscription->name,
                 ]
@@ -227,8 +235,6 @@ class PaymentController extends Controller
 
         $snapToken = null;
 
-        // echo json_encode($params);
-
         try {
             $snapToken = MidtransSnap::getSnapToken($params);
         } catch (Exception $e) {
@@ -241,6 +247,11 @@ class PaymentController extends Controller
 
         $order->midtrans_snap_token = $snapToken;
         $order->save();
+
+        // Set order as successful when laravel env is local
+        if (env('APP_ENV') === 'local') {
+            OrderHelper::setOrderAsSuccessful($order);
+        }
 
         DB::commit();
 

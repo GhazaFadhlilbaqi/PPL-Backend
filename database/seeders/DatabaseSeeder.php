@@ -15,11 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        # Some seeders are commented because it's populated from /database/sample-data
-        $this->call([
-            RolePermissionSeeder::class,
-            UserSeeder::class,
-        ]);
+        $this->call(RolePermissionSeeder::class);
+
+        if (env('APP_ENV') === 'local') {
+            $this->call(UserSeeder::class);
+        }
 
         if (env('USE_AHS_POPULATE', false)){
             Artisan::call('populate:ahs');
@@ -37,5 +37,8 @@ class DatabaseSeeder extends Seeder
             SubscriptionSeeder::class,
             MasterRabCategorySeeder::class,
         ]);
+
+        $this->call(FeatureSeeder::class);
+        $this->call(SubscriptionFeatureSeeder::class);
     }
 }

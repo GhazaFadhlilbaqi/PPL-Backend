@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers\Order;
 
-use App\Helpers\ProjectHelper;
+use App\Helpers\OrderHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Project;
-use App\Models\Subscription;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Vinkla\Hashids\Facades\Hashids;
 
 class OrderController extends Controller
 {
@@ -22,7 +18,7 @@ class OrderController extends Controller
     {
         $orders = Auth::user()->order()->with(['project', 'subscription'])->orderBy('created_at', 'DESC')->get();
 
-        $orders = $orders->map(function($data) {
+        $orders = $orders->map(function ($data) {
             $data->formatted_date = date('d-m-Y H:i', strtotime($data->created_at));
             $data->formatted_gross_amount = number_format($data->gross_amount);
             $data->formatted_expired_at = $data->expired_at ? date('d-m-Y', strtotime($data->expired_at)) : '-';
@@ -53,7 +49,7 @@ class OrderController extends Controller
 
         // Handle successful order
         if ($request->transaction_status == 'capture' || $request->status_code == '200') {
-            return $this->handleSuccessfulOrder($order);
+            OrderHelper::setOrderAsSuccessful($order);
             return response()->json([
                 'status' => 'ok'
             ]);
@@ -65,41 +61,6 @@ class OrderController extends Controller
         return response()->json([
             'status' => 'ok'
         ]);
-    }
-
-    private function handleSuccessfulOrder(Order $order) {
-        $project = $order->type == 'create'
-            ? $this->makeProject($order)
-            : Project::find($order->project_id);
-            $monthDuration = ['MONTHLY' => 1, 'QUARTERLY' => 3];
-        $subscription = Subscription::where('id', $order->subscription_id)->first();
-
-        if ($order->type == 'create') {
-            $order->expired_at = Carbon::parse($order->created_at)
-                ->addMonths($monthDuration[$subscription->subscription_type])
-                ->toDateString();
-        }
-
-        if ($order->type == 'renew') {
-            // Update subscription id
-            $project->subscription_id = $order->subscription_id;
-            $project->save();
-            
-            // Check for renew same package
-            $latestOrder = Order::where('id', '!=', $order->id)
-                ->where('status', 'completed')
-                ->latest()
-                ->first();
-            $latestExpiredDate = $latestOrder && $order->subscription_id == $latestOrder->id
-                ? $latestOrder->expired_at
-                : $order->expired_at;
-            $order->expired_at = Carbon::parse($latestExpiredDate)
-                ->addMonths($monthDuration[$subscription->subscription_type])
-                ->toDateString();
-            $order->save();
-        }
-
-        $this->markOrderAsComplete($project, $order);
     }
 
     public function orderStatusByProject(Project $project)
@@ -116,43 +77,8 @@ class OrderController extends Controller
 
     private function generateSignature($order)
     {
-        $input = $order->order_id . '200' . ($order->gross_amount .'.00') . (env('MIDTRANS_MODE') == 'sandbox' ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT') : env('MIDTRANS_SERVER_KEY_PRODUCTION'));
+        $input = $order->order_id . '200' . ($order->gross_amount . '.00') . (env('MIDTRANS_MODE') == 'sandbox' ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT') : env('MIDTRANS_SERVER_KEY_PRODUCTION'));
         return openssl_digest($input, 'sha512');
-    }
-
-    // Make project from ProjectTemporary
-    private function makeProject($order)
-    {
-        try {
-            DB::beginTransaction();
-
-            $projectTemporary = $order->projectTemporary;
-
-            $project = Project::create([
-                'user_id' => $projectTemporary->user_id,
-                'name' => $projectTemporary->name,
-                'activity' => $projectTemporary->activity,
-                'job' => $projectTemporary->job,
-                'address' => $projectTemporary->address,
-                'province_id' => $projectTemporary->province_id,
-                'fiscal_year' => $projectTemporary->fiscal_year,
-                'profit_margin' => $projectTemporary->profit_margin,
-                'ppn' => $projectTemporary->ppn,
-                'subscription_id' => $order->subscription_id,
-            ]);
-
-            $projectTemporary->delete();
-
-            DB::commit();
-
-            return $project;
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => $e->getMessage(),
-            ]);
-        }
     }
 
     private function determinePaymentMethod(Request $request)
@@ -163,10 +89,10 @@ class OrderController extends Controller
         switch ($request->payment_type) {
             case 'qris':
                 $paymentMethodStr = 'QRIS | ' . strtoupper($request->acquirer);
-            break;
+                break;
             case 'credit_card':
                 $paymentMethodStr = 'Credit Card | ' . strtoupper($request->bank);
-            break;
+                break;
             case 'bank_transfer':
                 $paymentMethodStr = 'Bank Transfer / VA';
             default:
@@ -174,16 +100,5 @@ class OrderController extends Controller
         }
 
         return $paymentMethodStr;
-    }
-
-    private function markOrderAsComplete(Project $project, Order $order)
-    {
-        Order::where('project_id', $project->id)->update([
-            'is_active' => false,
-        ]);
-        $order->project_id = $project->id;
-        $order->status = 'completed';
-        $order->is_active = true;
-        $order->save();
     }
 }

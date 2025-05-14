@@ -13,6 +13,7 @@ use App\Http\Controllers\CustomAhsItemController;
 use App\Http\Controllers\CustomItemPriceController;
 use App\Http\Controllers\CustomItemPriceGroupController;
 use App\Http\Controllers\DebugController;
+use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\ImplementationScheduleController;
 use App\Http\Controllers\Master\AhpController;
 use App\Http\Controllers\Master\AhsController;
@@ -306,6 +307,10 @@ Route::prefix('tutorials')->middleware('auth:sanctum')->group(function() {
 
 Route::prefix('subscriptions')->middleware('auth:sanctum')->group(function() {
     Route::get('', [SubscriptionController::class, 'index']);
+});
+
+Route::prefix('features')->middleware('auth:sanctum')->group(function() {
+    Route::resource('', FeaturesController::class);
 });
 
 Route::prefix('debug')->middleware('protect-debug')->group(function() {
