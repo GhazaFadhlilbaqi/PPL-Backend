@@ -89,6 +89,7 @@ class SubscriptionPriceSeeder extends Seeder
           'price' => $priceData['price'],
           'discounted_price' => $priceData['discounted_price'],
           'min_duration' => $priceData['min_duration'],
+          'is_active' => $priceData['is_active'],
         ]);
       }
     }
