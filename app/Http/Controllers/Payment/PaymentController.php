@@ -12,6 +12,7 @@ use App\Http\Controllers\Midtrans\Snap;
 use App\Models\Order;
 use App\Models\ProjectTemporary;
 use App\Models\Subscription;
+use App\Models\SubscriptionPrice;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -161,17 +162,12 @@ class PaymentController extends Controller
         DB::beginTransaction();
 
         $request->validate([
-            'subscription_type' => ['required', 'in:MONTHLY,YEARLY']
+            'subscription_price_id' => 'required|integer'
         ]);
 
         if ($request->type != 'create' && $request->type != 'renew') {
             throw new Exception('Invalid type');
         }
-
-        $subscription = Subscription::find($request->subscription_id);
-        $subscriptionPrice = $request->subscription_type === SubscriptionDurationType::YEARLY->value
-            ? $subscription->yearly_price * 12
-            : $subscription->monthly_price * $subscription->min_month;
 
         MidtransConfig::$serverKey = config('app.midtrans_env')
             ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT')
@@ -180,16 +176,21 @@ class PaymentController extends Controller
         MidtransConfig::$is3ds = true;
 
         $user = Auth::user();
+        $subscriptionPrice = SubscriptionPrice::with('subscription')
+            ->where('id', $request->subscription_price_id)
+            ->first();
 
         // Generate order data
         $order = Order::create([
             'order_id' => $this->generateOrderId(),
             'user_id' => $user->id,
             'project_id' => $request->type == 'create' ? null : Hashids::decode($request->project_hashid)[0],
-            'subscription_id' => $subscription->id,
-            'subscription_duration_type' => $request->subscription_type,
+            'subscription_id' => $subscriptionPrice->subscription_id,
+            'subscription_price_id' => $subscriptionPrice->id,
             'status' => 'waiting_for_payment',
-            'gross_amount' => $subscriptionPrice,
+            'gross_amount' => $subscriptionPrice->duration_type === SubscriptionDurationType::YEARLY->value
+                ? $subscriptionPrice->discounted_price * 12
+                : $subscriptionPrice->discounted_price * $subscriptionPrice->min_duration,
             'type' => $request->type == 'create' ? 'create' : 'renew'
         ]);
 
@@ -218,10 +219,10 @@ class PaymentController extends Controller
             ],
             'item_details' => [
                 [
-                    'id' => $subscription->hashid,
-                    'price' => $subscriptionPrice,
+                    'id' => $subscriptionPrice->subscription_id,
+                    'price' => $order->gross_amount,
                     'quantity' => 1,
-                    'name' => 'Project Plan : ' . $subscription->name,
+                    'name' => 'Project Plan : ' . $subscriptionPrice->subscription->name,
                 ]
             ],
             'customer_details' => [

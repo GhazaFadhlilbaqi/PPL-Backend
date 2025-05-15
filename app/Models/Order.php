@@ -19,7 +19,7 @@ class Order extends Model
         'gross_amount',
         'status',
         'subscription_id',
-        'subscription_duration_type',
+        'subscription_price_id',
         'expired_at',
         'is_active',
         'type'
@@ -39,6 +39,11 @@ class Order extends Model
     public function subscription()
     {
         return $this->belongsTo(Subscription::class);
+    }
+
+    public function subscriptionPrice()
+    {
+        return $this->belongsTo(SubscriptionPrice::class);
     }
 
     public function getIsExpiredAttribute()

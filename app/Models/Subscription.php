@@ -17,6 +17,11 @@ class Subscription extends Model
     public function features()
     {
         return $this->belongsToMany(Feature::class, 'subscription_feature')
-                    ->withTimestamps();
+            ->withTimestamps();
+    }
+
+    public function prices()
+    {
+        return $this->hasMany(SubscriptionPrice::class, 'subscription_id');
     }
 }

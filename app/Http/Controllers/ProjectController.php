@@ -25,19 +25,29 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
         return $this->getTableFormattedData(
-            Project::where('user_id', Auth::user()->id)->with(['province', 'subscription']))
-              // Get active order
-              ->addColumn('order', function($project) {
+            Project::where('user_id', Auth::user()->id)->with(['province', 'subscription'])
+        )
+            // Get active order
+            ->addColumn('order', function ($project) {
                 return $project->order()->where('is_active', true)->first();
-              })
-              ->addColumn('last_opened_at_formatted', function($data) {
-                  return $data->last_opened_at ? date('d-m-Y', strtotime($data->last_opened_at)) : 'Belum pernah dibuka';
-              })->addColumn('created_at_formatted', function($data) {
-                  return date('d-m-Y', strtotime($data->created_at));
-              })->addColumn('expired_at_formatted', function($data) {
-                  return date('d-m-Y', strtotime($data->order->expired_at));
-              })
-              ->make();
+            })
+            ->addColumn('last_opened_at_formatted', function ($data) {
+                return $data->last_opened_at ? date('d-m-Y', strtotime($data->last_opened_at)) : 'Belum pernah dibuka';
+            })->addColumn('created_at_formatted', function ($data) {
+                return date('d-m-Y', strtotime($data->created_at));
+            })->addColumn('expired_at_formatted', function ($data) {
+                return date('d-m-Y', strtotime($data->order->expired_at));
+            })->addColumn('subscriptionPrice', function ($data) {
+                $subscriptionPrice = $data->order->subscriptionPrice;
+                if ($subscriptionPrice == null) return;
+                return [
+                    'id' => $subscriptionPrice->id,
+                    'durationType' => $subscriptionPrice->duration_type,
+                    'discountedPrice' => $subscriptionPrice->discounted_price,
+                    'minDuration' => $subscriptionPrice->min_duration,
+                ];
+            })
+            ->make();
     }
 
     public function store_demo(ProjectRequest $request)
@@ -59,7 +69,16 @@ class ProjectController extends Controller
         ]);
 
         $project = Project::create($request->only([
-            'user_id', 'name', 'activity', 'job', 'address', 'province_id', 'fiscal_year', 'profit_margin', 'ppn', 'subscription_id'
+            'user_id',
+            'name',
+            'activity',
+            'job',
+            'address',
+            'province_id',
+            'fiscal_year',
+            'profit_margin',
+            'ppn',
+            'subscription_id'
         ]));
 
         $user = Auth::user();
@@ -111,7 +130,6 @@ class ProjectController extends Controller
 
                 $project->subscription_id = $order->subscription_id;
                 $project->save();
-
             } else {
                 throw new Exception('Tidak dapat renew project, tidak ada order yang bisa di assign ke project.');
             }
@@ -139,7 +157,14 @@ class ProjectController extends Controller
         $request->merge(['province_id' => Province::findByHashid($request->province_id)->id]);
 
         $project->update($request->only([
-            'name', 'activity', 'job', 'address', 'fiscal_year', 'profit_margin', 'province_id', 'ppn'
+            'name',
+            'activity',
+            'job',
+            'address',
+            'fiscal_year',
+            'profit_margin',
+            'province_id',
+            'ppn'
         ]));
 
         return response()->json([

@@ -10,7 +10,7 @@ class SubscriptionController extends Controller
 {
     public function index()
     {
-        $subscriptions = Subscription::with(['features'])
+        $subscriptions = Subscription::with(['features', 'prices'])
             ->orderBy('order', 'ASC')
             ->where('id', '!=', 'demo')
             ->get();

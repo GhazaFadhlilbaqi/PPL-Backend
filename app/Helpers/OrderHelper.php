@@ -20,7 +20,7 @@ class OrderHelper
     $subscription = Subscription::where('id', $order->subscription_id)->first();
 
     if ($order->type == 'create') {
-      $order->expired_at = self::calculateExpiredDate($project, $subscription, $order->created_at);
+      $order->expired_at = self::calculateExpiredDate($order, $subscription, $order->created_at);
     } else if ($order->type == 'renew') {
       self::updateRenewProject($project, $order, $subscription);
     }
@@ -55,8 +55,7 @@ class OrderHelper
         'fiscal_year' => $projectTemporary->fiscal_year,
         'profit_margin' => $projectTemporary->profit_margin,
         'ppn' => $projectTemporary->ppn,
-        'subscription_id' => $order->subscription_id,
-        'subscription_duration_type' => $order->subscription_duration_type,
+        'subscription_id' => $order->subscription_id
       ]);
 
       $projectTemporary->delete();
@@ -76,10 +75,6 @@ class OrderHelper
   {
     // Update subscription id
     $project->subscription_id = $order->subscription_id;
-    $project->subscription_duration_type = $order->subscription_duration_type;
-    if ($project->subscription_duration_type === null) {
-      $project->subscription_duration_type = SubscriptionDurationType::MONTHLY->value;
-    }
     $project->save();
 
     // Check for renew same package
@@ -92,17 +87,15 @@ class OrderHelper
     $latestExpiredDate = $latestOrder && $order->subscription_id == $latestOrder->id
       ? $latestOrder->expired_at
       : $order->expired_at;
-    $order->expired_at = self::calculateExpiredDate($project, $subscription, $latestExpiredDate);
+    $order->expired_at = self::calculateExpiredDate($order, $subscription, $latestExpiredDate);
     $order->save();
   }
 
-  private static function calculateExpiredDate(Project $project, Subscription $subscription, $expiredDate)
+  private static function calculateExpiredDate(Order $order, Subscription $subscription, $expiredDate)
   {
-    $extendedMonth = 0;
-    if ($project->subscription_duration_type === SubscriptionDurationType::YEARLY->value) {
+    $extendedMonth = $order->subscriptionPrice->min_duration;
+    if ($order->subscriptionPrice->duration_type === SubscriptionDurationType::YEARLY->value) {
       $extendedMonth = 12;
-    } else if ($project->subscription_duration_type === SubscriptionDurationType::MONTHLY->value) {
-      $extendedMonth = $subscription->min_month;
     }
     return Carbon::parse($expiredDate)->addMonths($extendedMonth)->toDateString();
   }
