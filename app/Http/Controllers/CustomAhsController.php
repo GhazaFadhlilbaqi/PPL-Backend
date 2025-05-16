@@ -88,7 +88,11 @@ class CustomAhsController extends CountableItemController
                     $request->selected_reference
                 );
             } else {
-                CustomAhs::create($request->only(['name', 'code', 'project_id']));
+                CustomAhs::create([
+                    'project_id' => $project->id,
+                    'code' => $request->code,
+                    'name' => $request->name
+                ]);
             }
 
             return response()->json([
