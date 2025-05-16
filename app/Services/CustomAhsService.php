@@ -144,7 +144,7 @@ class CustomAhsService
       ->pluck('itemPriceGroup')
       ->unique('id')
       ->values();
-      Log::info('Matched groups', json_encode($matchedGroups));
+    Log::info(json_encode(['Matched groups' => $matchedGroups]));
 
     return ItemPriceGroup::whereHas('itemPrice', function ($query) use ($item_price_ids) {
       $query->whereIn('id', $item_price_ids);
