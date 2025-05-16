@@ -55,6 +55,7 @@ class CustomAhsService
           ->pluck('ahs_itemable_id')
           ->toArray();
         $masterItemPrices = ItemPrice::whereIn('id', $item_price_ids)->get();
+        Log::info(json_encode($masterItemPrices));
         foreach ($masterItemPrices as $master_item_price) {
           $is_exists = CustomItemPrice::where('project_id', $project->id)
             ->where('code', $master_item_price->code)
