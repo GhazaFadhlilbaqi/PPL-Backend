@@ -12,6 +12,7 @@ use App\Models\ItemPrice;
 use App\Models\ItemPriceGroup;
 use App\Models\Project;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CustomAhsService
 {
@@ -39,6 +40,7 @@ class CustomAhsService
 
       // 3. Create custom item price group when not exists
       $master_item_price_groups = $this->getMasterItemPriceGroups($master_ahs, $project->province_id);
+      Log::info(json_encode($master_item_price_groups));
       foreach ($master_item_price_groups as $master_item_price_group) {
         $customGroup = CustomItemPriceGroup::firstOrCreate(
             [
@@ -121,7 +123,7 @@ class CustomAhsService
     return $custom_ahs_price;
   }
 
-  private function getMasterItemPriceGroups(Ahs $master_ahs, int $province_id)
+  private function getMasterItemPriceGroups(Ahs $master_ahs)
   {
     $item_price_ids = $master_ahs->ahsItem()
       ->where('ahs_itemable_type', ItemPrice::class)
@@ -130,7 +132,7 @@ class CustomAhsService
 
     if (empty($item_price_ids)) return collect();
 
-    return ItemPriceGroup::whereHas('itemPrice', function ($query) use ($item_price_ids, $province_id) {
+    return ItemPriceGroup::whereHas('itemPrice', function ($query) use ($item_price_ids) {
       $query->whereIn('id', $item_price_ids);
     })->distinct()->get();
   }
