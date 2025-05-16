@@ -55,10 +55,9 @@ class CustomAhsService
           ->pluck('ahs_itemable_id')
           ->toArray();
         $masterItemPrices = ItemPrice::whereIn('id', $item_price_ids)->get();
-        Log::info(json_encode($masterItemPrices));
         foreach ($masterItemPrices as $master_item_price) {
           $is_exists = CustomItemPrice::where('project_id', $project->id)
-            ->where('code', $master_item_price->code)
+            ->where('code', $master_item_price->id)
             ->exists();
           if ($is_exists) continue;
           $price_by_province = $master_item_price->price
@@ -84,7 +83,6 @@ class CustomAhsService
       $master_ahs_items = $master_ahs->ahsItem;
       foreach ($master_ahs_items as $master_ahs_item) {
         if ($master_ahs_item->ahs_itemable_type == ItemPrice::class) {
-          Log::info($master_ahs_item->ahs_itemable_id);
           $custom_ahs_itemable_id = CustomItemPrice::where([
             ['code', '=', $master_ahs_item->ahs_itemable_id],
             ['project_id', '=', $project->id]
