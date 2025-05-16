@@ -134,6 +134,7 @@ class CustomAhsService
 
     $itemPriceGroups = ItemPriceGroup::whereHas('itemPrice', function ($query) use ($item_price_ids) {
       $query->whereIn('id', $item_price_ids);
+      Log::info('Matching item_price_ids', $item_price_ids);
     })->get();
     Log::info(json_encode($itemPriceGroups));
 
