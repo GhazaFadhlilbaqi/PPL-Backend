@@ -10,6 +10,7 @@ class ItemPrice extends Model
     use HasFactory;
 
     public $incrementing = false;
+    protected $keyType = 'string';
     protected $fillable = ['id', 'item_price_group_id', 'unit_id', 'name'];
     protected $with = ['unit'];
 
