@@ -49,10 +49,14 @@ class CustomAhsService
         );
 
         // 4. Create custom item price
-        $master_item_prices = $master_item_price_group->itemPrice;
-        foreach ($master_item_prices as $master_item_price) {
+        $item_price_ids = $master_ahs->ahsItem()
+          ->where('ahs_itemable_type', ItemPrice::class)
+          ->pluck('ahs_itemable_id')
+          ->toArray();
+        $masterItemPrices = ItemPrice::whereIn('id', $item_price_ids)->get();
+        foreach ($masterItemPrices as $master_item_price) {
           $is_exists = CustomItemPrice::where('project_id', $project->id)
-            ->where('code', $master_item_price->code)
+            ->where('code', $master_item_price->id)
             ->exists();
           if ($is_exists) continue;
           $price_by_province = $master_item_price->price
