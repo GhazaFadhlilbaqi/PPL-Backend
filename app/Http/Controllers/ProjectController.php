@@ -24,11 +24,15 @@ class ProjectController extends Controller
 
     public function index(Request $request)
     {
-        return $this->getTableFormattedData(
-            Project::where('user_id', Auth::user()->id)->with(['province', 'subscription'])
-        )
-            // Get active order
-            ->addColumn('order', function ($project) {
+            $query = Project::where('user_id', Auth::user()->id)
+            ->with(['province', 'subscription'])
+            ->when($request->query('name'), function ($q, $name) {
+                return $q->where('name', 'like', "%$name%");
+            });
+
+            return $this->getTableFormattedData($query)
+              // Get active order        
+              ->addColumn('order', function($project) {
                 return $project->order()->where('is_active', true)->first();
             })
             ->addColumn('last_opened_at_formatted', function ($data) {
