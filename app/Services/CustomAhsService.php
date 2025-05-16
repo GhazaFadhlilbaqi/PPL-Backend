@@ -84,10 +84,14 @@ class CustomAhsService
           ])->first()?->id;
           $custom_ahs_itemable_type = CustomItemPrice::class;
         } else {
-          $custom_ahs_itemable_id = CustomAhs::where([
-            ['code', '=', $master_ahs_item->ahs_itemable_id],
-            ['project_id', '=', $project->id]
-          ])->first()?->id;
+          $customAhs = CustomAhs::firstOrCreate(
+            [
+              'code' => $master_ahs_item->ahs_itemable_id,
+              'project_id' => $project->id,
+            ],
+            ['name' => $master_ahs_item->ahsItemable?->name ?? '-']
+          );
+          $custom_ahs_itemable_id = $customAhs->id;
           $custom_ahs_itemable_type = CustomAhs::class;
         }
         if (!$custom_ahs_itemable_id) {
