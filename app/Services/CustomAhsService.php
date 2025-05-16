@@ -129,7 +129,7 @@ class CustomAhsService
       ->where('ahs_itemable_type', ItemPrice::class)
       ->pluck('ahs_itemable_id')
       ->toArray();
-
+    Log::info(json_encode($item_price_ids));
     if (empty($item_price_ids)) return collect();
 
     return ItemPriceGroup::whereHas('itemPrice', function ($query) use ($item_price_ids) {
