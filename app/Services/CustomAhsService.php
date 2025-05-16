@@ -83,6 +83,7 @@ class CustomAhsService
       $master_ahs_items = $master_ahs->ahsItem;
       foreach ($master_ahs_items as $master_ahs_item) {
         if ($master_ahs_item->ahs_itemable_type == ItemPrice::class) {
+          Log::info("ID", $master_ahs_item->ahs_itemable_id);
           $custom_ahs_itemable_id = CustomItemPrice::where([
             ['code', '=', $master_ahs_item->ahs_itemable_id],
             ['project_id', '=', $project->id]
