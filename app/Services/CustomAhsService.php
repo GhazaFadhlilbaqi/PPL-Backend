@@ -40,10 +40,13 @@ class CustomAhsService
       // 3. Create custom item price group when not exists
       $master_item_price_groups = $this->getMasterItemPriceGroups($master_ahs, $project->province_id);
       foreach ($master_item_price_groups as $master_item_price_group) {
-        CustomItemPriceGroup::firstOrCreate([
-          'project_id' => $project->id,
-          'name' => $master_item_price_group->name
-        ]);
+        $customGroup = CustomItemPriceGroup::firstOrCreate(
+            [
+              'project_id' => $project->id,
+              'master_item_price_group_id' => $master_item_price_group->id,
+            ],
+            ['name' => $master_item_price_group->name]
+        );
 
         // 4. Create custom item price
         $master_item_prices = $master_item_price_group->itemPrice;
@@ -60,7 +63,7 @@ class CustomAhsService
             ->first();
           CustomItemPrice::create([
             'code' => $master_item_price->id,
-            'custom_item_price_group_id' => $master_item_price_group->id,
+            'custom_item_price_group_id' => $customGroup->id,
             'unit_id' => $master_item_price->unit_id,
             'project_id' => $project->id,
             'name' => $master_item_price->name,
