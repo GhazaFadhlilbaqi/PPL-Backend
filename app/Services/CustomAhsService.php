@@ -138,6 +138,14 @@ class CustomAhsService
     })->get();
     Log::info(json_encode($itemPriceGroups));
 
+    $matchedGroups = ItemPrice::whereIn('id', $item_price_ids)
+      ->with('itemPriceGroup')
+      ->get()
+      ->pluck('itemPriceGroup')
+      ->unique('id')
+      ->values();
+      Log::info('Matched groups', json_encode($matchedGroups));
+
     return ItemPriceGroup::whereHas('itemPrice', function ($query) use ($item_price_ids) {
       $query->whereIn('id', $item_price_ids);
     })->distinct()->get();
