@@ -28,6 +28,7 @@ class SubscriptionFeatureSeeder extends Seeder
         'AHSP_PUPR_2024_REFERENCE',
         'RAB_EXCEL_EXPORT',
         'SIMPLE_RAB_REFERENCE',
+        'CREATE_IMPLEMENTATION_SCHEDULE',
       ],
       'professional' => [
         'RAB_TEMPLATE',

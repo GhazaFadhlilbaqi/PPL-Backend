@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Enums\SubscriptionDurationType;
+use App\Enums\SubscriptionType;
+use App\Exceptions\CustomException;
+use App\Helpers\EmailHelper;
 use App\Helpers\OrderHelper;
 use App\Http\Controllers\Controller;
 use Exception;
@@ -158,110 +161,117 @@ class PaymentController extends Controller
 
     public function fetchSubscriptionSnapToken(Request $request)
     {
-
         DB::beginTransaction();
 
-        $request->validate([
-            'subscription_price_id' => 'required|integer'
-        ]);
-
-        if ($request->type != 'create' && $request->type != 'renew') {
-            throw new Exception('Invalid type');
-        }
-
-        MidtransConfig::$serverKey = config('app.midtrans_env')
-            ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT')
-            : env('MIDTRANS_SERVER_KEY_PRODUCTION');
-        MidtransConfig::$isProduction = config('app.midtrans_env') == 'production';
-        MidtransConfig::$is3ds = true;
-
-        $user = Auth::user();
-        $subscriptionPrice = SubscriptionPrice::with('subscription')
-            ->where('id', $request->subscription_price_id)
-            ->first();
-
-        // Generate order data
-        $order = Order::create([
-            'order_id' => $this->generateOrderId(),
-            'user_id' => $user->id,
-            'project_id' => $request->type == 'create' ? null : Hashids::decode($request->project_hashid)[0],
-            'subscription_id' => $subscriptionPrice->subscription_id,
-            'subscription_price_id' => $subscriptionPrice->id,
-            'status' => 'waiting_for_payment',
-            'gross_amount' => $subscriptionPrice->duration_type === SubscriptionDurationType::YEARLY->value
-                ? $subscriptionPrice->discounted_price * 12
-                : $subscriptionPrice->discounted_price * $subscriptionPrice->min_duration,
-            'type' => $request->type == 'create' ? 'create' : 'renew'
-        ]);
-
-        // Check if the action is creating project or renewing project
-        if ($request->type == 'create') {
-            // This temporary project will become the "temporary" storage for project creation. It also
-            // act as order identifier towards project data.
-            ProjectTemporary::create([
-                'user_id' => Auth::user()->id,
-                'order_id' => $order->id,
-                'name' => $request->name,
-                'activity' => $request->activity,
-                'job' => $request->job,
-                'address' => $request->address,
-                'province_id' => Hashids::decode($request->province_id)[0],
-                'fiscal_year' => $request->fiscal_year,
-                'profit_margin' => $request->margin_profit,
-                'ppn' => $request->ppn,
-            ]);
-        }
-
-        $params = [
-            'transaction_details' => [
-                'order_id' => $order->order_id,
-                'gross_amount' => $order->gross_amount,
-            ],
-            'item_details' => [
-                [
-                    'id' => $subscriptionPrice->subscription_id,
-                    'price' => $order->gross_amount,
-                    'quantity' => 1,
-                    'name' => 'Project Plan : ' . $subscriptionPrice->subscription->name,
-                ]
-            ],
-            'customer_details' => [
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-                'address' => $user->address,
-                'phone' => $user->phone,
-                'email' => $user->email,
-            ],
-        ];
-
-        $snapToken = null;
-
         try {
+            $request->validate([
+                'subscription_price_id' => 'required|integer'
+            ]);
+
+            if ($request->type != 'create' && $request->type != 'renew') {
+                throw new Exception('Invalid type');
+            }
+
+            $user = Auth::user();
+            $subscriptionPrice = SubscriptionPrice::with('subscription')
+                ->where('id', $request->subscription_price_id)
+                ->first();
+
+            if (
+                $subscriptionPrice->subscription->id == SubscriptionType::STUDENT->value
+                && !EmailHelper::isStudentEmail($user->email)
+            ) {
+                throw new CustomException(
+                    'Email kamu tidak valid untuk perpanjang pake ini',
+                    422
+                );
+            }
+
+            MidtransConfig::$serverKey = config('app.midtrans_env')
+                ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT')
+                : env('MIDTRANS_SERVER_KEY_PRODUCTION');
+            MidtransConfig::$isProduction = config('app.midtrans_env') == 'production';
+            MidtransConfig::$is3ds = true;
+
+            $order = Order::create([
+                'order_id' => $this->generateOrderId(),
+                'user_id' => $user->id,
+                'project_id' => $request->type == 'create' ? null : Hashids::decode($request->project_hashid)[0],
+                'subscription_id' => $subscriptionPrice->subscription_id,
+                'subscription_price_id' => $subscriptionPrice->id,
+                'status' => 'waiting_for_payment',
+                'gross_amount' => $subscriptionPrice->duration_type === SubscriptionDurationType::YEARLY->value
+                    ? $subscriptionPrice->discounted_price * 12
+                    : $subscriptionPrice->discounted_price * $subscriptionPrice->min_duration,
+                'type' => $request->type == 'create' ? 'create' : 'renew'
+            ]);
+
+            if ($request->type == 'create') {
+                ProjectTemporary::create([
+                    'user_id' => $user->id,
+                    'order_id' => $order->id,
+                    'name' => $request->name,
+                    'activity' => $request->activity,
+                    'job' => $request->job,
+                    'address' => $request->address,
+                    'province_id' => Hashids::decode($request->province_id)[0],
+                    'fiscal_year' => $request->fiscal_year,
+                    'profit_margin' => $request->margin_profit,
+                    'ppn' => $request->ppn,
+                ]);
+            }
+
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $order->order_id,
+                    'gross_amount' => $order->gross_amount,
+                ],
+                'item_details' => [
+                    [
+                        'id' => $subscriptionPrice->subscription_id,
+                        'price' => $order->gross_amount,
+                        'quantity' => 1,
+                        'name' => 'Project Plan : ' . $subscriptionPrice->subscription->name,
+                    ]
+                ],
+                'customer_details' => [
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'address' => $user->address,
+                    'phone' => $user->phone,
+                    'email' => $user->email,
+                ],
+            ];
+
             $snapToken = MidtransSnap::getSnapToken($params);
-        } catch (Exception $e) {
+
+            $order->midtrans_snap_token = $snapToken;
+            $order->save();
+
+            if (env('APP_ENV') === 'local') {
+                OrderHelper::setOrderAsSuccessful($order);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'snap_token' => $snapToken,
+                ]
+            ]);
+        } catch (\Throwable $e) {
             DB::rollBack();
+
+            $statusCode = 500;
+            if ($e instanceof CustomException) {
+                $statusCode = $e->getStatusCode();
+            }
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-            ], 500);
+            ], $statusCode);
         }
-
-        $order->midtrans_snap_token = $snapToken;
-        $order->save();
-
-        // Set order as successful when laravel env is local
-        if (env('APP_ENV') === 'local') {
-            OrderHelper::setOrderAsSuccessful($order);
-        }
-
-        DB::commit();
-
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'snap_token' => $snapToken,
-            ]
-        ]);
     }
 
     public function setCanceled(Request $request)

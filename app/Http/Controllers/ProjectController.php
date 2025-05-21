@@ -7,6 +7,7 @@ use App\Exports\ProjectRabExport;
 use App\Helpers\ProjectHelper;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Requests\ProjectUpdateRequest;
+use App\Http\Resources\FeatureResource;
 use App\Models\Order;
 use App\Models\Project;
 use App\Models\Province;
@@ -200,9 +201,10 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
+        $project['features'] = FeatureResource::collection($project->activeOrder->subscription->features);
         return response()->json([
             'status' => 'success',
-            'data' => compact('project')
+            'data' => ['project' =>  $project]
         ]);
     }
 

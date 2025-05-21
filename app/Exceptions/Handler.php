@@ -54,7 +54,7 @@ class Handler extends ExceptionHandler
             ], 422);
         }
 
-        if ($exception instanceof HttpException) {
+        if ($exception instanceof HttpException || $exception instanceof CustomException) {
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),

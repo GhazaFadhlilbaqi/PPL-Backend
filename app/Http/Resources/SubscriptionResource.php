@@ -2,8 +2,11 @@
 
 namespace App\Http\Resources;
 
-use App\Models\SubscriptionPrice;
+use App\Enums\SubscriptionType;
+use App\Helpers\EmailHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class SubscriptionResource extends JsonResource
 {
@@ -15,6 +18,10 @@ class SubscriptionResource extends JsonResource
      */
     public function toArray($request)
     {
+        $isAvailable = true;
+        if ($this->id == SubscriptionType::STUDENT->value) {
+            $isAvailable = EmailHelper::isStudentEmail(Auth::user()->email);
+        }
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -24,7 +31,8 @@ class SubscriptionResource extends JsonResource
             'minMonth' => $this->min_month,
             'description' => $this->description,
             'features' => FeatureResource::collection($this->features),
-            'prices' => SubscriptionPriceResource::collection($this->prices)
+            'prices' => SubscriptionPriceResource::collection($this->prices),
+            'isAvailable' => $isAvailable
         ];
     }
 }

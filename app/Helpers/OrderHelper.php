@@ -78,14 +78,14 @@ class OrderHelper
     $project->save();
 
     // Check for renew same package
-    $latestOrder = Order::where('id', '!=', $order->id)
+    $pastOrder = Order::where('id', '!=', $order->id)
       ->where('status', 'completed')
       ->latest()
       ->first();
 
     // When latest order subscription id is same as current, it means that user extend their subscription.
-    $latestExpiredDate = $latestOrder && $order->subscription_id == $latestOrder->id
-      ? $latestOrder->expired_at
+    $latestExpiredDate = $pastOrder && $order->subscription_price_id == $pastOrder->subscription_price_id
+      ? $pastOrder->expired_at
       : $order->expired_at;
     $order->expired_at = self::calculateExpiredDate($order, $subscription, $latestExpiredDate);
     $order->save();
