@@ -182,7 +182,7 @@ class PaymentController extends Controller
                 && !EmailHelper::isStudentEmail($user->email)
             ) {
                 throw new CustomException(
-                    'Email kamu tidak valid untuk perpanjang pake ini',
+                    'Email invalid, harap gunakan email dari unversitas kamu.',
                     422
                 );
             }
