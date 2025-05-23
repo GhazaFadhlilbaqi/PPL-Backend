@@ -26,10 +26,11 @@ class ProjectController extends Controller
     public function index(Request $request)
     {
             $query = Project::where('user_id', Auth::user()->id)
-            ->with(['province', 'subscription'])
-            ->when($request->query('name'), function ($q, $name) {
-                return $q->where('name', 'like', "%$name%");
-            });
+                ->with(['province', 'subscription'])
+                ->when($request->query('name'), function ($q, $name) {
+                    return $q->where('name', 'like', "%$name%");
+                })
+                ->orderBy('last_opened_at', 'desc');
 
             return $this->getTableFormattedData($query)
               // Get active order        
