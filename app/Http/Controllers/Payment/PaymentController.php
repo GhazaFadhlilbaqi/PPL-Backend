@@ -14,6 +14,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Vinkla\Hashids\Facades\Hashids;
 use Midtrans\Config as MidtransConfig;
@@ -171,6 +172,8 @@ class PaymentController extends Controller
             : env('MIDTRANS_SERVER_KEY_PRODUCTION');
         MidtransConfig::$isProduction = config('app.midtrans_env') == 'production';
         MidtransConfig::$is3ds = true;
+
+        Log::debug('===> (DEBUG) MIDTRANS KEY: ' . MidtransConfig::$serverKey);
 
         $user = Auth::user();
 
