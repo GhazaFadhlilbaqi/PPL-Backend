@@ -167,13 +167,11 @@ class PaymentController extends Controller
 
         $subscription = Subscription::find($request->subscription_id);
 
-        MidtransConfig::$serverKey = config('app.midtrans_env')
+        MidtransConfig::$serverKey = config('app.midtrans_env') == 'production'
             ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT')
             : env('MIDTRANS_SERVER_KEY_PRODUCTION');
         MidtransConfig::$isProduction = config('app.midtrans_env') == 'production';
         MidtransConfig::$is3ds = true;
-
-        Log::debug('===> (DEBUG) MIDTRANS KEY: ' . MidtransConfig::$serverKey);
 
         $user = Auth::user();
 
