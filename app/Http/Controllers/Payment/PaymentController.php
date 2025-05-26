@@ -187,9 +187,9 @@ class PaymentController extends Controller
                 );
             }
 
-            MidtransConfig::$serverKey = config('app.midtrans_env')
-                ? env('MIDTRANS_SERVER_KEY_DEVELOPMENT')
-                : env('MIDTRANS_SERVER_KEY_PRODUCTION');
+            MidtransConfig::$serverKey = config('app.midtrans_env') == 'production'
+                ? env('MIDTRANS_SERVER_KEY_PRODUCTION')
+                : env('MIDTRANS_SERVER_KEY_DEVELOPMENT');
             MidtransConfig::$isProduction = config('app.midtrans_env') == 'production';
             MidtransConfig::$is3ds = true;
 
