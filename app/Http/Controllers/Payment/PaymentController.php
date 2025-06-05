@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Payment;
 
-use App\Enums\SubscriptionDurationType;
 use App\Enums\SubscriptionType;
 use App\Exceptions\CustomException;
 use App\Helpers\EmailHelper;
@@ -14,8 +13,8 @@ use App\Http\Controllers\Midtrans\Config;
 use App\Http\Controllers\Midtrans\Snap;
 use App\Models\Order;
 use App\Models\ProjectTemporary;
-use App\Models\Subscription;
 use App\Models\SubscriptionPrice;
+use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -27,7 +26,13 @@ use Midtrans\Snap as MidtransSnap;
 class PaymentController extends Controller
 {
 
+    protected OrderService $orderService;
     const productPrice = 10000;
+
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
 
     public function fetchSnapToken(Request $request)
     {
@@ -193,18 +198,10 @@ class PaymentController extends Controller
             MidtransConfig::$isProduction = config('app.midtrans_env') == 'production';
             MidtransConfig::$is3ds = true;
 
-            $order = Order::create([
-                'order_id' => $this->generateOrderId(),
+            $order = $this->orderService->createOrder([
                 'user_id' => $user->id,
-                'project_id' => $request->type == 'create' ? null : Hashids::decode($request->project_hashid)[0],
-                'subscription_id' => $subscriptionPrice->subscription_id,
-                'subscription_price_id' => $subscriptionPrice->id,
-                'status' => 'waiting_for_payment',
-                'gross_amount' => $subscriptionPrice->duration_type === SubscriptionDurationType::YEARLY->value
-                    ? $subscriptionPrice->discounted_price * 12
-                    : $subscriptionPrice->discounted_price * $subscriptionPrice->min_duration,
-                'type' => $request->type == 'create' ? 'create' : 'renew'
-            ]);
+                'type' => $request->type
+            ], $subscriptionPrice);
 
             if ($request->type == 'create') {
                 ProjectTemporary::create([

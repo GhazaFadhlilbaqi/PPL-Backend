@@ -55,7 +55,8 @@ class OrderHelper
         'fiscal_year' => $projectTemporary->fiscal_year,
         'profit_margin' => $projectTemporary->profit_margin,
         'ppn' => $projectTemporary->ppn,
-        'subscription_id' => $order->subscription_id
+        'subscription_id' => $order->subscription_id,
+        'last_opened_at' => now()
       ]);
 
       $projectTemporary->delete();

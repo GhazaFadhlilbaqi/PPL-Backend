@@ -1,8 +1,7 @@
 <?php
 
 use App\Exports\SCurveExport;
-
-use App\Http\Controllers\AdminProjectController;
+use App\Http\Controllers\Admin\AdminProjectController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -53,7 +52,9 @@ Route::middleware(('auth:sanctum'))->group(function() {
     Route::resource('users', UserController::class);
     Route::put('users/{user}/demo-quota', [UserController::class, 'updateDemoQuota']);
 
-    Route::resource('admin/projects', AdminProjectController::class);
+    Route::prefix('admin')->group(function() {
+        Route::resource('projects', AdminProjectController::class);
+    });
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
