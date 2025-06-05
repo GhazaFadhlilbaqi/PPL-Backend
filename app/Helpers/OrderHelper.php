@@ -47,9 +47,9 @@ class OrderHelper
 
       $project = Project::create([
         'user_id' => $projectTemporary->user_id,
+        'institution_name' => $projectTemporary->institution_name,
+        'department_name' => $projectTemporary->department_name,
         'name' => $projectTemporary->name,
-        'activity' => $projectTemporary->activity,
-        'job' => $projectTemporary->job,
         'address' => $projectTemporary->address,
         'province_id' => $projectTemporary->province_id,
         'fiscal_year' => $projectTemporary->fiscal_year,

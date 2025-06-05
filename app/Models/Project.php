@@ -17,11 +17,10 @@ class Project extends Model
 
     protected $fillable = [
         'user_id',
+        'institution_name',
+        'department_name',
         'name',
-        'activity',
-        'job',
         'address',
-        'job',
         'province_id',
         'fiscal_year',
         'profit_margin',

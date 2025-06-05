@@ -210,9 +210,9 @@ class PaymentController extends Controller
                 ProjectTemporary::create([
                     'user_id' => $user->id,
                     'order_id' => $order->id,
-                    'name' => $request->name,
-                    'activity' => $request->activity,
-                    'job' => $request->job,
+                    'institution_name' => $request->institution_name,
+                    'department_name' => $request->department_name,
+                    'name' => $request->job_name,
                     'address' => $request->address,
                     'province_id' => Hashids::decode($request->province_id)[0],
                     'fiscal_year' => $request->fiscal_year,

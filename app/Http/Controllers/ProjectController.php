@@ -6,7 +6,6 @@ use App\Enums\AhsSectionEnum;
 use App\Exports\ProjectRabExport;
 use App\Helpers\ProjectHelper;
 use App\Http\Requests\ProjectRequest;
-use App\Http\Requests\ProjectUpdateRequest;
 use App\Http\Resources\FeatureResource;
 use App\Models\Order;
 use App\Models\Project;
@@ -155,24 +154,39 @@ class ProjectController extends Controller
         }
     }
 
-    public function update(Project $project, ProjectUpdateRequest $request)
+    public function update(Project $project, Request $request)
     {
-
-        if ($project->user_id != Auth::user()->id) return $this->giveUnbelongedAccessResponse();
-
-        $request->merge(['province_id' => Province::findByHashid($request->province_id)->id]);
-
-        $project->update($request->only([
-            'name',
-            'activity',
-            'job',
-            'address',
-            'fiscal_year',
-            'profit_margin',
-            'province_id',
-            'ppn'
-        ]));
-
+        if ($project->user_id != Auth::user()->id) {
+            return $this->giveUnbelongedAccessResponse();
+        };
+        $validatedRequest = $request->validate([
+            'institution_name' => 'required|string|max:255',
+            'department_name'  => 'nullable|string|max:255',
+            'job_name'         => 'required|string|max:255',
+            'address'          => 'required|string|max:255',
+            'province_id'      => 'required|string',
+            'fiscal_year'      => 'required|integer|min:2020|max:2100',
+            'profit_margin'    => 'nullable|numeric|min:0|max:100',
+            'ppn'              => 'nullable|numeric|min:0|max:100',
+        ]);
+        $validatedRequest['name'] = $validatedRequest['job_name'];
+        $province = Province::findByHashid($validatedRequest['province_id']);
+        if (!$province) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Provinsi tidak ditemukan'
+            ], 422);
+        }
+        $project->update([
+            'institution_name' => $validatedRequest['institution_name'],
+            'department_name'  => $validatedRequest['department_name'],
+            'name'             => $validatedRequest['job_name'],
+            'address'          => $validatedRequest['address'],
+            'province_id'      => $province->id,
+            'fiscal_year'      => $validatedRequest['fiscal_year'],
+            'profit_margin'    => $validatedRequest['profit_margin'],
+            'ppn'              => $validatedRequest['ppn'],
+        ]);
         return response()->json([
             'status' => 'success',
             'data' => compact('project')
