@@ -111,27 +111,26 @@ class CountableItemController extends Controller
     # Count price per item + subtotal (by multiply of price per item and coefficient)
     protected function countAhsItemTotal($ahsItem, $province = null)
     {
-
+        $mutatedAhsItem = $ahsItem;
         # Check if ahsItem referenced to item price
-        if ($ahsItem->ahs_itemable_type === ItemPrice::class) {
+        if ($mutatedAhsItem->ahs_itemable_type === ItemPrice::class) {
 
             // $itemPrice = $ahsItem->ahsItemable->with(['price' => function($q) use ($province, $ahsItem) {
             //     $q->where('province_id', $province);
             // }])->first();
 
             // HACK: This is a shortcut to get accurate price by province, but it's take 1 query more
-            $itemPrice = ItemPriceProvince::where('province_id', $province)->where('item_price_id', $ahsItem->ahs_itemable_id)->first();
+            $itemPrice = ItemPriceProvince::where('province_id', $province)->where('item_price_id', $mutatedAhsItem->ahs_itemable_id)->first();
 
             // $fixedPrice = count($itemPrice->price) > 0 ? $itemPrice->price[0]->price : 0;
             $fixedPrice = $itemPrice ? ($itemPrice->price ?? 0) : 0;
-            $ahsItem->ahsItemable->subtotal = $fixedPrice;
+            $mutatedAhsItem->ahsItemable->subtotal = $fixedPrice;
 
-            return $fixedPrice * $ahsItem->coefficient;
-
-        } else if ($ahsItem->ahs_itemable_type === Ahs::class) {
-            return $this->countAhsSubtotal($ahsItem->ahsItemable, $province)->subtotal * $ahsItem->coefficient;
-        } else if ($ahsItem->ahs_itemable_type === Ahp::class) {
-            return $this->countAhpItem($ahsItem->ahsItemable)->S * $ahsItem->coefficient;
+            return $fixedPrice * $mutatedAhsItem->coefficient;
+        } else if ($mutatedAhsItem->ahs_itemable_type === Ahs::class) {
+            return $this->countAhsSubtotal($mutatedAhsItem->ahsItemable, $province)->subtotal * $mutatedAhsItem->coefficient;
+        } else if ($mutatedAhsItem->ahs_itemable_type === Ahp::class) {
+            return $this->countAhpItem($mutatedAhsItem->ahsItemable)->S * $mutatedAhsItem->coefficient;
         } else {
             throw new Exception('Itemable type not supported');
         }
