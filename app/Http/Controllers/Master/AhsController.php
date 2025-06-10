@@ -42,33 +42,36 @@ class AhsController extends CountableItemController
 
   public function index(Request $request, $ahsId = null)
   {
-    $ahs = !is_null($ahsId) ? Ahs::where('id', $ahsId) : Ahs::query();
+    $query = Ahs::when($ahsId, function ($query) use ($ahsId) {
+        return $query->where('id', $ahsId);
+      })
+      ->with(['referenceGroup'])
+      ->with(['ahsItem' => function ($ahsItem) {
+        $ahsItem->with(['ahsItemable', 'unit']);
+      }])
+      ->orderBy('created_at', 'desc');
 
-    $ahs = $ahs->with(['ahsItem' => function ($ahsItem) {
-      $ahsItem->with(['ahsItemable', 'unit']);
-    }])
-      ->orderBy('created_at', 'DESC');
 
     if (isset($request->q)) {
-      $ahs->where('name', 'LIKE', '%' . $request->q . '%')
+      $query->where('name', 'LIKE', '%' . $request->q . '%')
         ->orWhere('id', 'LIKE', '%' . $request->q . '%');
     }
 
-    if ($request->selected_ahs_group && $request->selected_ahs_group != '' && $request->selected_ahs_group != 'all') {
-      $ahs->where('groups', $request->selected_ahs_group);
+    if ($request->selected_ahs_group) {
+      $query->where('reference_group_id', $request->selected_ahs_group);
     }
 
     # Paginate AHS
     $isPaginateRequest = $request->has('page') && (int) $request->page > 0;
     $paginationAttribute = [];
     if ($isPaginateRequest) {
-      $paginationResult = $this->paginateAhs($ahs, $request->page, $request->per_page);
-      $ahs = $paginationResult['ahs'];
+      $paginationResult = $this->paginateAhs($query, $request->page, $request->per_page);
+      $query = $paginationResult['ahs'];
       $paginationAttribute['total_page'] = $paginationResult['total_page'];
       $paginationAttribute['total_rows'] = $paginationResult['total_rows'];
     };
 
-    $ahs = $ahs->get();
+    $ahs = $query->get();
 
     $provinceId = Hashids::decode($request->province);
 
@@ -132,12 +135,26 @@ class AhsController extends CountableItemController
     ]);
   }
 
-  public function store(AhsRequest $request)
+  public function store(Request $request)
   {
-    $createdAhs = Ahs::create($request->only(['id', 'name', 'groups']));
+    $isExists = Ahs::where('code', $request->id)
+      ->where('reference_group_id', $request->referenceId)
+      ->exists();
+    if ($isExists) {
+      return response()->json([
+        'status' => 'fail',
+        'message' => 'Gagal membuat AHS, kode sudah digunakan'
+      ], 422);
+      return;
+    }
+    $ahs = Ahs::create([
+      'code' => $request->id,
+      'name' => $request->name,
+      'reference_group_id' => $request->referenceId
+    ]);
     return response()->json([
       'status' => 'success',
-      'data' => $createdAhs
+      'data' => $ahs
     ]);
   }
 
@@ -268,15 +285,16 @@ class AhsController extends CountableItemController
   public function fetchMasterAhsProject(Request $request)
   {
     $ahsQuery = Ahs::query();
-    if ($request->filled('group')) {
-      $ahsQuery->where('groups', $request->group);
+    if ($request->filled('referenceGroupId')) {
+      $ahsQuery->where('reference_group_id', $request->referenceGroupId);
     }
-    $masterAhsItems = $ahsQuery->where(function ($query) use ($request) {
-      $query->where('id', 'LIKE', "%$request->q%")
-        ->orWhere('name', 'LIKE', "%$request->q%");
-    })
+    $masterAhsItems = $ahsQuery
+      ->where(function ($query) use ($request) {
+        $query->where('id', 'LIKE', "%$request->q%")
+          ->orWhere('name', 'LIKE', "%$request->q%");
+      })
       ->take($request->limit)
-      ->select(['id', 'code', 'name', 'groups'])
+      ->select(['id', 'code', 'name'])
       ->without('ahsItem')
       ->latest()
       ->get();

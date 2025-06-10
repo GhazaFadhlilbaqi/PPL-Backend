@@ -1,7 +1,7 @@
 <?php
 
-use App\Exports\SCurveExport;
 use App\Http\Controllers\Admin\AdminProjectController;
+use App\Http\Controllers\AhsReferenceGroupController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -54,6 +54,10 @@ Route::middleware(('auth:sanctum'))->group(function() {
 
     Route::prefix('admin')->group(function() {
         Route::resource('projects', AdminProjectController::class);
+    });
+
+    Route::prefix('ahs-reference-groups')->group(function() {
+        Route::resource('/', AhsReferenceGroupController::class);
     });
 });
 

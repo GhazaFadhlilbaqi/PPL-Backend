@@ -30,19 +30,25 @@ class CustomAhsController extends CountableItemController
         $isPaginatedRequest = $request->has('page') && $request->page > 0;
         $paginationAttribute = [];
 
-        $customAhs = CustomAhs::where('project_id', $project->hashidToId($project->hashid))->with(['customAhsItem' => function ($q) {
-            $q->with(['unit', 'customAhsItemable']);
-        }]);
+        $query = CustomAhs::where('project_id', $project->hashidToId($project->hashid))
+            ->with([
+                'customAhsItem' => function ($q) {
+                    $q->with(['unit', 'customAhsItemable']);
+                }
+            ]);
 
         # Paginate Custom AHS
         if ($isPaginatedRequest) {
-            $paginationResult = $this->paginateCustomAhs($customAhs, $request->page, $request->per_page);
-            $customAhs = $paginationResult['customAhs'];
+            $paginationResult = $this->paginateCustomAhs($query, $request->page, $request->per_page);
+            $query = $paginationResult['customAhs'];
             $paginationAttribute['total_page'] = $paginationResult['total_page'];
             $paginationAttribute['total_rows'] = $paginationResult['total_rows'];
         }
 
-        $customAhs = $customAhs->get();
+        $customAhs = $query->get();
+
+        // echo json_encode($customAhs);
+        // return;
 
         # Arrange Custom AHS
         if ($request->has('arrange') && $request->arrange == 'true') {
@@ -80,12 +86,12 @@ class CustomAhsController extends CountableItemController
                 ], 409);
             };
 
-            if ($request->selected_reference) {
-                $masterAhs = Ahs::where('code', $request->code)->first();
+            $masterAhs = Ahs::where('id', $request->selectedAhsId)->first();
+            if ($masterAhs) {
                 $customAhsService->customFromMasterAhs(
                     $project,
                     $masterAhs->id,
-                    $request->selected_reference
+                    $masterAhs->reference_group_id
                 );
             } else {
                 CustomAhs::create([
@@ -125,6 +131,7 @@ class CustomAhsController extends CountableItemController
 
     public function destroy(Project $project, CustomAhs $customAhs)
     {
+
         // Check it's dependency
         $deps = $this->getCustomAhsDependencies($project->hashidToId($project->hashid), $customAhs->id);
         $hasDependencies = $deps['rab']->count() > 0 || $deps['customAhs']->count() > 0;
@@ -136,6 +143,14 @@ class CustomAhsController extends CountableItemController
                 'message' => 'AHS ini masih terhubung dengan data RAB / AHS lain'
             ], 400);
         }
+
+        // TODO: Should remove related custom item price that auto generated but not used anywhere
+        // foreach ($customAhs->customAhsItem as $customAhsItem) {
+        //     if ($customAhsItem->custom_ahs_itemable_type == CustomItemPrice::class) {
+        //         // echo "ABC";
+        //         echo count($customAhsItem->customAhsItemable->customAhsItems);
+        //     }
+        // }
 
         $customAhs->delete();
 

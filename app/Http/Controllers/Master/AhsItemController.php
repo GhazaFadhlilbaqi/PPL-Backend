@@ -127,7 +127,7 @@ class AhsItemController extends Controller
             return [
                 'ahs_itemable_type' => "App\\Models\\Ahs",
                 'id' => $ahs->id,
-                'display_id' => $ahs->id,
+                'display_id' => $ahs->code,
                 'name' => $ahs->name
             ];
         });

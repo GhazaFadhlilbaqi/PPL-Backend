@@ -84,15 +84,24 @@ class RabItemController extends Controller
     ]);
   }
 
+  public function destroy(Project $project, Rab $rab, RabItem $rabItem)
+  {
+    $rabItem->delete();
+
+    return response()->json([
+      'status' => 'success'
+    ], 204);
+  }
+
   public function updateAhs(Project $project, Rab $rab, RabItem $rabItem, Request $request)
   {
     try {
       // 1. Find or create custom ahs based on selected ahs
-      if ($request->group_id) {
+      if ($request->referenceGroupId) {
         $custom_ahs = $this->customAhsService->customFromMasterAhs(
           $project,
           $request->ahs_id,
-          $request->group_id
+          $request->referenceGroupId
         );
         if ($custom_ahs === null) {
           throw new CustomException("AHS tidak ditemukan!");
@@ -120,14 +129,5 @@ class RabItemController extends Controller
         'message' => $e->getMessage()
       ], 409);
     }
-  }
-
-  public function destroy(Project $project, Rab $rab, RabItem $rabItem)
-  {
-    $rabItem->delete();
-
-    return response()->json([
-      'status' => 'success'
-    ], 204);
   }
 }

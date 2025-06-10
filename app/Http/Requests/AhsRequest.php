@@ -25,7 +25,6 @@ class AhsRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => ['required', Rule::unique('ahs', 'id')->ignore($this->ahs, 'id')],
             'name' => 'required'
         ];
     }

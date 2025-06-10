@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\CustomException;
 use App\Models\Ahs;
+use App\Models\AhsItem;
 use App\Models\CustomAhs;
 use App\Models\CustomAhsItem;
 use App\Models\CustomItemPrice;
@@ -16,112 +17,95 @@ use Illuminate\Support\Facades\Log;
 
 class CustomAhsService
 {
-  public function customFromMasterAhs(Project $project, int $master_ahs_id, string $group_key)
+  public function customFromMasterAhs(Project $project, int $master_ahs_id, string $referenceGroupId)
   {
-    return DB::transaction(function () use ($project, $master_ahs_id, $group_key) {
-      // 1. Find master ahs based on id & group reference
+    return DB::transaction(function () use ($project, $master_ahs_id, $referenceGroupId) {
       $master_ahs = Ahs::where(['id' => $master_ahs_id])
-        ->where(['groups' => $group_key])
+        ->where(['reference_group_id' => $referenceGroupId])
         ->first();
       if (!$master_ahs) {
         throw new CustomException('Data AHS tidak ditemukan');
       };
-
-      // 2. Check past custom ahs related to master ahs
-      $custom_ahs = CustomAhs::where(['code' => $master_ahs->code])
-        ->where(['project_id' => $project->id])
-        ->first();
-      if ($custom_ahs) return $custom_ahs;
-      $custom_ahs = CustomAhs::create([
-        'code' => $master_ahs->code,
-        'project_id' => $project->id,
-        'name' => $master_ahs->name
-      ]);
-
-      // 3. Create custom item price group when not exists
-      $master_item_price_groups = $this->getMasterItemPriceGroups($master_ahs);
-      foreach ($master_item_price_groups as $master_item_price_group) {
-        $customGroup = CustomItemPriceGroup::firstOrCreate(
-            [
-              'project_id' => $project->id,
-              'master_item_price_group_id' => $master_item_price_group->id,
-            ],
-            ['name' => $master_item_price_group->name]
-        );
-
-        // 4. Create custom item price
-        $item_price_ids = $master_ahs->ahsItem()
-          ->where('ahs_itemable_type', ItemPrice::class)
-          ->pluck('ahs_itemable_id')
-          ->toArray();
-        $masterItemPrices = ItemPrice::whereIn('id', $item_price_ids)->get();
-        foreach ($masterItemPrices as $master_item_price) {
-          $is_exists = CustomItemPrice::where('project_id', $project->id)
-            ->where('code', $master_item_price->id)
-            ->exists();
-          if ($is_exists) continue;
-          $price_by_province = $master_item_price->price
-            ->filter(function ($price_by_province) use ($project) {
-              return $price_by_province->province_id === $project->province_id;
-            })
-            ->values()
-            ->first();
-          CustomItemPrice::create([
-            'code' => $master_item_price->id,
-            'custom_item_price_group_id' => $customGroup->id,
-            'unit_id' => $master_item_price->unit_id,
-            'project_id' => $project->id,
-            'name' => $master_item_price->name,
-            'is_default' => true,
-            'price' => $price_by_province ? $price_by_province->price : 0,
-            'default_price' => $price_by_province ? $price_by_province->price : 0
-          ]);
-        }
-      }
-
-      // 5. Create AHS items (no need to check for existing custom AHS items, as the process is skipped if custom AHS already exists)
-      $master_ahs_items = $master_ahs->ahsItem;
-      foreach ($master_ahs_items as $master_ahs_item) {
-        if ($master_ahs_item->ahs_itemable_type == ItemPrice::class) {
-          $custom_ahs_itemable_id = CustomItemPrice::where([
-            ['code', '=', $master_ahs_item->ahs_itemable_id],
-            ['project_id', '=', $project->id]
-          ])->first()?->id;
-          $custom_ahs_itemable_type = CustomItemPrice::class;
-        } else {
-          $customAhs = CustomAhs::firstOrCreate(
-            [
-              'code' => $master_ahs_item->ahs_itemable_id,
-              'project_id' => $project->id,
-            ],
-            ['name' => $master_ahs_item->ahsItemable?->name ?? '-']
-          );
-          $custom_ahs_itemable_id = $customAhs->id;
-          $custom_ahs_itemable_type = CustomAhs::class;
-        }
-        if (!$custom_ahs_itemable_id) {
-          throw new CustomException("Ahs tidak ditemukan!");
-        }
-        CustomAhsItem::create([
-          'custom_ahs_id' => $custom_ahs->id,
-          'unit_id' => $master_ahs_item->unit_id,
-          'coefficient' => $master_ahs_item->coefficient,
-          'section' => $master_ahs_item->section,
-          'custom_ahs_itemable_id' => $custom_ahs_itemable_id,
-          'custom_ahs_itemable_type' => $custom_ahs_itemable_type
-        ]);
-      }
-
-      return $custom_ahs;
+      $customAhs = $this->createCustomAhs($master_ahs, $project);
+      return $customAhs;
     });
+  }
+
+  private function createCustomAhs($masterAhs, $project)
+  {
+    $parentCustomAhs = CustomAhs::create([
+      'code' => $masterAhs->code,
+      'name' => $masterAhs->name,
+      'project_id' => $project->id,
+    ]);
+
+    $masterAhsItems = AhsItem::where('ahs_id', $masterAhs->id)->get();
+    foreach ($masterAhsItems as $masterAhsItem) {
+      if (!$masterAhsItem->ahsItemable) return;
+      
+      $customAhsItemable = null;
+      $customAhsItemableType = null;
+
+      if ($masterAhsItem->ahs_itemable_type == ItemPrice::class) {
+        $masterItemPrice = $masterAhsItem->ahsItemable;
+        $customItemPriceGroup = CustomItemPriceGroup::firstOrCreate(
+          [
+            'project_id' => $project->id,
+            'name' => $masterItemPrice->itemPriceGroup->name
+          ]
+        );
+        $masterItemPriceByProvince = $masterItemPrice->price
+          ->where('province_id', $project->province_id)
+          ->first();
+        $customAhsItemable = CustomItemPrice::create([
+          'code' => $masterItemPrice->id,
+          'custom_item_price_group_id' => $customItemPriceGroup->id,
+          'unit_id' => $masterItemPrice->unit_id,
+          'project_id' => $project->id,
+          'name' => $masterItemPrice->name,
+          'price' => $masterItemPriceByProvince->price ?? 0
+        ]);
+        $customAhsItemableType = CustomItemPrice::class;
+      }
+
+      if ($masterAhsItem->ahs_itemable_type == Ahs::class) {
+        $masterAhs = $masterAhsItem->ahsItemable;
+        $customAhsItemable = $this->createCustomAhs($masterAhs, $project);
+        $customAhsItemableType = CustomAhs::class;
+      }
+
+      CustomAhsItem::create([
+        'name' => $customAhsItemableType === CustomAhs::class
+          ? $customAhsItemable->name
+          : null,
+        'custom_ahs_id' => $parentCustomAhs->id,
+        'unit_id' => $masterAhsItem->unit_id,
+        'coefficient' => $masterAhsItem->coefficient,
+        'section' => $masterAhsItem->section,
+        'custom_ahs_itemable_id' => $customAhsItemable->id,
+        'custom_ahs_itemable_type' => $customAhsItemableType
+      ]);
+    }
+  
+    return $parentCustomAhs;
   }
 
   public function calculateCustomAhsPrice(int $profit_margin, CustomAhs $custom_ahs)
   {
     $custom_ahs_price = 0;
     foreach ($custom_ahs->customAhsItem as $customAhsItem) {
-      $ahs_item_price = ($customAhsItem->customAhsItemable->price * $customAhsItem->coefficient);
-      $custom_ahs_price = $custom_ahs_price + ($ahs_item_price + ($ahs_item_price * ($profit_margin / 100)));
+      $subtotalPrice = $customAhsItem->custom_ahs_itemable_type == CustomAhs::class
+        ? $this->calculateCustomAhsPrice($profit_margin, $customAhsItem->customAhsItemable)
+        : $customAhsItem->customAhsItemable->price;
+      $ahs_item_price = $subtotalPrice * $customAhsItem->coefficient;
+      if ($customAhsItem->custom_ahs_itemable_type == CustomAhs::class) {
+        $custom_ahs_price = $custom_ahs_price + $ahs_item_price;
+        continue;
+      }
+      if ($customAhsItem->custom_ahs_itemable_type == CustomItemPrice::class) {
+        $custom_ahs_price = $custom_ahs_price + ($ahs_item_price + ($ahs_item_price * ($profit_margin / 100)));
+        continue;
+      }
     }
     return $custom_ahs_price;
   }

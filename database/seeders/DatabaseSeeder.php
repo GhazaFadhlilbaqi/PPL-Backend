@@ -40,5 +40,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(FeatureSeeder::class);
         $this->call(SubscriptionFeatureSeeder::class);
+        $this->call(AhsReferenceGroupSeeder::class);
     }
 }

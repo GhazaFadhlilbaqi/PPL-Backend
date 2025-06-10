@@ -32,4 +32,9 @@ class CustomItemPrice extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    public function customAhsItems()
+    {
+        return $this->morphMany(CustomAhsItem::class, 'custom_ahs_itemable');
+    }
 }
