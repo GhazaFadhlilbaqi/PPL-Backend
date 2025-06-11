@@ -17,25 +17,37 @@ use Illuminate\Support\Facades\Log;
 
 class CustomAhsService
 {
-  public function customFromMasterAhs(Project $project, int $master_ahs_id, string $referenceGroupId)
-  {
-    return DB::transaction(function () use ($project, $master_ahs_id, $referenceGroupId) {
-      $master_ahs = Ahs::where(['id' => $master_ahs_id])
-        ->where(['reference_group_id' => $referenceGroupId])
+  public function customFromMasterAhs(
+    Project $project,
+    Ahs $masterAhs,
+    String $customCode,
+    String $customName
+  ) {
+    return DB::transaction(function () use ($project, $masterAhs, $customCode, $customName) {
+      $master_ahs = Ahs::where(['id' => $masterAhs->id])
+        ->where(['reference_group_id' => $masterAhs->reference_group_id])
         ->first();
       if (!$master_ahs) {
         throw new CustomException('Data AHS tidak ditemukan');
       };
-      $customAhs = $this->createCustomAhs($master_ahs, $project);
-      return $customAhs;
+      return $this->createCustomAhs(
+        $master_ahs,
+        $project,
+        $customCode,
+        $customName
+      );
     });
   }
 
-  private function createCustomAhs($masterAhs, $project)
-  {
+  private function createCustomAhs(
+    Ahs $masterAhs,
+    Project $project,
+    String $customCode,
+    String $customName
+  ) {
     $parentCustomAhs = CustomAhs::create([
-      'code' => $masterAhs->code,
-      'name' => $masterAhs->name,
+      'code' => $customCode,
+      'name' => $customName,
       'project_id' => $project->id,
     ]);
 
@@ -70,7 +82,12 @@ class CustomAhsService
 
       if ($masterAhsItem->ahs_itemable_type == Ahs::class) {
         $masterAhs = $masterAhsItem->ahsItemable;
-        $customAhsItemable = $this->createCustomAhs($masterAhs, $project);
+        $customAhsItemable = $this->createCustomAhs(
+          $masterAhs,
+          $project,
+          $masterAhs->code,
+          $masterAhs->name
+        );
         $customAhsItemableType = CustomAhs::class;
       }
 
@@ -108,17 +125,5 @@ class CustomAhsService
       }
     }
     return $custom_ahs_price;
-  }
-
-  private function getMasterItemPriceGroups(Ahs $master_ahs)
-  {
-    $item_price_ids = $master_ahs->ahsItem()
-      ->where('ahs_itemable_type', ItemPrice::class)
-      ->pluck('ahs_itemable_id')
-      ->toArray();
-    if (empty($item_price_ids)) return collect();
-    return ItemPriceGroup::whereHas('itemPrice', function ($query) use ($item_price_ids) {
-      $query->whereIn('id', $item_price_ids);
-    })->distinct()->get();
   }
 }

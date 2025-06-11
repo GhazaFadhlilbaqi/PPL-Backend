@@ -35,7 +35,8 @@ class CustomAhsController extends CountableItemController
                 'customAhsItem' => function ($q) {
                     $q->with(['unit', 'customAhsItemable']);
                 }
-            ]);
+            ])
+            ->orderBy('created_at', 'desc');
 
         # Paginate Custom AHS
         if ($isPaginatedRequest) {
@@ -90,8 +91,9 @@ class CustomAhsController extends CountableItemController
             if ($masterAhs) {
                 $customAhsService->customFromMasterAhs(
                     $project,
-                    $masterAhs->id,
-                    $masterAhs->reference_group_id
+                    $masterAhs,
+                    $request->code,
+                    $request->name
                 );
             } else {
                 CustomAhs::create([

@@ -9,6 +9,7 @@ use App\Http\Requests\AhsRequest;
 
 use App\Models\Ahs;
 use App\Models\AhsItem;
+use App\Models\ItemPrice;
 use Vinkla\Hashids\Facades\Hashids;
 
 use Illuminate\Support\Collection;
@@ -42,13 +43,21 @@ class AhsController extends CountableItemController
 
   public function index(Request $request, $ahsId = null)
   {
+    $provinceId = Hashids::decode($request->province);
     $query = Ahs::when($ahsId, function ($query) use ($ahsId) {
         return $query->where('id', $ahsId);
       })
-      ->with(['referenceGroup'])
-      ->with(['ahsItem' => function ($ahsItem) {
-        $ahsItem->with(['ahsItemable', 'unit']);
-      }])
+      ->with([
+          'referenceGroup',
+          'ahsItem.unit',
+          'ahsItem.ahsItemable' => function ($morph) use ($provinceId) {
+              $morph->morphWith([
+                ItemPrice::class => ['price' => function ($query) use ($provinceId) {
+                  $query->where('province_id', $provinceId);
+                }],
+            ]);
+          }
+      ])
       ->orderBy('created_at', 'desc');
 
 
@@ -72,8 +81,6 @@ class AhsController extends CountableItemController
     };
 
     $ahs = $query->get();
-
-    $provinceId = Hashids::decode($request->province);
 
     # Categorizing by section
     if ($request->arrange == 'true' && $request->has('province')) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\CustomException;
+use App\Models\Ahs;
 use App\Models\CustomAhs;
 use App\Models\Project;
 use App\Models\Rab;
@@ -37,10 +38,12 @@ class RabItemController extends Controller
 
   public function store(Project $project, Rab $rab, Request $request)
   {
-
+    $defaultUnit = Unit::where('name', 'Ls')->first() ?? Unit::first();
     $request->merge([
       'rab_id' => $rab->hashidToId($rab->hashid),
-      'unit_id' => ($request->has('unit_id') && $request->rab_item_header_id) ? Unit::findByHashid($request->unit_id)->id : Unit::first()->id,
+      'unit_id' => ($request->has('unit_id') && $request->rab_item_header_id)
+        ? Unit::findByHashid($request->unit_id)->id
+        : $defaultUnit->id,
       'rab_item_header_id' => ($request->has('rab_item_header_id') && $request->rab_item_header_id) ? Hashids::decode($request->rab_item_header_id)[0] : NULL,
     ]);
 
@@ -98,10 +101,12 @@ class RabItemController extends Controller
     try {
       // 1. Find or create custom ahs based on selected ahs
       if ($request->referenceGroupId) {
+        $masterAhs = Ahs::where('id', $request->ahs_id)->first();
         $custom_ahs = $this->customAhsService->customFromMasterAhs(
           $project,
-          $request->ahs_id,
-          $request->referenceGroupId
+          $masterAhs,
+          $masterAhs->code,
+          $masterAhs->name
         );
         if ($custom_ahs === null) {
           throw new CustomException("AHS tidak ditemukan!");

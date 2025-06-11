@@ -39,10 +39,10 @@ class ItemPrice extends Model
         return $this->morphMany(AhsItem::class, 'ahsItemable');
     }
 
-    public static function withPriceByProvince($provinceId)
+    public function priceByProvince($provinceId)
     {
-        return parent::with(['price' => function($q) use ($provinceId) {
-            $q->where('province_id', $provinceId);
-        }]);
+        return $this->hasOne(ItemPriceProvince::class, 'item_price_id')
+            ->where('province_id', $provinceId)
+            ->select('id', 'item_price_id', 'price', 'province_id');
     }
 }

@@ -139,6 +139,12 @@ class CountableItemController extends Controller
 
         foreach ($ahs->ahsItem as $ahsItem) {
             $ahsItem->subtotal = $this->countAhsItemTotal($ahsItem, $province);
+            if ($ahsItem->ahs_itemable_type === Ahs::class) {
+                $ahsItem->price = $ahsItem->ahsItemable->subtotal ?? 0;
+            }
+            if ($ahsItem->ahs_itemable_type === ItemPrice::class) {
+                $ahsItem->price = $ahsItem->ahsItemable->price?->first()?->price ?? 0;
+            }
             $ahsSubtotal += $ahsItem->subtotal;
         }
 
