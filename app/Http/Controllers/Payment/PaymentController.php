@@ -247,7 +247,7 @@ class PaymentController extends Controller
 
             $order->save();
 
-            if (env('APP_ENV') === 'local') {
+            if (env('APP_ENV') === 'local' || $subscriptionPrice->subscription->id == SubscriptionType::DEMO->value) {
                 OrderHelper::setOrderAsSuccessful($order);
             }
 
