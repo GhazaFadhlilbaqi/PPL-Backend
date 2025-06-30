@@ -16,6 +16,11 @@ class SubscriptionFeatureSeeder extends Seeder
   public function run()
   {
     $mapping = [
+      'demo' => [
+        'RAB_TEMPLATE',
+        'ITEM_PRICE_REFERENCE',
+        'AHSP_PUPR_2024_REFERENCE'
+      ],
       'student' => [
         'RAB_TEMPLATE',
         'ITEM_PRICE_REFERENCE',

@@ -12,7 +12,6 @@ class SubscriptionController extends Controller
     {
         $subscriptions = Subscription::with(['features', 'prices'])
             ->orderBy('order', 'ASC')
-            ->where('id', '!=', 'demo')
             ->get();
         return response()->json([
             'status' => 'success',

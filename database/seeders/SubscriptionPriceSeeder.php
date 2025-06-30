@@ -78,6 +78,15 @@ class SubscriptionPriceSeeder extends Seeder
           'min_duration' => 1,
           'is_active' => true
         ]
+      ],
+      'demo' => [
+        [
+          'duration_type' => 'MONTHLY',
+          'price' => 0,
+          'discounted_price' => 0,
+          'min_duration' => 1,
+          'is_active' => true
+        ]
       ]
     ];
 

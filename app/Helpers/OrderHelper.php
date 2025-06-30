@@ -59,7 +59,7 @@ class OrderHelper
         'last_opened_at' => now()
       ]);
 
-      $projectTemporary->delete();
+      $projectTemporary?->delete();
 
       DB::commit();
 

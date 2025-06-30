@@ -14,6 +14,7 @@ use App\Http\Controllers\Midtrans\Snap;
 use App\Models\Order;
 use App\Models\ProjectTemporary;
 use App\Models\SubscriptionPrice;
+use App\Models\User;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -192,12 +193,6 @@ class PaymentController extends Controller
                 );
             }
 
-            MidtransConfig::$serverKey = config('app.midtrans_env') == 'production'
-                ? env('MIDTRANS_SERVER_KEY_PRODUCTION')
-                : env('MIDTRANS_SERVER_KEY_DEVELOPMENT');
-            MidtransConfig::$isProduction = config('app.midtrans_env') == 'production';
-            MidtransConfig::$is3ds = true;
-
             $order = $this->orderService->createOrder([
                 'user_id' => $user->id,
                 'type' => $request->type
@@ -240,22 +235,33 @@ class PaymentController extends Controller
                 ],
             ];
 
-            $snapToken = MidtransSnap::getSnapToken($params);
+            if ($subscriptionPrice->subscription->id != SubscriptionType::DEMO->value) {
+                MidtransConfig::$serverKey = config('app.midtrans_env') == 'production'
+                    ? env('MIDTRANS_SERVER_KEY_PRODUCTION')
+                    : env('MIDTRANS_SERVER_KEY_DEVELOPMENT');
+                MidtransConfig::$isProduction = config('app.midtrans_env') == 'production';
+                MidtransConfig::$is3ds = true;
+                $snapToken = MidtransSnap::getSnapToken($params);
+                $order->midtrans_snap_token = $snapToken;
+            }
 
-            $order->midtrans_snap_token = $snapToken;
             $order->save();
 
             if (env('APP_ENV') === 'local') {
                 OrderHelper::setOrderAsSuccessful($order);
             }
 
+            if ($subscriptionPrice->subscription->id == SubscriptionType::DEMO->value) {
+                $user = User::find(Auth::id());
+                $user->demo_quota = $user->demo_quota - 1;
+                $user->save();
+            }
+
             DB::commit();
 
             return response()->json([
                 'status' => 'success',
-                'data' => [
-                    'snap_token' => $snapToken,
-                ]
+                'data' => ['snap_token' => $snapToken ?? 'demo']
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
