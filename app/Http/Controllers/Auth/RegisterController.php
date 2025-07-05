@@ -79,10 +79,9 @@ class RegisterController extends Controller
 
     private function createUserAccount(RegisterRequest $request) {
         $request->merge([
-            'password' => Hash::make($request->password),
-            'demo_quota' => 1
+            'password' => Hash::make($request->password)
         ]);
-        $user = User::create($request->only(['first_name', 'last_name', 'email', 'password', 'job', 'phone', 'demo_quota']));
+        $user = User::create($request->only(['first_name', 'last_name', 'email', 'password', 'job', 'phone']));
         $user->assignRole('owner');
         if (!app()->environment('local')) {
             $this->sendVerificationMail($user);
