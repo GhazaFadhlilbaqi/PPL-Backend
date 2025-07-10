@@ -13,6 +13,8 @@ use App\Models\Province;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Vinkla\Hashids\Facades\Hashids;
@@ -149,33 +151,41 @@ class ItemPriceController extends Controller
   # NOTE: Should using ItemPriceRequest validation request class
   public function update($item_price_id, Request $request)
   {
-    // 1) Validate request
-    $request->validate([
-      'group_id' => 'required',
-      'id' => 'required',
-      'name' => 'required',
-      'price' => 'required|numeric',
-      'unit_id' => 'required'
+    $validated = $request->validate([
+        'id' => ['required', 'string'],
+        'group_id' => ['required', 'string'],
+        'unit_id' => ['required', 'string'],
+        'province_id' => ['required', 'string'],
+        'name' => ['required', 'string'],
+        'price' => ['required', 'numeric'],
     ]);
-    $request['group_id'] = Hashids::decode($request->group_id)[0];
-    $request['unit_id'] = Hashids::decode($request->unit_id)[0];
 
-    // 2) Update item price
-    ItemPrice::where('id', $item_price_id)->update(
-      $request->only(['id', 'item_price_group_id', 'unit_id', 'name'])
-    );
+    DB::transaction(function () use ($item_price_id, $validated) {
+        $itemPrice = ItemPrice::find($item_price_id);
+        $itemPrice->update([
+            'id' => $validated['id'],
+            'item_price_group_id' => Hashids::decode($validated['group_id'])[0],
+            'unit_id' => Hashids::decode($validated['unit_id'])[0],
+            'name' => $validated['name'],
+        ]);
 
-    // 3) Update item price province
-    ItemPriceProvince::where([
-      'item_price_id' => $request->id
-    ])->update($request->only(['price']));
+        $itemPriceProvince = ItemPriceProvince::where('item_price_id', $itemPrice->id)->first();
+        if (!isset($itemPriceProvince)) {
+            $decodedProvince = Hashids::decode($validated['province_id'])[0];
+            ItemPriceProvince::create([
+                'item_price_id' => $itemPrice->id,
+                'province_id' => $decodedProvince,
+                'price' => $validated['price']
+            ]);
+        } else {
+            $itemPriceProvince->update(["price" => $validated['price']]);
+        }
 
-    // 4) Update related AHS
-    if ($item_price_id != $request->id) {
-      AhsItem::where('ahs_itemable_id', $item_price_id)->update([
-        'ahs_itemable_id' => $request->id
-      ]);
-    }
+        if ($item_price_id != $validated['id']) {
+            $ahsItem = AhsItem::where('ahs_itemable_id', $item_price_id)->first();
+            $ahsItem->update(['ahs_itemable_id' => $validated['id']]);
+        }
+    });
 
     return response()->json([
       'status' => 'success',
