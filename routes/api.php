@@ -29,6 +29,7 @@ use App\Http\Controllers\Order\OrderController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RabController;
+use App\Http\Controllers\RabImportController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\RabItemController;
 use App\Http\Controllers\RabItemHeaderController;
@@ -232,6 +233,7 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
         Route::prefix('rab')->group(function() {
             Route::get('', [RabController::class, 'index']);
             Route::post('', [RabController::class, 'store']);
+            Route::post('import', [RabImportController::class, 'import']);
             Route::get('{rab}/delete', [RabController::class, 'destroy']);
             Route::post('{rab}', [RabController::class, 'update']);
 
