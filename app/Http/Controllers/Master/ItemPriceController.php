@@ -14,7 +14,6 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Vinkla\Hashids\Facades\Hashids;
@@ -183,7 +182,7 @@ class ItemPriceController extends Controller
 
         if ($item_price_id != $validated['id']) {
             $ahsItem = AhsItem::where('ahs_itemable_id', $item_price_id)->first();
-            $ahsItem->update(['ahs_itemable_id' => $validated['id']]);
+            $ahsItem?->update(['ahs_itemable_id' => $validated['id']]);
         }
     });
 
