@@ -183,7 +183,7 @@ class ItemPriceController extends Controller
 
         if ($item_price_id != $validated['id']) {
             $ahsItem = AhsItem::where('ahs_itemable_id', $item_price_id)->first();
-            $ahsItem->update(['ahs_itemable_id' => $validated['id']]);
+            $ahsItem?->update(['ahs_itemable_id' => $validated['id']]);
         }
     });
 
