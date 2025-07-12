@@ -321,29 +321,30 @@ class ProjectController extends Controller
             ->get(); 
         $mappedRabs = $rabs->map(function ($rab) {
             $mappedRabItems = $rab->rabItem->map(function ($rabItem) {
+                $customAhsItems = $rabItem->customAhs?->customAhsItem->map(function ($customAhsItem) use ($rabItem) {
+                    $unitName = $customAhsItem->custom_ahs_itemable_type == CustomAhs::class
+                        ? $customAhsItem->unit->name
+                        : $customAhsItem->customAhsItemable->unit->name;
+                    $customAhsItemPrice = $customAhsItem->customAhsItemable->price;
+                    if ( $customAhsItem->custom_ahs_itemable_type == CustomAhs::class) {
+                        $customAhsItemPrice = $customAhsItem->customAhsItemable->customAhsItem
+                            ->sum(function ($customAhsItem) {
+                                return $customAhsItem->customAhsItemable->price ?? 0;
+                            });
+                    }
+                    return [
+                        'name' => $customAhsItem->customAhsItemable->name,
+                        'coefficient' => $customAhsItem->coefficient,
+                        'price' => $customAhsItemPrice ,
+                        'unitName' => $unitName,
+                        'totalNeeds' => $rabItem->volume * $customAhsItem->coefficient,
+                        'totalPrice' => $customAhsItem->coefficient * $customAhsItemPrice
+                    ];
+                });
                 return [
                     'volume' => $rabItem->volume,
-                    'customAhsName' => $rabItem->customAhs->name,
-                    'customAhsItems' => $rabItem->customAhs->customAhsItem->map(function ($customAhsItem) use ($rabItem) {
-                        $unitName = $customAhsItem->custom_ahs_itemable_type == CustomAhs::class
-                            ? $customAhsItem->unit->name
-                            : $customAhsItem->customAhsItemable->unit->name;
-                        $customAhsItemPrice = $customAhsItem->customAhsItemable->price;
-                        if ( $customAhsItem->custom_ahs_itemable_type == CustomAhs::class) {
-                            $customAhsItemPrice = $customAhsItem->customAhsItemable->customAhsItem
-                                ->sum(function ($customAhsItem) {
-                                    return $customAhsItem->customAhsItemable->price ?? 0;
-                                });
-                        }
-                        return [
-                            'name' => $customAhsItem->customAhsItemable->name,
-                            'coefficient' => $customAhsItem->coefficient,
-                            'price' => $customAhsItemPrice ,
-                            'unitName' => $unitName,
-                            'totalNeeds' => $rabItem->volume * $customAhsItem->coefficient,
-                            'totalPrice' => $customAhsItem->coefficient * $customAhsItemPrice
-                        ];
-                    })
+                    'customAhsName' => $rabItem->customAhs->name ?? '-',
+                    'customAhsItems' => $customAhsItems  ?? []
                 ];
             });
             return [
