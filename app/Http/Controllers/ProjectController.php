@@ -7,9 +7,13 @@ use App\Exports\ProjectRabExport;
 use App\Helpers\ProjectHelper;
 use App\Http\Requests\ProjectRequest;
 use App\Http\Resources\FeatureResource;
+use App\Models\CustomAhs;
+use App\Models\CustomItemPrice;
+use App\Models\ItemPrice;
 use App\Models\Order;
 use App\Models\Project;
 use App\Models\Province;
+use App\Models\Rab;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -286,11 +290,21 @@ class ProjectController extends Controller
                     $mergedAhsItem['total_coefficient'] = $mergedAhsItem['total_coefficient'] + $ahsItem->coefficient;
                     continue;
                 }
+                $unitName = $ahsItem->custom_ahs_itemable_type == CustomAhs::class
+                    ? $ahsItem->unit->name
+                    : $customAhsItem->unit->name;
+                $customAhsItemPrice = $customAhsItem->price;
+                if ($ahsItem->custom_ahs_itemable_type == CustomAhs::class) {
+                    $customAhsItemPrice = $customAhsItem->customAhsItem
+                        ->sum(function ($customAhsItem) {
+                            return $customAhsItem->customAhsItemable->price ?? 0;
+                        });
+                }
                 $mergedAhsItems->push(new Collection([
                     'name' => $customAhsItem->name,
-                    'unit_name' => $customAhsItem->unit->name,
+                    'unit_name' => $unitName,
                     'total_coefficient' => $ahsItem->coefficient,
-                    'total_price' => $customAhsItem->price,
+                    'total_price' => $ahsItem->coefficient * $customAhsItemPrice,
                     'section' => $ahsItem->section
                 ]));
             }
@@ -299,6 +313,47 @@ class ProjectController extends Controller
         return $mergedAhsItems->sortBy('name')->values()->sortBy(function ($item) {
             return $item['section'] != AhsSectionEnum::LABOR->value && $item['section'] == null;
         })->values();
+    }
+
+    function rabItemPrices(Project $project, Request $request) {
+        $rabs = Rab::where('project_id', $project->id)
+            ->with('rabItem.customAhs.customAhsItem.customAhsItemable')
+            ->get(); 
+        $mappedRabs = $rabs->map(function ($rab) {
+            $mappedRabItems = $rab->rabItem->map(function ($rabItem) {
+                return [
+                    'volume' => $rabItem->volume,
+                    'customAhsName' => $rabItem->customAhs->name,
+                    'customAhsItems' => $rabItem->customAhs->customAhsItem->map(function ($customAhsItem) use ($rabItem) {
+                        $unitName = $customAhsItem->custom_ahs_itemable_type == CustomAhs::class
+                            ? $customAhsItem->unit->name
+                            : $customAhsItem->customAhsItemable->unit->name;
+                        $customAhsItemPrice = $customAhsItem->customAhsItemable->price;
+                        if ( $customAhsItem->custom_ahs_itemable_type == CustomAhs::class) {
+                            $customAhsItemPrice = $customAhsItem->customAhsItemable->customAhsItem
+                                ->sum(function ($customAhsItem) {
+                                    return $customAhsItem->customAhsItemable->price ?? 0;
+                                });
+                        }
+                        return [
+                            'name' => $customAhsItem->customAhsItemable->name,
+                            'coefficient' => $customAhsItem->coefficient,
+                            'price' => $customAhsItemPrice ,
+                            'unitName' => $unitName,
+                            'totalNeeds' => $rabItem->volume * $customAhsItem->coefficient,
+                            'totalPrice' => $customAhsItem->coefficient * $customAhsItemPrice
+                        ];
+                    })
+                ];
+            });
+            return [
+                'name' => $rab->name,
+                'rabItems' => $mappedRabItems
+            ];
+        });
+        return [
+            'rabs' => $mappedRabs
+        ];
     }
 
     private function giveUnbelongedAccessResponse()
