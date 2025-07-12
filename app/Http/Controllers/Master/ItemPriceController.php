@@ -151,7 +151,7 @@ class ItemPriceController extends Controller
   public function update($item_price_id, Request $request)
   {
     $validated = $request->validate([
-        'id' => ['required', 'string'],
+        'id' => ['required', 'string', 'max:16'],
         'group_id' => ['required', 'string'],
         'unit_id' => ['required', 'string'],
         'province_id' => ['required', 'string'],

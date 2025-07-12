@@ -229,6 +229,7 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
         Route::get('export', [ProjectController::class, 'export'])->middleware('project.ensure-project-eligible-to-export');
         Route::post('renew', [ProjectController::class, 'renew']);
         Route::get('material-summary', [ProjectController::class, 'getMaterialSummary']);
+        Route::get('rab-item-prices', [ProjectController::class, 'rabItemPrices']);
 
         Route::prefix('rab')->group(function() {
             Route::get('', [RabController::class, 'index']);
