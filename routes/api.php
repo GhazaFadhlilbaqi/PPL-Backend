@@ -234,7 +234,9 @@ Route::prefix('project')->middleware(['auth:sanctum', 'can:access-project-page']
         Route::prefix('rab')->group(function() {
             Route::get('', [RabController::class, 'index']);
             Route::post('', [RabController::class, 'store']);
+            Route::get('export-lpse', [RabController::class, 'exportLPSE']);
             Route::post('import', [RabImportController::class, 'import']);
+            Route::post('import-lpse', [RabImportController::class, 'importLPSE']);
             Route::get('{rab}/delete', [RabController::class, 'destroy']);
             Route::post('{rab}', [RabController::class, 'update']);
 

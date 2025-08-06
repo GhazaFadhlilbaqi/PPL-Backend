@@ -40,6 +40,7 @@ class SubscriptionFeatureSeeder extends Seeder
         'ITEM_PRICE_REFERENCE',
         'AHSP_PUPR_2024_REFERENCE',
         'RAB_EXCEL_EXPORT',
+        'RAB_LPSE_EXPORT',
         'SIMPLE_RAB_REFERENCE',
         'CREATE_IMPLEMENTATION_SCHEDULE',
         'CREATE_AUTOMATED_SCURVE',

@@ -20,6 +20,7 @@ class FeatureSeeder extends Seeder
       ['code' => 'ITEM_PRICE_REFERENCE', 'name' =>  'Referensi harga satuan'],
       ['code' => 'AHSP_PUPR_2024_REFERENCE', 'name' =>  'Referensi AHSP Permen PUPR 2024'],
       ['code' => 'RAB_EXCEL_EXPORT', 'name' =>  'Export perhitungan RAB dalam bentuk file Excel'],
+      ['code' => 'RAB_LPSE_EXPORT', 'name' =>  'Export perhitungan RAB dalam bentuk file Excel APENDO LPSE'],
       ['code' => 'SIMPLE_RAB_REFERENCE', 'name' =>  'Referensi RAB sederhana'],
       ['code' => 'CREATE_IMPLEMENTATION_SCHEDULE', 'name' =>  'Pembuatan Jadwal Pelaksanaan'],
       ['code' => 'CREATE_AUTOMATED_SCURVE', 'name' =>  'Pembuatan Kurva S secara otomatis'],

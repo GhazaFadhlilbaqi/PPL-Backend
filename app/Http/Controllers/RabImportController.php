@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\LPSEImport;
 use App\Imports\RabExcelImport;
 use App\Models\Project;
 use Illuminate\Http\Request;
@@ -17,6 +18,23 @@ class RabImportController extends Controller
 
         try {
             Excel::import(new RabExcelImport($project), $request->file('file'));
+            return response()->json(['status' => 'success']);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function importLPSE(Request $request, Project $project)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv'
+        ]);
+
+        try {
+            Excel::import(new LPSEImport($project), $request->file('file'));
             return response()->json(['status' => 'success']);
         } catch (\Throwable $e) {
             return response()->json([

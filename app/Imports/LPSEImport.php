@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use App\Models\RabItemHeader;
 
-class RabExcelImport implements ToCollection, WithStartRow
+class LPSEImport implements ToCollection, WithStartRow
 {
     protected $project;
 
@@ -23,7 +23,7 @@ class RabExcelImport implements ToCollection, WithStartRow
 
     public function startRow(): int
     {
-        return 12;
+        return 8;
     }
 
     public function collection(Collection $rows)
@@ -41,47 +41,25 @@ class RabExcelImport implements ToCollection, WithStartRow
         $currentRab = null;
         $currentHeader = null;
 
-        foreach ($rows as $i => $row) {
-            $no = trim((string) ($row[0] ?? ''));
-            $uraian = trim((string) ($row[1] ?? ''));
-            $volume = str_replace(',', '.', (string) ($row[3] ?? ''));
-            $satuan = trim((string) ($row[4] ?? ''));
-            $hargaSatuan = preg_replace('/[^\d.]/', '', (string) ($row[5] ?? ''));
-                
-            $result = preg_match('/^[IVXLCDM]+$/', $no);
-
-            $isPossibleHeader = !empty($no) &&
-            preg_match('/^[IVXLCDM]+$/', $no) &&
-            empty($row[2]) && empty($row[3]) && empty($row[4]) && empty($row[5]);
+        $isPossibleHeader = empty($satuan);
         
-            if ($no === '') {
+        if ($isPossibleHeader) {
+            $currentRab = Rab::create([
+                'project_id' => $this->project->id,
+                'name' => "RAB APENDO LPSE",
+            ]);
+        }
+
+        foreach ($rows as $i => $row) {
+            $uraian = trim((string) ($row[0] ?? ''));
+            $volume = str_replace(',', '.', (string) ($row[2] ?? ''));
+            $satuan = trim((string) ($row[1] ?? ''));
+            // $hargaSatuan = preg_replace('/[^\d.]/', '', (string) ($row[5] ?? ''));
+
+            if ($uraian === '') {
                 continue;
             }        
-
-            if ($isPossibleHeader) {
-                if ($currentRab) {
-                    $currentHeader = RabItemHeader::create([
-                        'rab_id' => $currentRab->id,
-                        'name' => $uraian,
-                    ]);
-                } else {
-                }
-                continue;
-            }
-
-            if ($uraian && !is_numeric($no)) {
-                $currentRab = Rab::create([
-                    'project_id' => $this->project->id,
-                    'name' => $uraian,
-                ]);
-                $currentHeader = null;
-                continue;
-            }
-        
-            if (!$currentRab) {
-                continue;
-            }
-        
+                        
             if (str_contains(strtolower($uraian), 'total')) continue;
         
             $unit = \App\Models\Unit::whereRaw('LOWER(name) = ?', [strtolower($satuan)])->first();

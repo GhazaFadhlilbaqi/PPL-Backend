@@ -13,12 +13,14 @@ use App\Models\ItemPrice;
 use App\Models\ItemPriceGroup;
 use App\Models\Project;
 use App\Models\Rab;
+use App\Exports\LPSEExportSheet;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\MasterRab;
 use App\Models\RabItem;
 use App\Models\RabItemHeader;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RabController extends CountableItemController
 {
@@ -98,6 +100,18 @@ class RabController extends CountableItemController
             'status' => 'success',
             'data' => compact('rabs')
         ]);
+    }
+
+    public function exportLPSE(Project $project)
+    {
+        $projectId = $project->hashidToId($project->hashid);
+
+        return Excel::download(
+            new LPSEExportSheet(
+              $projectId
+            ),
+            'Master Ahs.xlsx'
+          );
     }
 
     public function store(Request $request, Project $project)
