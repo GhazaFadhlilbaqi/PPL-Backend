@@ -9,6 +9,7 @@ use App\Http\Requests\AhsRequest;
 
 use App\Models\Ahs;
 use App\Models\AhsItem;
+use App\Models\AhsReferenceGroup;
 use App\Models\ItemPrice;
 use Vinkla\Hashids\Facades\Hashids;
 
@@ -280,9 +281,11 @@ class AhsController extends CountableItemController
 
   public function export()
   {
+    $ahsReferenceGroups = AhsReferenceGroup::all(); 
+
     return Excel::download(
       new MasterAhsExportController(
-        $this->masterAhsGroups,
+        $ahsReferenceGroups,
         $this->ahsItemTypes
       ),
       'Master Ahs.xlsx'

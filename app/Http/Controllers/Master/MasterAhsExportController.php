@@ -69,12 +69,12 @@ class MasterAhsExportSheet extends CountableItemController implements FromCollec
       $ahsList = Ahs::all();
       $this->totalAhsCount = count($ahsList);
       foreach ($ahsList as $index => $ahs) {
-        $masterAhsGroup = collect($this->masterAhsGroups)->firstWhere('key', $ahs->groups);
+        $masterAhsGroup = collect($this->masterAhsGroups)->firstWhere('id', $ahs->reference_group_id);
         
         $ahsCollection->push([
           $index + 1,
           $ahs->id,
-          $masterAhsGroup['title'] ?? '-',
+          $ahs->referenceGroup->name,
           $ahs->name
         ]);
       }
