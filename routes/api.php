@@ -54,6 +54,7 @@ Route::middleware(('auth:sanctum'))->group(function() {
     Route::put('users/{user}/demo-quota', [UserController::class, 'updateDemoQuota']);
 
     Route::prefix('admin')->group(function() {
+        Route::get('projects/download', [AdminProjectController::class, 'download']);
         Route::resource('projects', AdminProjectController::class);
     });
 

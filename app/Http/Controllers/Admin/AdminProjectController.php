@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\AdminProjectExport;
 use App\Http\Controllers\Controller;
 use App\Helpers\OrderHelper;
 use App\Models\Order;
@@ -12,6 +13,7 @@ use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
 use Vinkla\Hashids\Facades\Hashids;
 
 class AdminProjectController extends Controller
@@ -138,5 +140,9 @@ class AdminProjectController extends Controller
             'status' => 'success',
             'data' => compact('project')
         ]);
+    }
+
+    public function download() {
+        return Excel::download(new AdminProjectExport, 'admin-projects.xlsx');
     }
 }
