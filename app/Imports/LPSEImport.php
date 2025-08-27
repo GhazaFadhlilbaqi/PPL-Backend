@@ -11,10 +11,13 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use App\Models\RabItemHeader;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\BeforeImport;
 
-class LPSEImport implements ToCollection, WithStartRow
+class LPSEImport implements ToCollection, WithStartRow, WithEvents
 {
     protected $project;
+    protected $firstCellValue;
 
     public function __construct(Project $project)
     {
@@ -24,6 +27,16 @@ class LPSEImport implements ToCollection, WithStartRow
     public function startRow(): int
     {
         return 8;
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            BeforeImport::class => function (BeforeImport $event) {
+                $sheet = $event->reader->getDelegate()->getActiveSheet();
+                $this->firstCellValue = trim((string) $sheet->getCell('A1')->getValue());
+            },
+        ];
     }
 
     public function collection(Collection $rows)
@@ -46,7 +59,7 @@ class LPSEImport implements ToCollection, WithStartRow
         if ($isPossibleHeader) {
             $currentRab = Rab::create([
                 'project_id' => $this->project->id,
-                'name' => "RAB APENDO LPSE",
+                'name' => $this->firstCellValue ?? "RAB APENDO LPSE",
             ]);
         }
 
