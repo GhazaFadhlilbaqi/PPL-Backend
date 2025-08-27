@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use App\Models\RabItemHeader;
 
-class RabExcelImport implements ToCollection, WithStartRow
+class RabExcelImport implements ToCollection
 {
     protected $project;
 
@@ -21,13 +21,22 @@ class RabExcelImport implements ToCollection, WithStartRow
         $this->project = $project;
     }
 
-    public function startRow(): int
-    {
-        return 12;
-    }
-
     public function collection(Collection $rows)
     {
+        $startIndex = null;
+
+        foreach ($rows as $i => $row) {
+            if (trim($row[0]) === 'No' && trim($row[1]) === 'URAIAN PEKERJAAN') {
+                $startIndex = $i + 1;
+                break;
+            }
+        }
+    
+        if ($startIndex === null) {
+            // Could not find the expected header row
+            return;
+        }
+    
         // Find existing RABs
         $existingRabs = Rab::where('project_id', $this->project->id)->get();
     
@@ -41,7 +50,7 @@ class RabExcelImport implements ToCollection, WithStartRow
         $currentRab = null;
         $currentHeader = null;
 
-        foreach ($rows as $i => $row) {
+        foreach ($rows->slice($startIndex) as $row) {
             $no = trim((string) ($row[0] ?? ''));
             $uraian = trim((string) ($row[1] ?? ''));
             $volume = str_replace(',', '.', (string) ($row[3] ?? ''));
